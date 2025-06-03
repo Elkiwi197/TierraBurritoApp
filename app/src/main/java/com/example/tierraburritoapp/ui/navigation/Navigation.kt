@@ -81,11 +81,10 @@ fun Navigation() {
             composable<DetallePlato> { navBackStackEntry ->
                 val detalle = navBackStackEntry.toRoute() as DetallePlato
                 DetallePlatoPantalla(
-                    platoId = detalle.id,
+                    platoId = detalle.idPlato,
                     showSnackbar = { showSnackbar(it) }
                 )
             }
-
         }
     }
 }

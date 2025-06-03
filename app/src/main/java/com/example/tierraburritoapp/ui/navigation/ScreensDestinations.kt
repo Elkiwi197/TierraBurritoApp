@@ -10,7 +10,7 @@ object Login
 object ListaPlatos
 
 @Serializable
-data class DetallePlato(val id: Int)
+data class DetallePlato(val idPlato: Int)
 
 @Serializable
 data class PedidoActual(val pedido: Pedido)

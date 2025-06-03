@@ -31,7 +31,6 @@ class DetallePlatoViewModel @Inject constructor(
             when (val result = getPlatoByIdUseCase(id)) {
                 is NetworkResult.Success -> _uiState.value =
                     _uiState.value.copy(isLoading = false, plato = result.data)
-
                 is NetworkResult.Error -> _uiState.value =
                     _uiState.value.copy(isLoading = false)//todo llamar al snackbar
                 is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)

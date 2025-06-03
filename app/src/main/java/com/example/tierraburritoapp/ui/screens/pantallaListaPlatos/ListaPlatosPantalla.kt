@@ -70,7 +70,7 @@ fun ListaPlatosPantalla(
                 items(uiState.platos) { plato ->
                     PlatoCard(
                         plato = plato,
-                        onClick = { onNavigateToDetallePlato(plato.id) }
+                        onNavigateToDetallePlato =  onNavigateToDetallePlato
                     )
                 }
             }
@@ -81,14 +81,14 @@ fun ListaPlatosPantalla(
 @Composable
 fun PlatoCard(
     plato: Plato,
-    onClick: () -> Unit
+    onNavigateToDetallePlato: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(color = MaterialTheme.colorScheme.background)
-            .clickable { onClick() },
+            .clickable { onNavigateToDetallePlato(plato.id) },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
