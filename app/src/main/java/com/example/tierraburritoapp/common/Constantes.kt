@@ -2,6 +2,7 @@ package com.example.tierraburritoapp.common
 
 object Constantes {
 
+    const val FOTO_PLATO = "Imagen del plato"
     const val CLIENTE = "CLIENTE"
     const val REPARTIDOR = "REPARTIDOR"
     const val DETALLE_PLATO = "DetallePlato"
@@ -14,7 +15,7 @@ object Constantes {
     const val LOADING_INDICATOR = "LoadingIndicator"
     const val RutaFoto = "RutaFoto"
     const val PRECIO = "Precio"
-    const val PELICULAS: String = "borrar"
+    const val PLATOS: String = "Platos"
     const val LOCALIZED_DESCRIPTION = "adf"
     const val ERROR_DESCONOCIDO = "Hubo un fallo inesperado"
     const val ID = "Id"
@@ -25,4 +26,5 @@ object Constantes {
     const val ERROR_INICIANDO_SESION = "Error iniciando sesión"
     const val CORREO_CONTRASENA_INCORRECTOS = "Correo o contraseña incorrectos"
     const val USUARIO_ANADIDO = "Usuario añadido con éxito"
+    const val PEDIDO_ACTUAL = "Pedido actual"
 }

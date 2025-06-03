@@ -18,15 +18,19 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
     companion object {
         private val ACCESS_TOKEN = stringPreferencesKey("ACCESS_TOKEN")
         private val REFRESH_TOKEN = stringPreferencesKey("REFRESH_TOKEN")
+        private val SIMPLE_TOKEN = stringPreferencesKey("SIMPLE_TOKEN")
     }
 
-    fun getToken(): Flow<String?> {
+    fun getAccessToken(): Flow<String?> {
         return context.dataStore.data.map { preferences -> preferences[ACCESS_TOKEN] }
     }
 
-    // Método para obtener el refresh token
     fun getRefreshToken(): Flow<String?> {
         return context.dataStore.data.map { preferences -> preferences[REFRESH_TOKEN] }
+    }
+
+    fun getSimpleToken(): Flow<String?> {
+        return context.dataStore.data.map { preferences -> preferences[SIMPLE_TOKEN] }
     }
 
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
@@ -36,12 +40,16 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
         }
     }
 
-    // Método para eliminar ambos tokens
     suspend fun deleteTokens() {
         context.dataStore.edit { preferences ->
             preferences.remove(ACCESS_TOKEN)
             preferences.remove(REFRESH_TOKEN)
         }
     }
+
+    suspend fun saveToken(token: String) {
+        context.dataStore.edit { preferences ->
+            preferences[SIMPLE_TOKEN] = token
+        }    }
 }
 

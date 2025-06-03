@@ -20,18 +20,20 @@ class DetallePlatoViewModel @Inject constructor(
 
     fun handleEvent(event: DetallePlatoContract.DetallePlatoEvent) {
         when (event) {
-            is DetallePlatoContract.DetallePlatoEvent.LoadPlato -> obtenerDetalle(event.id)
+            is DetallePlatoContract.DetallePlatoEvent.LoadPlato -> getPlatoById(event.id)
             is DetallePlatoContract.DetallePlatoEvent.UiEventDone -> clearUiEvents()
         }
     }
 
-    private fun obtenerDetalle(id: Int) {
+    private fun getPlatoById(id: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             when (val result = getPlatoByIdUseCase(id)) {
                 is NetworkResult.Success -> _uiState.value =
                     _uiState.value.copy(isLoading = false, plato = result.data)
-                is NetworkResult.Error -> _uiState.value = _uiState.value.copy(isLoading = false)//todo llamar al snackbar
+
+                is NetworkResult.Error -> _uiState.value =
+                    _uiState.value.copy(isLoading = false)//todo llamar al snackbar
                 is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
             }
         }

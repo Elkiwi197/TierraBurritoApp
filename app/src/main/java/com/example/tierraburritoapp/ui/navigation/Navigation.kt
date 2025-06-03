@@ -60,6 +60,14 @@ fun Navigation() {
             navController = navController,
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable<Login> {
+                LoginSignupPantalla(
+                    onNavigateToListaPlatos = {
+                        navController.navigate(ListaPlatos)
+                    },
+                    showSnackbar = { showSnackbar(it) }
+                )
+            }
 
             composable<ListaPlatos> {
                 ListaPlatosPantalla(
@@ -74,14 +82,6 @@ fun Navigation() {
                 val detalle = navBackStackEntry.toRoute() as DetallePlato
                 DetallePlatoPantalla(
                     platoId = detalle.id,
-                    showSnackbar = { showSnackbar(it) }
-                )
-            }
-            composable<Login> {
-                LoginSignupPantalla(
-                    onNavigateToListaPlatos = {
-                        navController.navigate(ListaPlatos)
-                    },
                     showSnackbar = { showSnackbar(it) }
                 )
             }

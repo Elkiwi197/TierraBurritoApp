@@ -2,7 +2,6 @@ package com.example.tierraburritoapp.data.remote.datasource
 
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.model.TipoUsuario
-import com.example.tierraburritoapp.data.model.TokenResponse
 import com.example.tierraburritoapp.data.model.UsuarioLogin
 import com.example.tierraburritoapp.data.model.UsuarioSignup
 import com.example.tierraburritoapp.data.remote.NetworkResult
@@ -30,8 +29,13 @@ class LoginSignupDataSource @Inject constructor(
         return result
     }
 
-    suspend fun logInUsuario(request: UsuarioLogin): NetworkResult<TokenResponse> {
-        val response = loginSignupService.loginUser(request.correo, request.contrasena)
-        return safeApiCall { response }
+    suspend fun logInUsuario(usuarioLogin: UsuarioLogin): NetworkResult<String> {
+        val result = safeApiCall {
+            val response: Response<ResponseBody> =
+                loginSignupService.loginUser(usuarioLogin.correo, usuarioLogin.contrasena)
+            val message = response.body()?.string() ?: Constantes.ERROR_MAPEANDO
+            Response.success(message)
+        }
+        return result
     }
 }

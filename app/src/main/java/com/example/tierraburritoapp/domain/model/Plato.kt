@@ -1,5 +1,8 @@
 package com.example.tierraburritoapp.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Plato (
     val id: Int,
     val nombre: String,

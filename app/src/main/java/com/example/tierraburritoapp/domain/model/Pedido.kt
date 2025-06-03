@@ -1,5 +1,8 @@
 package com.example.tierraburritoapp.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Pedido (
     val id: Int,
     val direccion: String,

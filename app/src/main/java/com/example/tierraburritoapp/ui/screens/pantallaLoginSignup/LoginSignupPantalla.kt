@@ -40,7 +40,7 @@ fun LoginSignupPantalla(
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
             when (it) {
-                is UiEvent.Navigate -> onNavigateToListaPlatos()
+                is UiEvent.Navigate ->  onNavigateToListaPlatos()
                 is UiEvent.ShowSnackbar -> showSnackbar(it.message)
             }
             viewModel.handleEvent(LoginSignupContract.LoginSignupEvent.UiEventDone)
