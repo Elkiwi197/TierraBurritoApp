@@ -33,8 +33,10 @@ class LoginSignupDataSource @Inject constructor(
         val result = safeApiCall {
             val response: Response<ResponseBody> =
                 loginSignupService.loginUser(usuarioLogin.correo, usuarioLogin.contrasena)
-            val message = response.body()?.string() ?: Constantes.ERROR_MAPEANDO
-            Response.success(message)
+
+                val message = response.body()?.string() ?: Constantes.ERROR_MAPEANDO
+                Response.success(response.code(), message)
+
         }
         return result
     }

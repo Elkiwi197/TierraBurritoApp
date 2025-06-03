@@ -63,7 +63,13 @@ constructor(
         viewModelScope.launch {
             when (val result = logInUseCase(UsuarioLogin(correo = correo, contrasena = contrasena))) {
                 is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
-                is NetworkResult.Success -> _uiState.value = _uiState.value.copy(isLoading = false, uiEvent = UiEvent.Navigate())
+                is NetworkResult.Success -> {
+                    if (result.data.equals(Constantes.SESION_INICIADA)){
+                        _uiState.value = _uiState.value.copy(isLoading = false, uiEvent = UiEvent.Navigate())
+                    } else {
+                        _uiState.value = _uiState.value.copy(isLoading = false, uiEvent = UiEvent.ShowSnackbar(result.message?: "No llega el mensaje" ))
+                    }
+                }
                 is NetworkResult.Error -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     uiEvent = UiEvent.ShowSnackbar(result.message?: Constantes.ERROR_DESCONOCIDO)

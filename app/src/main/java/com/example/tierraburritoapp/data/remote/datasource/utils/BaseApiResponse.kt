@@ -9,9 +9,13 @@ abstract class BaseApiResponse {
         try {
             val response = apiCall()
             if (response.isSuccessful) {
-                val body = response.body()
-                body?.let {
-                    return NetworkResult.Success(body)
+                if (response.code() < 299){
+                    val body = response.body()
+                    body?.let {
+                        return NetworkResult.Success(body)
+                    }
+                } else {
+                    return error("${response.code()} ${response.errorBody()?.string()?.substringAfter(":")?.substringBefore("}")}")
                 }
             }
             return error("${response.code()} ${response.message()}")
