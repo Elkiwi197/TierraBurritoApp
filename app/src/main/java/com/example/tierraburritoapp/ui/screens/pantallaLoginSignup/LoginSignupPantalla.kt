@@ -27,10 +27,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.model.TipoUsuario
 import com.example.tierraburritoapp.ui.common.UiEvent
+import com.example.tierraburritoapp.ui.common.VariablesViewModel
 
 @Composable
 fun LoginSignupPantalla(
     viewModel: LoginSignupViewModel = hiltViewModel(),
+    variablesViewModel: VariablesViewModel,
     showSnackbar: (String) -> Unit,
     onNavigateToListaPlatos: () -> Unit
 ) {
@@ -40,7 +42,10 @@ fun LoginSignupPantalla(
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
             when (it) {
-                is UiEvent.Navigate ->  onNavigateToListaPlatos()
+                is UiEvent.Navigate -> {
+                    variablesViewModel.actualizarCorreoCliente(uiState.correoLogin)
+                    onNavigateToListaPlatos()
+                }
                 is UiEvent.ShowSnackbar -> showSnackbar(it.message)
             }
             viewModel.handleEvent(LoginSignupContract.LoginSignupEvent.UiEventDone)

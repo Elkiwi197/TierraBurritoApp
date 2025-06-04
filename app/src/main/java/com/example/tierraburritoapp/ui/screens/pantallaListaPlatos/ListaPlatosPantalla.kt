@@ -35,7 +35,7 @@ import com.example.tierraburritoapp.ui.common.UiEvent
 fun ListaPlatosPantalla(
     viewModel: ListaPlatosViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
-    onNavigateToDetallePlato: (Int) -> Unit
+    onNavigateToDetallePlato: (idPlato: Int) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -70,7 +70,7 @@ fun ListaPlatosPantalla(
                 items(uiState.platos) { plato ->
                     PlatoCard(
                         plato = plato,
-                        onNavigateToDetallePlato =  onNavigateToDetallePlato
+                        onNavigateToDetallePlato = onNavigateToDetallePlato
                     )
                 }
             }

@@ -8,6 +8,7 @@ interface DetallePlatoContract {
 
     sealed class DetallePlatoEvent {
         data class LoadPlato(val id: Int) : DetallePlatoEvent()
+        data class AnadirPlatoAlPedido(val plato: Plato, val correoCliente: String): DetallePlatoEvent()
         data object UiEventDone : DetallePlatoEvent()
     }
 

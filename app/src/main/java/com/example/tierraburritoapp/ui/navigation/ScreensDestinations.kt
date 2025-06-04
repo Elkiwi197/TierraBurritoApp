@@ -13,5 +13,5 @@ object ListaPlatos
 data class DetallePlato(val idPlato: Int)
 
 @Serializable
-data class PedidoActual(val pedido: Pedido)
+object PedidoActual
 

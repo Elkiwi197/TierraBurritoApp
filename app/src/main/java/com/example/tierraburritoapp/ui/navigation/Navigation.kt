@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -17,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.tierraburritoapp.ui.common.BottomBar
 import com.example.tierraburritoapp.ui.common.TopBar
+import com.example.tierraburritoapp.ui.common.VariablesViewModel
 import com.example.tierraburritoapp.ui.screens.pantallaDetallePlato.DetallePlatoPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaListaPlatos.ListaPlatosPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaLoginSignup.LoginSignupPantalla
@@ -26,6 +28,7 @@ import kotlinx.coroutines.launch
 fun Navigation() {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
+    val variablesViewModel: VariablesViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
     val showSnackbar = { message: String ->
         scope.launch {
@@ -62,6 +65,7 @@ fun Navigation() {
         ) {
             composable<Login> {
                 LoginSignupPantalla(
+                    variablesViewModel = variablesViewModel,
                     onNavigateToListaPlatos = {
                         navController.navigate(ListaPlatos)
                     },
@@ -71,8 +75,8 @@ fun Navigation() {
 
             composable<ListaPlatos> {
                 ListaPlatosPantalla(
-                    onNavigateToDetallePlato = {
-                        navController.navigate(DetallePlato(id))
+                    onNavigateToDetallePlato = { idPlato ->
+                        navController.navigate(DetallePlato(idPlato = idPlato))
                     },
                     showSnackbar = { showSnackbar(it) }
                 )
@@ -81,6 +85,7 @@ fun Navigation() {
             composable<DetallePlato> { navBackStackEntry ->
                 val detalle = navBackStackEntry.toRoute() as DetallePlato
                 DetallePlatoPantalla(
+                    variablesViewModel = variablesViewModel,
                     platoId = detalle.idPlato,
                     showSnackbar = { showSnackbar(it) }
                 )

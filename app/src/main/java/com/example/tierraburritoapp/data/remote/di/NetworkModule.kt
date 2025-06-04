@@ -3,12 +3,15 @@ package com.example.tierraburritoapp.data.remote.di
 
 import com.example.tierraburritoapp.BuildConfig
 import com.example.tierraburritoapp.data.remote.apiservices.LoginSignupService
+import com.example.tierraburritoapp.data.remote.apiservices.PedidosService
 import com.example.tierraburritoapp.data.remote.apiservices.PlatosService
 import com.example.tierraburritoapp.data.remote.repositories.LoginSignupRepository
+import com.example.tierraburritoapp.data.remote.repositories.PedidosRepository
 import com.example.tierraburritoapp.data.remote.repositories.PlatosRepository
 import com.example.tierraburritoapp.data.utils.AuthInterceptor
 import com.example.tierraburritoapp.domain.usecases.loginsignup.LogInUseCase
 import com.example.tierraburritoapp.domain.usecases.loginsignup.SignUpUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.AnadirPlatoPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatoByIdUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatosUseCase
 import dagger.Module
@@ -68,6 +71,12 @@ object NetworkModule {
         return retrofit.create(PlatosService::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun providePedidosService(retrofit: Retrofit): PedidosService {
+        return retrofit.create(PedidosService::class.java)
+    }
+
     @Module
     @InstallIn(ViewModelComponent::class)
     object LoginSignupUseCaseModule {
@@ -103,5 +112,17 @@ object NetworkModule {
              return GetPlatoByIdUseCase(repo)
          }
      }
+
+    @Module
+    @InstallIn(ViewModelComponent::class)
+    object PedidosUseCaseModule {
+        @Provides
+        fun provideAnadirPlatoPedidoUseCase(
+            repo: PedidosRepository
+        ): AnadirPlatoPedidoUseCase {
+            return AnadirPlatoPedidoUseCase(repo)
+        }
+
+    }
 
 }
