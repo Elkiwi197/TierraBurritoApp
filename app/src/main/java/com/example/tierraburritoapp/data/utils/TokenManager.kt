@@ -45,4 +45,3 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
     }
 
 }
-
