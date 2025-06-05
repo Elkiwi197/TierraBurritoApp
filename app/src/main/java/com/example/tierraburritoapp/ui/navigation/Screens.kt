@@ -13,6 +13,8 @@ val appDestinationList = listOf(
     LoginDestination,
     ListaPlatosDestination,
     DetallePlatoDestination,
+    PedidoActualDestination,
+    MisPedidosDestination
 )
 
 interface AppDestination {
@@ -57,4 +59,32 @@ object DetallePlatoDestination : AppDestination {
     override val route = DetallePlato
     override val title = Constantes.DETALLE_PLATO
 }
+
+object PedidoActualDestination : AppDestination {
+    override val route = PedidoActual
+    override val title = Constantes.PEDIDO_ACTUAL
+
+    override val scaffoldState = ScaffoldState(
+        topBarState = TopBarState(
+            showNavigationIcon = false,
+            arrangement = Arrangement.Start
+        ),
+        fabVisible = true
+    )
+}
+
+object MisPedidosDestination : AppDestination {
+    override val route = MisPedidos
+    override val title = Constantes.MIS_PEDIDOS
+
+    override val scaffoldState = ScaffoldState(
+        topBarState = TopBarState(
+            showNavigationIcon = false,
+            arrangement = Arrangement.Start
+        ),
+        fabVisible = true
+    )
+}
+
+
 

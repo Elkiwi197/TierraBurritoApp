@@ -23,7 +23,7 @@ class LoginSignupRepository @Inject constructor(
             when (val resultado = loginSignupDataSource.logInUsuario(request)) {
                 is NetworkResult.Success -> {
                     resultado.data?.let {
-                        tokenManager.saveToken(it)
+                        tokenManager.saveTokens(it.accessToken, it.refreshToken)
                     }
                     NetworkResult.Success(Constantes.SESION_INICIADA)
                 }
@@ -37,4 +37,3 @@ class LoginSignupRepository @Inject constructor(
         }
     }
 }
-

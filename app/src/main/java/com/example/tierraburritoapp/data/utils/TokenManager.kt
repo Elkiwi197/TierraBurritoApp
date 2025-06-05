@@ -18,7 +18,6 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
     companion object {
         private val ACCESS_TOKEN = stringPreferencesKey("ACCESS_TOKEN")
         private val REFRESH_TOKEN = stringPreferencesKey("REFRESH_TOKEN")
-        private val SIMPLE_TOKEN = stringPreferencesKey("SIMPLE_TOKEN")
     }
 
     fun getAccessToken(): Flow<String?> {
@@ -29,9 +28,7 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
         return context.dataStore.data.map { preferences -> preferences[REFRESH_TOKEN] }
     }
 
-    fun getSimpleToken(): Flow<String?> {
-        return context.dataStore.data.map { preferences -> preferences[SIMPLE_TOKEN] }
-    }
+
 
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
         context.dataStore.edit { preferences ->
@@ -47,9 +44,5 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
         }
     }
 
-    suspend fun saveToken(token: String) {
-        context.dataStore.edit { preferences ->
-            preferences[SIMPLE_TOKEN] = token
-        }    }
 }
 

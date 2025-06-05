@@ -45,7 +45,6 @@ fun TopBar(
 
             },
             navigationIcon = {
-
                 if (destination.scaffoldState.topBarState.showNavigationIcon) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(

@@ -22,6 +22,7 @@ import com.example.tierraburritoapp.ui.common.VariablesViewModel
 import com.example.tierraburritoapp.ui.screens.pantallaDetallePlato.DetallePlatoPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaListaPlatos.ListaPlatosPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaLoginSignup.LoginSignupPantalla
+import com.example.tierraburritoapp.ui.screens.pantallaPedidoActual.PedidoActualPantalla
 import kotlinx.coroutines.launch
 
 @Composable
@@ -90,6 +91,20 @@ fun Navigation() {
                     showSnackbar = { showSnackbar(it) }
                 )
             }
+
+            composable<PedidoActual> {
+                PedidoActualPantalla (
+                    variablesViewModel = variablesViewModel,
+                    showSnackbar = { showSnackbar(it) }
+                )
+            }
+
+//            composable<MisPedidos> {
+//                MisPedidosPantalla (
+//                    variablesViewModel = variablesViewModel,
+//                    showSnackbar = { showSnackbar(it) }
+//                )
+//            }
         }
     }
 }

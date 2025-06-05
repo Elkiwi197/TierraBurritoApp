@@ -1,5 +1,6 @@
 package com.example.tierraburritoapp.data.remote.apiservices
 
+import com.example.tierraburritoapp.data.model.TokenResponse
 import com.example.tierraburritoapp.data.model.UsuarioSignup
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -16,5 +17,5 @@ interface LoginSignupService {
     suspend fun signUpCliente(@Body usuarioSignup: UsuarioSignup): Response<ResponseBody>
 
     @POST("/login")
-    suspend fun loginUser(@Query("correo") correo: String, @Query("contrasena") contrasena:String): Response<ResponseBody>
+    suspend fun loginUser(@Query("correo") correo: String, @Query("contrasena") contrasena:String): Response<TokenResponse>
 }

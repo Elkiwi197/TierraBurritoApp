@@ -11,7 +11,7 @@ import com.example.tierraburritoapp.data.remote.repositories.PlatosRepository
 import com.example.tierraburritoapp.data.utils.AuthInterceptor
 import com.example.tierraburritoapp.domain.usecases.loginsignup.LogInUseCase
 import com.example.tierraburritoapp.domain.usecases.loginsignup.SignUpUseCase
-import com.example.tierraburritoapp.domain.usecases.pedidos.AnadirPlatoPedidoUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.AnadirPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatoByIdUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatosUseCase
 import dagger.Module
@@ -117,10 +117,10 @@ object NetworkModule {
     @InstallIn(ViewModelComponent::class)
     object PedidosUseCaseModule {
         @Provides
-        fun provideAnadirPlatoPedidoUseCase(
+        fun providePedidoUseCase(
             repo: PedidosRepository
-        ): AnadirPlatoPedidoUseCase {
-            return AnadirPlatoPedidoUseCase(repo)
+        ): AnadirPedidoUseCase {
+            return AnadirPedidoUseCase(repo)
         }
 
     }

@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.domain.model.Ingrediente
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
 
@@ -89,11 +90,8 @@ fun DetallePlatoPantalla(
                     .height(50.dp),
                 onClick = {
                     uiState.plato?.let {
-                        viewModel.handleEvent(
-                            DetallePlatoContract.DetallePlatoEvent.AnadirPlatoAlPedido(
-                                plato, variablesViewModel.correoCliente
-                            )
-                        )
+                        variablesViewModel.anadirPlatoAlPedido(plato)
+                        showSnackbar(Constantes.PLATO_ANADIDO_A_PEDIDO)
                     }
                 }
             ) {
@@ -111,15 +109,19 @@ fun IngredienteView(
     ingrediente: Ingrediente,
     modifier: Modifier
 ) {
-    Text(
-        text = ingrediente.toString().replace("_", " ")
-    )
+    Column (
+      modifier = Modifier
+          .padding(16.dp)
+    ){
+        Text(
+            text = ingrediente.toString().replace("_", " ")
+        )
+        Button(onClick = { /* Acción 1 */ }) {
+            Text("Botón 1")
+        }
 
-    Button(onClick = { /* Acción 1 */ }) {
-        Text("Botón 1")
-    }
-
-    Button(onClick = { /* Acción 2 */ }) {
-        Text("Botón 2")
+        Button(onClick = { /* Acción 2 */ }) {
+            Text("Botón 2")
+        }
     }
 }

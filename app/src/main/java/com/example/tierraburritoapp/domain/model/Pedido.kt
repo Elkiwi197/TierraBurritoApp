@@ -2,11 +2,11 @@ package com.example.tierraburritoapp.domain.model
 
 
 data class Pedido(
-    val id: Int = 0,
-    val direccion: String,
-    val nombreCliente: String,
-    val platos: List<Plato>,
-    val otros: List<Producto>,
-    val precio: Double,
-    val estado: EstadoPedido
+    var id: Int = 0,
+    var direccion: String,
+    var correoCliente: String,
+    var platos: List<Plato>,
+    var otros: List<Producto>,
+    var precio: Double,
+    var estado: EstadoPedido
 )

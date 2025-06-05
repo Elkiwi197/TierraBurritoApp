@@ -1,6 +1,5 @@
 package com.example.tierraburritoapp.ui.navigation
 
-import com.example.tierraburritoapp.domain.model.Pedido
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,4 +13,7 @@ data class DetallePlato(val idPlato: Int)
 
 @Serializable
 object PedidoActual
+
+@Serializable
+object MisPedidos
 

@@ -43,7 +43,7 @@ fun LoginSignupPantalla(
         uiState.uiEvent?.let {
             when (it) {
                 is UiEvent.Navigate -> {
-                    variablesViewModel.actualizarCorreoCliente(uiState.correoLogin)
+                    variablesViewModel.cambiarCorreoCliente(uiState.correoLogin)
                     onNavigateToListaPlatos()
                 }
                 is UiEvent.ShowSnackbar -> showSnackbar(it.message)

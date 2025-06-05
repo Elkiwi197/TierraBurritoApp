@@ -10,6 +10,7 @@ import androidx.navigation.NavController
 import com.example.tierraburritoapp.R
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.ui.navigation.ListaPlatos
+import com.example.tierraburritoapp.ui.navigation.MisPedidos
 import com.example.tierraburritoapp.ui.navigation.PedidoActual
 
 
@@ -32,6 +33,13 @@ fun BottomBar(navController: NavController) {
             selected = false,
             onClick = { navController.navigate(PedidoActual) }
         )
-        //todo añadir reseñas, pedido actual y lista de pedidos de usuario
+        NavigationBarItem(
+            icon = { Icon(
+                painterResource(R.drawable.baseline_format_list_bulleted_24), contentDescription =
+                Constantes.MIS_PEDIDOS) },
+            label = { Text(Constantes.MIS_PEDIDOS) },
+            selected = false,
+            onClick = { navController.navigate(MisPedidos) }
+        )
     }
 }
