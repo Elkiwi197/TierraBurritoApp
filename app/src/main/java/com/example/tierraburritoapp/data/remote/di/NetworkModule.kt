@@ -5,10 +5,14 @@ import com.example.tierraburritoapp.BuildConfig
 import com.example.tierraburritoapp.data.remote.apiservices.LoginSignupService
 import com.example.tierraburritoapp.data.remote.apiservices.PedidosService
 import com.example.tierraburritoapp.data.remote.apiservices.PlatosService
+import com.example.tierraburritoapp.data.remote.apiservices.ProductosService
 import com.example.tierraburritoapp.data.remote.repositories.LoginSignupRepository
 import com.example.tierraburritoapp.data.remote.repositories.PedidosRepository
 import com.example.tierraburritoapp.data.remote.repositories.PlatosRepository
+import com.example.tierraburritoapp.data.remote.repositories.ProductosRepository
 import com.example.tierraburritoapp.data.utils.AuthInterceptor
+import com.example.tierraburritoapp.domain.usecases.ingredientes.GetExtrasByPlatoUseCase
+import com.example.tierraburritoapp.domain.usecases.ingredientes.GetIngredientesByPlatoUseCase
 import com.example.tierraburritoapp.domain.usecases.loginsignup.LogInUseCase
 import com.example.tierraburritoapp.domain.usecases.loginsignup.SignUpUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.AnadirPedidoUseCase
@@ -77,6 +81,13 @@ object NetworkModule {
         return retrofit.create(PedidosService::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideProductosService(retrofit: Retrofit): ProductosService {
+        return retrofit.create(ProductosService::class.java)
+    }
+
+
     @Module
     @InstallIn(ViewModelComponent::class)
     object LoginSignupUseCaseModule {
@@ -122,7 +133,25 @@ object NetworkModule {
         ): AnadirPedidoUseCase {
             return AnadirPedidoUseCase(repo)
         }
-
     }
+
+    @Module
+    @InstallIn(ViewModelComponent::class)
+    object IngredientesUseCaseModule {
+        @Provides
+        fun provideGetIngredientesByPlatoUseCase(
+            repo: ProductosRepository
+        ): GetIngredientesByPlatoUseCase {
+            return GetIngredientesByPlatoUseCase(repo)
+        }
+
+        @Provides
+        fun provideGetExtrasByPlatoUseCase(
+            repo: ProductosRepository
+        ): GetExtrasByPlatoUseCase {
+            return GetExtrasByPlatoUseCase(repo)
+        }
+    }
+
 
 }

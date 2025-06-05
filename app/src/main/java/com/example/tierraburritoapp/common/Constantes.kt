@@ -33,6 +33,6 @@ object Constantes {
     const val REPARTIDOR = "REPARTIDOR"
     const val RutaFoto = "RutaFoto"
     const val SESION_INICIADA = "Sesión iniciada"
+    const val TOKEN_CADUCADO = "Token caducado"
     const val USUARIO_ANADIDO = "Usuario añadido con éxito"
-
 }

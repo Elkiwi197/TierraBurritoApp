@@ -22,6 +22,7 @@ import com.example.tierraburritoapp.ui.common.VariablesViewModel
 import com.example.tierraburritoapp.ui.screens.pantallaDetallePlato.DetallePlatoPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaListaPlatos.ListaPlatosPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaLoginSignup.LoginSignupPantalla
+import com.example.tierraburritoapp.ui.screens.pantallaMisPedidos.MisPedidosPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaPedidoActual.PedidoActualPantalla
 import kotlinx.coroutines.launch
 
@@ -79,6 +80,9 @@ fun Navigation() {
                     onNavigateToDetallePlato = { idPlato ->
                         navController.navigate(DetallePlato(idPlato = idPlato))
                     },
+                    onNavigateToLoginSignup = {
+                        navController.navigate(Login)
+                    },
                     showSnackbar = { showSnackbar(it) }
                 )
             }
@@ -88,23 +92,32 @@ fun Navigation() {
                 DetallePlatoPantalla(
                     variablesViewModel = variablesViewModel,
                     platoId = detalle.idPlato,
+                    onNavigateToLoginSignup = {
+                        navController.navigate(Login)
+                    },
                     showSnackbar = { showSnackbar(it) }
                 )
             }
 
             composable<PedidoActual> {
-                PedidoActualPantalla (
+                PedidoActualPantalla(
                     variablesViewModel = variablesViewModel,
+                    onNavigateToLoginSignup = {
+                        navController.navigate(Login)
+                    },
                     showSnackbar = { showSnackbar(it) }
                 )
             }
 
-//            composable<MisPedidos> {
-//                MisPedidosPantalla (
-//                    variablesViewModel = variablesViewModel,
-//                    showSnackbar = { showSnackbar(it) }
-//                )
-//            }
+            composable<MisPedidos> {
+                MisPedidosPantalla (
+                    variablesViewModel = variablesViewModel,
+                    onNavigateToLoginSignup = {
+                        navController.navigate(Login)
+                    },
+                    showSnackbar = { showSnackbar(it) }
+                )
+            }
         }
     }
 }

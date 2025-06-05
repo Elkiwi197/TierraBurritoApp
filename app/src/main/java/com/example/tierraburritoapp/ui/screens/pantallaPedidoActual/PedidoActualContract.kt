@@ -1,8 +1,6 @@
 package com.example.tierraburritoapp.ui.screens.pantallaPedidoActual
 
-import com.example.tierraburritoapp.domain.model.EstadoPedido
 import com.example.tierraburritoapp.domain.model.Pedido
-import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.ui.common.UiEvent
 
 interface PedidoActualContract {

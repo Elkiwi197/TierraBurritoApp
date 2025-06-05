@@ -12,5 +12,9 @@ class PedidosRepository @Inject constructor(
         return pedidosDataSource.anadirPedido(pedido)
     }
 
+    suspend fun getPedidosByCorreo(correo: String): NetworkResult<List<Pedido>> {
+        return pedidosDataSource.getPedidosByCorreo(correo)
+    }
+
 
 }

@@ -46,17 +46,20 @@ fun PedidoActualPantalla(
     viewModel: PedidoActualViewModel = hiltViewModel(),
     variablesViewModel: VariablesViewModel,
     showSnackbar: (String) -> Unit,
+    onNavigateToLoginSignup: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var id by remember { mutableStateOf("") }
-    var nombre by remember { mutableStateOf("") }
+
     val pedido = variablesViewModel.pedidoActual
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
             if (it is UiEvent.ShowSnackbar) {
                 showSnackbar(it.message)
+            } else if (it is UiEvent.Navigate) {
+                onNavigateToLoginSignup()
+                showSnackbar(it.mensaje)
             }
             viewModel.handleEvent(PedidoActualContract.PedidoActualEvent.UiEventDone)
         }

@@ -29,13 +29,40 @@ constructor(
 
     fun handleEvent(event: LoginSignupContract.LoginSignupEvent) {
         when (event) {
-            is LoginSignupContract.LoginSignupEvent.Login -> iniciarSesion(event.correo, event.contrasena)
-            is LoginSignupContract.LoginSignupEvent.SignUp -> registrarse(UsuarioSignup( 0, event.nombre, event.contrasena, event.correo, event.tipoUsuario, false, "" ))
+            is LoginSignupContract.LoginSignupEvent.Login -> iniciarSesion(
+                event.correo,
+                event.contrasena
+            )
+
+            is LoginSignupContract.LoginSignupEvent.SignUp -> registrarse(
+                UsuarioSignup(
+                    0,
+                    event.nombre,
+                    event.contrasena,
+                    event.correo,
+                    event.tipoUsuario,
+                    false,
+                    ""
+                )
+            )
+
             is LoginSignupContract.LoginSignupEvent.ActualizarCorreoLogIn -> updateEmailLogin(event.correoLogin)
-            is LoginSignupContract.LoginSignupEvent.ActualizarCorreoSignUp -> updateEmailSignup(event.correoSignup)
-            is LoginSignupContract.LoginSignupEvent.ActualizarContrasenaLogIn -> updatePasswordLogin(event.contrasenaLogin)
-            is LoginSignupContract.LoginSignupEvent.ActualizarContrasenaSignUp -> updatePasswordSignup(event.contrasenaSignup)
-            is LoginSignupContract.LoginSignupEvent.ActualizarNombreSignUp -> updateUsernameSignup(event.nombreSignup)
+            is LoginSignupContract.LoginSignupEvent.ActualizarCorreoSignUp -> updateEmailSignup(
+                event.correoSignup
+            )
+
+            is LoginSignupContract.LoginSignupEvent.ActualizarContrasenaLogIn -> updatePasswordLogin(
+                event.contrasenaLogin
+            )
+
+            is LoginSignupContract.LoginSignupEvent.ActualizarContrasenaSignUp -> updatePasswordSignup(
+                event.contrasenaSignup
+            )
+
+            is LoginSignupContract.LoginSignupEvent.ActualizarNombreSignUp -> updateUsernameSignup(
+                event.nombreSignup
+            )
+
             is LoginSignupContract.LoginSignupEvent.ActualizarTipoUsuario -> updateTipoUsuario(event.tipoUsuario)
             is LoginSignupContract.LoginSignupEvent.UiEventDone -> clearUiEvents()
         }
@@ -50,32 +77,41 @@ constructor(
                     isLoading = false,
                     uiEvent = UiEvent.ShowSnackbar(result.data ?: Constantes.USUARIO_ANADIDO)
                 )
+
                 is NetworkResult.Error -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     uiEvent = UiEvent.ShowSnackbar(result.message ?: Constantes.ERROR_DESCONOCIDO)
                 )
             }
-        }    }
+        }
+    }
 
 
     private fun iniciarSesion(correo: String, contrasena: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
-            when (val result = logInUseCase(UsuarioLogin(correo = correo, contrasena = contrasena))) {
+            when (val result =
+                logInUseCase(UsuarioLogin(correo = correo, contrasena = contrasena))) {
                 is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
                 is NetworkResult.Success -> {
-                    if (result.data.equals(Constantes.SESION_INICIADA)){
-                        _uiState.value = _uiState.value.copy(isLoading = false, uiEvent = UiEvent.Navigate())
+                    if (result.data.equals(Constantes.SESION_INICIADA)) {
+                        _uiState.value =
+                            _uiState.value.copy(isLoading = false, uiEvent = UiEvent.Navigate())
                     } else {
-                        _uiState.value = _uiState.value.copy(isLoading = false, uiEvent = UiEvent.ShowSnackbar(result.message?: "No llega el mensaje" ))
+                        _uiState.value =
+                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
+                                UiEvent.ShowSnackbar(it)
+                            })
                     }
                 }
+
                 is NetworkResult.Error -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    uiEvent = UiEvent.ShowSnackbar(result.message?: Constantes.ERROR_DESCONOCIDO)
+                    uiEvent = UiEvent.ShowSnackbar(result.message ?: Constantes.ERROR_DESCONOCIDO)
                 )
             }
-        }    }
+        }
+    }
 
     private fun updateUsernameSignup(nombreSignup: String) {
         _uiState.value = _uiState.value.copy(nombreSignup = nombreSignup)

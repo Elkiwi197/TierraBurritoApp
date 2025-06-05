@@ -1,6 +1,7 @@
 package com.example.tierraburritoapp.data.remote.datasource
 
 import com.example.tierraburritoapp.common.Constantes
+import com.example.tierraburritoapp.data.model.TipoUsuario
 import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.data.remote.apiservices.PedidosService
 import com.example.tierraburritoapp.data.remote.datasource.utils.BaseApiResponse
@@ -18,9 +19,17 @@ class PedidosDataSource @Inject constructor(
             val response: Response<ResponseBody>
             response = pedidosService.anadirPedido(pedido)
             val message = response.body()?.string() ?: Constantes.ERROR_MAPEANDO
-            Response.success(message)
+            if (response.isSuccessful) {
+                Response.success(message)
+            } else {
+                Response.error(response.code(), response.body() ?: response.errorBody()!!)
+            }
         }
         return result
     }
 
+    suspend fun getPedidosByCorreo(correo: String) =
+        safeApiCall {
+            pedidosService.getPedidosByCorreo(correo)
+        }
 }

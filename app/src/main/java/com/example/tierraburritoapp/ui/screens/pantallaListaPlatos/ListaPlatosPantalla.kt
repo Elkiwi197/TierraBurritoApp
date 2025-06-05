@@ -35,7 +35,8 @@ import com.example.tierraburritoapp.ui.common.UiEvent
 fun ListaPlatosPantalla(
     viewModel: ListaPlatosViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
-    onNavigateToDetallePlato: (idPlato: Int) -> Unit
+    onNavigateToDetallePlato: (idPlato: Int) -> Unit,
+    onNavigateToLoginSignup: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -47,6 +48,9 @@ fun ListaPlatosPantalla(
         uiState.uiEvent?.let {
             if (it is UiEvent.ShowSnackbar) {
                 showSnackbar(it.message)
+            } else if (it is UiEvent.Navigate) {
+                onNavigateToLoginSignup()
+                showSnackbar(it.mensaje)
             }
             viewModel.handleEvent(ListaPlatosContract.ListaPlatosEvent.UiEventDone)
         }
@@ -110,11 +114,15 @@ fun PlatoCard(
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    text = plato.ingredientes.toString(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                Column {
+                    plato.ingredientes.forEach { ingrediente ->
+                        Text(
+                            text = ingrediente.nombre.replace("_", " "),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
             }
         }
     }

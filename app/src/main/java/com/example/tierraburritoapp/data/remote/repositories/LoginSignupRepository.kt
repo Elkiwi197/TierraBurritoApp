@@ -19,21 +19,24 @@ class LoginSignupRepository @Inject constructor(
     }
 
     suspend fun iniciarSesionUsuario(request: UsuarioLogin): NetworkResult<String> {
+        var code = 0
         return try {
-            when (val resultado = loginSignupDataSource.logInUsuario(request)) {
+            val resultado = loginSignupDataSource.logInUsuario(request)
+            code = resultado.code
+            when (resultado) {
                 is NetworkResult.Success -> {
                     resultado.data?.let {
                         tokenManager.saveTokens(it.accessToken, it.refreshToken)
                     }
-                    NetworkResult.Success(Constantes.SESION_INICIADA)
+                    NetworkResult.Success(Constantes.SESION_INICIADA, code = code)
                 }
                 is NetworkResult.Error -> {
-                    NetworkResult.Error(resultado.message ?: Constantes.ERROR_DESCONOCIDO)
+                    NetworkResult.Error(resultado.message ?: Constantes.ERROR_DESCONOCIDO, code = code)
                 }
-                is NetworkResult.Loading -> NetworkResult.Loading()
+                is NetworkResult.Loading -> NetworkResult.Loading(code = resultado.code)
             }
         } catch (e: Exception) {
-            NetworkResult.Error(e.message ?: Constantes.ERROR_INICIANDO_SESION)
+            NetworkResult.Error(e.message ?: Constantes.ERROR_INICIANDO_SESION, code = code)
         }
     }
 }

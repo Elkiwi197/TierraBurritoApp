@@ -23,7 +23,7 @@ constructor(
     val uiState: StateFlow<PedidoActualContract.PedidoActualState> = _uiState
 
     fun handleEvent(event: PedidoActualContract.PedidoActualEvent) {
-        when (event){
+        when (event) {
             is PedidoActualContract.PedidoActualEvent.HacerPedido -> hacerPedido(pedido = event.pedido)
             PedidoActualContract.PedidoActualEvent.UiEventDone -> clearUiEvents()
         }
@@ -38,14 +38,23 @@ constructor(
                     isLoading = false,
                     uiEvent = UiEvent.ShowSnackbar(result.data ?: Constantes.PEDIDO_REALIZADO)
                 )
-                is NetworkResult.Error -> _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    uiEvent = UiEvent.ShowSnackbar(result.message ?: Constantes.ERROR_DESCONOCIDO)
-                )
+
+                is NetworkResult.Error -> {
+                    if (result.code == 401) {
+                        _uiState.value =
+                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
+                                UiEvent.Navigate(mensaje = it)
+                            })
+                    } else {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            uiEvent = UiEvent.ShowSnackbar(
+                                result.message ?: Constantes.ERROR_DESCONOCIDO))
+                    }
+                }
             }
         }
     }
-
 
 
     private fun clearUiEvents() {

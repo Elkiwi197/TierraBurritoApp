@@ -2,12 +2,14 @@ package com.example.tierraburritoapp.data.remote
 
 sealed class NetworkResult<T>(
     var data: T? = null,
-    val message: String? = null
+    val message: String? = null,
+    val code: Int
 ) {
 
-    class Success<T>(data: T) : NetworkResult<T>(data)
-    class Error<T>(message: String, data: T? = null) : NetworkResult<T>(data, message)
-    class Loading<T> : NetworkResult<T>()
+    class Success<T>(data: T, code: Int) : NetworkResult<T>(data = data, code = code)
+    class Error<T>(message: String, data: T? = null, code: Int) :
+        NetworkResult<T>(data = data, message = message, code = code)
+    class Loading<T>(code: Int) : NetworkResult<T>(code = code)
 
 }
 
