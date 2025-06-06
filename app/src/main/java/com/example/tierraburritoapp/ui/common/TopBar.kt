@@ -30,8 +30,8 @@ fun TopBar(
         TopAppBar(
 
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.tertiary,
+                titleContentColor = MaterialTheme.colorScheme.secondary,
             ),
             title = {
                 Row(

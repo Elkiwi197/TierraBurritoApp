@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,15 +54,13 @@ fun DetallePlatoPantalla(
         viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadPlato(platoId))
     }
     LaunchedEffect(uiState.platoModelo) {
-        launch { viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadIngredientes(plato = platoModelo))}
-        launch { viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadExtras(plato = platoModelo))}
+        launch { viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadIngredientes(plato = platoModelo)) }
+        launch { viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadExtras(plato = platoModelo)) }
     }
     LaunchedEffect(uiState.ingredientes) {
         platoPedirState.value = platoModelo.copy(ingredientes = uiState.ingredientes)
     }
-    LaunchedEffect(uiState.extras) {
-       // platoPedirState.value = platoModelo.copy(extras = uiState.extras)
-    }
+
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
@@ -76,16 +78,21 @@ fun DetallePlatoPantalla(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = platoPedir.rutaFoto,
-            modifier = Modifier.fillMaxWidth()
+
+        AsyncImage(
+            model = platoPedir.rutaFoto,
+            contentDescription = Constantes.FOTO_PLATO,
+            modifier = Modifier
+                .height(200.dp)
+                .width(200.dp)
         )
         Text(
             text = platoPedir.nombre,
-            modifier = Modifier.fillMaxWidth()
+            color = MaterialTheme.colorScheme.primary
         )
         Row(
             modifier = Modifier
@@ -99,6 +106,8 @@ fun DetallePlatoPantalla(
                 IngredienteCard(
                     ingrediente = ingrediente,
                     estaIncluido = estaIncluido,
+                    colorAnadir = MaterialTheme.colorScheme.secondary,
+                    colorEliminar = MaterialTheme.colorScheme.tertiary,
                     onToggle = {
                         val nuevaLista = platoPedir.ingredientes.toMutableList().apply {
                             if (estaIncluido) remove(ingrediente) else add(ingrediente)
@@ -121,6 +130,8 @@ fun DetallePlatoPantalla(
                 ExtraCard(
                     extra = extra,
                     estaIncluido = estaIncluido,
+                    colorAnadir = MaterialTheme.colorScheme.secondary,
+                    colorEliminar = MaterialTheme.colorScheme.tertiary,
                     onToggle = {
                         val nuevaLista = platoPedir.extras.toMutableList().apply {
                             if (estaIncluido) {
@@ -143,8 +154,7 @@ fun DetallePlatoPantalla(
         )
         Button(
             modifier = Modifier
-                .width(100.dp)
-                .height(75.dp),
+                .wrapContentSize(),
             onClick = {
                 variablesViewModel.anadirPlatoAlPedido(platoPedir)
                 showSnackbar(Constantes.PLATO_ANADIDO_A_PEDIDO)
@@ -159,6 +169,8 @@ fun DetallePlatoPantalla(
 fun IngredienteCard(
     ingrediente: Producto,
     estaIncluido: Boolean,
+    colorAnadir: Color,
+    colorEliminar: Color,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -183,8 +195,12 @@ fun IngredienteCard(
                     .width(100.dp)
             )
             Text(text = ingrediente.nombre.replace("_", " "))
-            Button(onClick = onToggle) {
-                Text(if (estaIncluido) "Eliminar" else "Añadir")
+            Button(
+                onClick = onToggle,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (estaIncluido) colorEliminar else colorAnadir
+                )            ) {
+                Text(text = if (estaIncluido) "Eliminar" else "Añadir")
             }
         }
     }
@@ -195,6 +211,8 @@ fun IngredienteCard(
 fun ExtraCard(
     extra: Producto,
     estaIncluido: Boolean,
+    colorAnadir: Color,
+    colorEliminar: Color,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -219,8 +237,12 @@ fun ExtraCard(
             )
             Text(text = extra.nombre.replace("_", " "))
             Text(text = extra.precio.toString() + "€")
-            Button(onClick = onToggle) {
-                Text(if (estaIncluido) "Eliminar" else "Añadir")
+            Button(
+                onClick = onToggle,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (estaIncluido) colorEliminar else colorAnadir
+                )            ) {
+                Text(text = if (estaIncluido) "Eliminar" else "Añadir")
             }
         }
     }

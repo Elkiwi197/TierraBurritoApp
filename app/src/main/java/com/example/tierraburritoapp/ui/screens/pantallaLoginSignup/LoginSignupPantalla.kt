@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -18,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -46,22 +49,26 @@ fun LoginSignupPantalla(
                     variablesViewModel.cambiarCorreoCliente(uiState.correoLogin)
                     onNavigateToListaPlatos()
                 }
+
                 is UiEvent.ShowSnackbar -> showSnackbar(it.message)
             }
             viewModel.handleEvent(LoginSignupContract.LoginSignupEvent.UiEventDone)
         }
     }
+
+
     Column(
         modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(50.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         LogInBundle(
-            modifier = Modifier
-                .padding(30.dp)
-                .background(color = MaterialTheme.colorScheme.background),
+            modifier = Modifier,
+            colorPrimario = MaterialTheme.colorScheme.primary,
+            colorSecundario = MaterialTheme.colorScheme.secondary,
             uiState = uiState,
             actualizarCorreoLogIn = {
                 viewModel.handleEvent(
@@ -80,17 +87,17 @@ fun LoginSignupPantalla(
             hacerLogIn = {
                 viewModel.handleEvent(
                     LoginSignupContract.LoginSignupEvent.Login(
-                        correo =uiState.correoLogin,
+                        correo = uiState.correoLogin,
                         contrasena = uiState.contrasenaLogin
                     )
                 )
             }
         )
         SignUpBundle(
-            modifier = Modifier
-                .padding(30.dp)
-                .background(color = MaterialTheme.colorScheme.background), //todo preguntar a Óscar por que no sale
+            modifier = Modifier,
             uiState = uiState,
+            colorPrimario = MaterialTheme.colorScheme.primary,
+            colorSecundario = MaterialTheme.colorScheme.secondary,
             actualizarNombreSignUp = {
                 viewModel.handleEvent(
                     LoginSignupContract.LoginSignupEvent.ActualizarNombreSignUp(
@@ -136,23 +143,30 @@ fun LoginSignupPantalla(
 @Composable
 fun LogInBundle(
     modifier: Modifier,
+    colorPrimario: Color,
+    colorSecundario: Color,
     uiState: LoginSignupContract.LoginSignupState,
     actualizarCorreoLogIn: (String) -> Unit = {},
     actualizarContrasenaLogIn: (String) -> Unit = {},
     hacerLogIn: () -> Unit = {}
 ) {
     Column(
-        modifier = modifier
     ) {
         Text(
-            text = Constantes.INICIAR_SESION
+            text = Constantes.INICIAR_SESION,
+            color = colorPrimario
         )
         OutlinedTextField(
             value = uiState.correoLogin,
             onValueChange = {
                 actualizarCorreoLogIn(it)
             },
-            label = { Text(Constantes.CORREO_ELECTRONICO) },
+            label = {
+                Text(
+                    color = colorSecundario,
+                    text = Constantes.CORREO_ELECTRONICO
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
@@ -162,7 +176,12 @@ fun LogInBundle(
             onValueChange = {
                 actualizarContrasenaLogIn(it)
             },
-            label = { Text(Constantes.CONTRASENA) },
+            label = {
+                Text(
+                    color = colorSecundario,
+                    text = Constantes.CONTRASENA
+                )
+            },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Password,
@@ -176,7 +195,7 @@ fun LogInBundle(
             onClick = {
                 hacerLogIn()
             },
-            modifier = Modifier.fillMaxWidth()
+            colors = ButtonDefaults.buttonColors(colorPrimario)
         ) {
             Text(text = Constantes.INICIAR_SESION)
         }
@@ -186,6 +205,8 @@ fun LogInBundle(
 @Composable
 fun SignUpBundle(
     modifier: Modifier,
+    colorPrimario: Color,
+    colorSecundario: Color,
     uiState: LoginSignupContract.LoginSignupState,
     actualizarNombreSignUp: (String) -> Unit = {},
     actualizarCorreoSignUp: (String) -> Unit = {},
@@ -197,14 +218,20 @@ fun SignUpBundle(
         modifier = modifier
     ) {
         Text(
-            text = Constantes.REGISTRARSE
+            text = Constantes.REGISTRARSE,
+            color = colorPrimario
         )
         OutlinedTextField(
             value = uiState.nombreSignup,
             onValueChange = {
                 actualizarNombreSignUp(it)
             },
-            label = { Text(Constantes.NOMBRE) },
+            label = {
+                Text(
+                    text = Constantes.NOMBRE,
+                    color = colorSecundario
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth(),
         )
@@ -213,7 +240,12 @@ fun SignUpBundle(
             onValueChange = {
                 actualizarCorreoSignUp(it)
             },
-            label = { Text(Constantes.CORREO_ELECTRONICO) },
+            label = {
+                Text(
+                    text = Constantes.CORREO_ELECTRONICO,
+                    color = colorSecundario
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
@@ -223,7 +255,12 @@ fun SignUpBundle(
             onValueChange = {
                 actualizarContrasenaSignUp(it)
             },
-            label = { Text(Constantes.CONTRASENA) },
+            label = {
+                Text(
+                    text = Constantes.CONTRASENA,
+                    color = colorSecundario
+                )
+            },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Password,
@@ -257,7 +294,7 @@ fun SignUpBundle(
             onClick = {
                 hacerSignUp()
             },
-            modifier = Modifier.fillMaxWidth()
+            colors = ButtonDefaults.buttonColors(colorPrimario)
         ) {
             Text(text = Constantes.REGISTRARSE)
         }

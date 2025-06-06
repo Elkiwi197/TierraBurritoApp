@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -74,6 +75,8 @@ fun ListaPlatosPantalla(
                 items(uiState.platos) { plato ->
                     PlatoCard(
                         plato = plato,
+                        colorPrimario = MaterialTheme.colorScheme.primary,
+                        colorSecundario = MaterialTheme.colorScheme.secondary,
                         onNavigateToDetallePlato = onNavigateToDetallePlato
                     )
                 }
@@ -85,6 +88,8 @@ fun ListaPlatosPantalla(
 @Composable
 fun PlatoCard(
     plato: Plato,
+    colorPrimario: Color,
+    colorSecundario: Color,
     onNavigateToDetallePlato: (Int) -> Unit
 ) {
     Card(
@@ -98,28 +103,33 @@ fun PlatoCard(
         Row(
             modifier = Modifier.padding(16.dp)
         ) {
-            AsyncImage(
-                model = plato.rutaFoto,
-                contentDescription = Constantes.FOTO_PLATO,
-                modifier = Modifier
-                    .height(120.dp)
-                    .width(120.dp)
-            )
-
+            Column {
+                AsyncImage(
+                    model = plato.rutaFoto,
+                    contentDescription = Constantes.FOTO_PLATO,
+                    modifier = Modifier
+                        .height(120.dp)
+                        .width(120.dp)
+                )
+                Text(
+                    text = plato.precio.toString() + "€",
+                    color = colorPrimario
+                )
+            }
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
                     text = plato.nombre,
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = colorPrimario
                 )
                 Column {
                     plato.ingredientes.forEach { ingrediente ->
                         Text(
                             text = ingrediente.nombre.replace("_", " "),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = colorSecundario
                         )
                     }
                 }
