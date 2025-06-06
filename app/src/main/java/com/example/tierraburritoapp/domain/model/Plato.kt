@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 data class Plato (
     val id: Int,
     val nombre: String,
-    val ingredientes: MutableList<Producto>,
-    val extras: MutableList<Producto>,
-    val precio: Double,
+    var ingredientes: MutableList<Producto>,
+    var extras: MutableList<Producto>,
+    var precio: Double,
     val rutaFoto: String
 )

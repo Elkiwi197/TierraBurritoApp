@@ -121,24 +121,39 @@ fun PedidoCard(
                         color = MaterialTheme.colorScheme.secondary
                     )
                     Text(
-                        text = plato.ingredientes.toString(),
+                        text = "Ingredientes",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
+                    plato.ingredientes.forEach{ingrediente ->
+                        Text(
+                            text = ingrediente.nombre.replace("_", " "),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                     Text(
-                        text = plato.extras.toString(),
+                        text = "Extras",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
+                    plato.extras.forEach{extra ->
+                        Text(
+                            text = extra.nombre.replace("_", " ") + ": " + extra.precio + "€",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+
                     Text(
-                        text = plato.precio.toString(),
+                        text = plato.precio.toString() + "€",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
             Text(
-                text = pedido.precio.toString(),
+                text = "Total: " + pedido.precio.toString() + "€",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.secondary
             )

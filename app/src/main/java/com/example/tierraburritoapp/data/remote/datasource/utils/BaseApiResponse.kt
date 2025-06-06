@@ -10,7 +10,7 @@ abstract class BaseApiResponse {
     suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): NetworkResult<T> {
         var code = 0
         try {
-            val response = apiCall()
+                val response = apiCall()
             code = response.code()
             if (response.isSuccessful) {
                 if (code < 299) {

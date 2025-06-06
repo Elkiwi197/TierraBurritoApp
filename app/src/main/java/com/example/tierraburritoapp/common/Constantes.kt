@@ -13,6 +13,7 @@ object Constantes {
     const val ERROR_INICIANDO_SESION = "Error iniciando sesión"
     const val ERROR_MAPEANDO = "Error mapeando objeto"
     const val FOTO_PLATO = "Imagen del plato"
+    const val FOTO_INGREDIENTE = "Foto ingrediente"
     const val ID = "Id"
     const val INGREDIENTES = "Ingredientes"
     const val INICIAR_SESION = "Iniciar sesión"

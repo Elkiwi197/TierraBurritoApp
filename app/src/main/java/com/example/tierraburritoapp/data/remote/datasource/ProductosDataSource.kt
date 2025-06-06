@@ -11,10 +11,10 @@ class ProductosDataSource @Inject constructor(
     private val productosService: ProductosService
 ) : BaseApiResponse() {
 
-    suspend fun getIngredientesByPlato(plato: Plato): NetworkResult<List<Producto>> =
+    suspend fun getIngredientesByPlato(plato: Plato) =
         safeApiCall { productosService.getIngredientesByPlato(plato) }
 
-    suspend fun getExtrasByPlato(plato: Plato): NetworkResult<List<Producto>> =
+    suspend fun getExtrasByPlato(plato: Plato) =
         safeApiCall { productosService.getExtrasByPlato(plato) }
 
 }

@@ -16,6 +16,7 @@ import com.example.tierraburritoapp.domain.usecases.ingredientes.GetIngredientes
 import com.example.tierraburritoapp.domain.usecases.loginsignup.LogInUseCase
 import com.example.tierraburritoapp.domain.usecases.loginsignup.SignUpUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.AnadirPedidoUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidosByCorreoUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatoByIdUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatosUseCase
 import dagger.Module
@@ -128,10 +129,16 @@ object NetworkModule {
     @InstallIn(ViewModelComponent::class)
     object PedidosUseCaseModule {
         @Provides
-        fun providePedidoUseCase(
+        fun provideAnadirPedidoUseCase(
             repo: PedidosRepository
         ): AnadirPedidoUseCase {
             return AnadirPedidoUseCase(repo)
+        }
+        @Provides
+        fun provideGetPedidosByCorreoUseCase(
+            repo: PedidosRepository
+        ): GetPedidosByCorreoUseCase {
+            return GetPedidosByCorreoUseCase(repo)
         }
     }
 

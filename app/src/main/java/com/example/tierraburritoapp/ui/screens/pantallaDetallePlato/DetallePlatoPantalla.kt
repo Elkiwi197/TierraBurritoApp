@@ -20,17 +20,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.tierraburritoapp.common.Constantes
-import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.domain.model.Producto
 import com.example.tierraburritoapp.ui.common.UiEvent
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun DetallePlatoPantalla(
@@ -42,130 +42,165 @@ fun DetallePlatoPantalla(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var id by remember { mutableStateOf("") }
-    var nombre by remember { mutableStateOf("") }
-    var precio by remember { mutableStateOf("") }
-    var rutafoto by remember { mutableStateOf("") }
-
-    val plato = uiState.plato
-    val ingredientes = uiState.ingredientes
-    val extras = uiState.extras
+    val platoModelo = uiState.platoModelo
+    val platoPedirState = remember { mutableStateOf(uiState.platoPedir.copy()) }
+    val platoPedir = platoPedirState.value
 
     LaunchedEffect(platoId) {
         viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadPlato(platoId))
     }
-    LaunchedEffect(plato) {
-        plato?.let {
-            id = it.id.toString()
-            nombre = it.nombre
-            precio = it.precio.toString()
-            rutafoto = it.rutaFoto
-        }
+    LaunchedEffect(uiState.platoModelo) {
+        launch { viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadIngredientes(plato = platoModelo))}
+        launch { viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadExtras(plato = platoModelo))}
+    }
+    LaunchedEffect(uiState.ingredientes) {
+        platoPedirState.value = platoModelo.copy(ingredientes = uiState.ingredientes)
+    }
+    LaunchedEffect(uiState.extras) {
+       // platoPedirState.value = platoModelo.copy(extras = uiState.extras)
     }
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
-            if (it is UiEvent.ShowSnackbar) {
-                showSnackbar(it.message)
-            } else if (it is UiEvent.Navigate) {
-                onNavigateToLoginSignup()
-                showSnackbar(it.mensaje)
+            when (it) {
+                is UiEvent.ShowSnackbar -> showSnackbar(it.message)
+                is UiEvent.Navigate -> {
+                    onNavigateToLoginSignup()
+                    showSnackbar(it.mensaje)
+                }
             }
             viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.UiEventDone)
         }
     }
 
-    plato?.let {
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = platoPedir.rutaFoto,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Text(
+            text = platoPedir.nombre,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = rutafoto,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Text(
-                text = nombre,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ingredientes.forEach { ingrediente ->
-                    IngredienteCard(
-                        plato = plato,
-                        ingrediente = ingrediente,
-                        modifier = Modifier.padding(end = 8.dp),
-                        eliminarIngrediente = {
-                            viewModel.handleEvent(
-                                DetallePlatoContract.DetallePlatoEvent.EliminarIngrediente(
-                                    ingrediente
-                                )
-                            )
-                        },
-                        anadirIngrediente = {
-                            viewModel.handleEvent(
-                                DetallePlatoContract.DetallePlatoEvent.AnadirIngrediente(
-                                    ingrediente
-                                )
-                            )
+            uiState.ingredientes.forEach { ingrediente ->
+                val estaIncluido = platoPedir.ingredientes.contains(ingrediente)
+                IngredienteCard(
+                    ingrediente = ingrediente,
+                    estaIncluido = estaIncluido,
+                    onToggle = {
+                        val nuevaLista = platoPedir.ingredientes.toMutableList().apply {
+                            if (estaIncluido) remove(ingrediente) else add(ingrediente)
                         }
-                    )
-                }
-            }
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .horizontalScroll(rememberScrollState())
-//                    .padding(8.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                extras.forEach { extra ->
-//                    ExtraCard(
-//                        ingrediente = extra,
-//                        modifier = Modifier.padding(end = 8.dp),
-//                        eliminarIngrediente = {viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.EliminarIngrediente(ingrediente))},
-//                        anadirIngrediente = {viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.AnadirIngrediente(ingrediente))}
-//                    )
-//                }
-//            }
-            Button(
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(50.dp),
-                onClick = {
-                    uiState.plato?.let {
-                        variablesViewModel.anadirPlatoAlPedido(plato)
-                        showSnackbar(Constantes.PLATO_ANADIDO_A_PEDIDO)
-                    }
-                }
-            ) {
-                Text(
-                    text = "Añadir plato al pedido"
+                        platoPedirState.value = platoPedir.copy(ingredientes = nuevaLista)
+                    },
+                    modifier = Modifier.padding(end = 8.dp),
                 )
             }
-
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            uiState.extras.forEach { extra ->
+                val estaIncluido = platoPedir.extras.contains(extra)
+                ExtraCard(
+                    extra = extra,
+                    estaIncluido = estaIncluido,
+                    onToggle = {
+                        val nuevaLista = platoPedir.extras.toMutableList().apply {
+                            if (estaIncluido) {
+                                remove(extra)
+                                platoPedir.precio -= extra.precio
+                            } else {
+                                add(extra)
+                                platoPedir.precio += extra.precio
+                            }
+                        }
+                        platoPedirState.value = platoPedir.copy(extras = nuevaLista)
+                    },
+                    modifier = Modifier.padding(end = 8.dp),
+                )
+            }
+        }
+        Text(
+            text = platoPedir.precio.toString() + "€",
+            modifier = Modifier.fillMaxWidth()
+        )
+        Button(
+            modifier = Modifier
+                .width(100.dp)
+                .height(75.dp),
+            onClick = {
+                variablesViewModel.anadirPlatoAlPedido(platoPedir)
+                showSnackbar(Constantes.PLATO_ANADIDO_A_PEDIDO)
+            }
+        ) {
+            Text("Añadir plato al pedido")
         }
     }
 }
 
 @Composable
 fun IngredienteCard(
-    plato: Plato,
     ingrediente: Producto,
-    modifier: Modifier,
-    eliminarIngrediente: (ingrediente: Producto) -> Unit = {},
-    anadirIngrediente: (ingrediente: Producto) -> Unit = {}
+    estaIncluido: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
+            .width(200.dp)
+            .padding(8.dp)
+            .background(color = MaterialTheme.colorScheme.background),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            AsyncImage(
+                model = ingrediente.rutaFoto,
+                contentDescription = Constantes.FOTO_INGREDIENTE,
+                modifier = Modifier
+                    .height(100.dp)
+                    .width(100.dp)
+            )
+            Text(text = ingrediente.nombre.replace("_", " "))
+            Button(onClick = onToggle) {
+                Text(if (estaIncluido) "Eliminar" else "Añadir")
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ExtraCard(
+    extra: Producto,
+    estaIncluido: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .width(200.dp)
             .padding(8.dp)
             .background(color = MaterialTheme.colorScheme.background),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -173,25 +208,21 @@ fun IngredienteCard(
         Column(
             modifier = Modifier
                 .padding(16.dp)
+                .align(Alignment.CenterHorizontally)
         ) {
-
-            Text(
-                text = ingrediente.toString().replace("_", " ")
+            AsyncImage(
+                model = extra.rutaFoto,
+                contentDescription = Constantes.FOTO_INGREDIENTE,
+                modifier = Modifier
+                    .height(100.dp)
+                    .width(100.dp)
             )
-
-            if (plato.ingredientes.contains(ingrediente)) {
-                Button(onClick = {
-                    eliminarIngrediente(ingrediente)
-                }) {
-                    Text("Eliminar")
-                }
-            } else {
-                Button(onClick = {
-                    anadirIngrediente(ingrediente)
-                }) {
-                    Text("Añadir")
-                }
+            Text(text = extra.nombre.replace("_", " "))
+            Text(text = extra.precio.toString() + "€")
+            Button(onClick = onToggle) {
+                Text(if (estaIncluido) "Eliminar" else "Añadir")
             }
         }
     }
 }
+
