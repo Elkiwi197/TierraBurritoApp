@@ -16,14 +16,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.tierraburritoapp.ui.common.BottomBar
+import com.example.tierraburritoapp.ui.common.BottomBarCliente
 import com.example.tierraburritoapp.ui.common.TopBar
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
-import com.example.tierraburritoapp.ui.screens.pantallaDetallePlato.DetallePlatoPantalla
-import com.example.tierraburritoapp.ui.screens.pantallaListaPlatos.ListaPlatosPantalla
+import com.example.tierraburritoapp.ui.screens.pantallaDetallePlatoCliente.DetallePlatoPantalla
+import com.example.tierraburritoapp.ui.screens.pantallaListaPlatosCliente.ListaPlatosPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaLoginSignup.LoginSignupPantalla
-import com.example.tierraburritoapp.ui.screens.pantallaMisPedidos.MisPedidosPantalla
-import com.example.tierraburritoapp.ui.screens.pantallaPedidoActual.PedidoActualPantalla
+import com.example.tierraburritoapp.ui.screens.pantallaMisPedidosCliente.MisPedidosPantalla
+import com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente.PedidoActualPantalla
+import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosPantalla
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,7 +56,7 @@ fun Navigation() {
         },
         bottomBar = {
             if (screen != LoginDestination) {
-                BottomBar(navController = navController)
+                BottomBarCliente(navController = navController)
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -70,6 +71,9 @@ fun Navigation() {
                     variablesViewModel = variablesViewModel,
                     onNavigateToListaPlatos = {
                         navController.navigate(ListaPlatos)
+                    },
+                    onNavigateToSeleccionPedidos = {
+                        navController.navigate(SeleccionPedidos)
                     },
                     showSnackbar = { showSnackbar(it) }
                 )
@@ -110,8 +114,20 @@ fun Navigation() {
             }
 
             composable<MisPedidos> {
-                MisPedidosPantalla (
+                MisPedidosPantalla(
                     variablesViewModel = variablesViewModel,
+                    onNavigateToLoginSignup = {
+                        navController.navigate(Login)
+                    },
+                    showSnackbar = { showSnackbar(it) }
+                )
+            }
+
+            composable<SeleccionPedidos> {
+                SeleccionPedidosPantalla(
+                    onNavigateToDetallePedido = { idPedido ->
+                        //navController.navigate(DetallePedido(idPlato = idPedido))
+                    },
                     onNavigateToLoginSignup = {
                         navController.navigate(Login)
                     },

@@ -28,7 +28,7 @@ android {
     productFlavors {
         create("development") {
             dimension = "env"
-            buildConfigField("String", "API_URL", "\"http://192.168.100.138:8080\"")
+            buildConfigField("String", "API_URL", "\"http://10.6.66.80:8080\"")
 
             testInstrumentationRunner = "dagger.hilt.android.testing.HiltAndroidJUnitRunner"
 
@@ -36,7 +36,7 @@ android {
         }
         create("production") {
             dimension = "env"
-            buildConfigField("String", "API_URL", "\"http://192.168.100.138:8080\"")
+            buildConfigField("String", "API_URL", "\"http://10.6.66.80:8080\"")
 
         }
     }
@@ -87,17 +87,19 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.timber)
+
+    // Compose
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(platform(libs.androidx.compose.bom))
 
     // Retrofit
     implementation(libs.retrofit)

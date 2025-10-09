@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -36,9 +35,11 @@ import com.example.tierraburritoapp.ui.common.VariablesViewModel
 fun LoginSignupPantalla(
     viewModel: LoginSignupViewModel = hiltViewModel(),
     variablesViewModel: VariablesViewModel,
+    onNavigateToListaPlatos: () -> Unit,
+    onNavigateToSeleccionPedidos: () -> Unit,
     showSnackbar: (String) -> Unit,
-    onNavigateToListaPlatos: () -> Unit
-) {
+
+    ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -46,12 +47,20 @@ fun LoginSignupPantalla(
         uiState.uiEvent?.let {
             when (it) {
                 is UiEvent.Navigate -> {
-                    variablesViewModel.cambiarCorreoCliente(uiState.correoLogin)
-                    onNavigateToListaPlatos()
+                    variablesViewModel.cambiarCorreoUsuario(uiState.correoLogin)
+                    variablesViewModel.cambiarTipoUsuario(uiState.tipoUsuario)
+                    variablesViewModel.tipoUsuario.let {
+                        when (it) {
+                            TipoUsuario.CLIENTE -> onNavigateToListaPlatos()
+                            TipoUsuario.REPARTIDOR -> onNavigateToSeleccionPedidos()
+                        }
+
+                    }
                 }
 
                 is UiEvent.ShowSnackbar -> showSnackbar(it.message)
             }
+
             viewModel.handleEvent(LoginSignupContract.LoginSignupEvent.UiEventDone)
         }
     }
@@ -88,7 +97,7 @@ fun LoginSignupPantalla(
                 viewModel.handleEvent(
                     LoginSignupContract.LoginSignupEvent.Login(
                         correo = uiState.correoLogin,
-                        contrasena = uiState.contrasenaLogin
+                        contrasena = uiState.contrasenaLogin,
                     )
                 )
             }
@@ -278,7 +287,7 @@ fun SignUpBundle(
                         actualizarTipoUsuario(TipoUsuario.CLIENTE)
                     }
                 )
-                Text(text = "Cliente")
+                Text(text = Constantes.CLIENTE)
             }
             Row {
                 RadioButton(
@@ -287,7 +296,7 @@ fun SignUpBundle(
                         actualizarTipoUsuario(TipoUsuario.REPARTIDOR)
                     }
                 )
-                Text(text = "Repartidor")
+                Text(text = Constantes.REPARTIDOR)
             }
         }
         Button(

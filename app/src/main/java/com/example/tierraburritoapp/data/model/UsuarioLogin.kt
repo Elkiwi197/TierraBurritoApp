@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UsuarioLogin(
-    val correo: String,
-    val contrasena: String
+     val correo: String,
+     val contrasena: String,
 )

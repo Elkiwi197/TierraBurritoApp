@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaMisPedidos
+package com.example.tierraburritoapp.ui.screens.pantallaMisPedidosCliente
 
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.UiEvent

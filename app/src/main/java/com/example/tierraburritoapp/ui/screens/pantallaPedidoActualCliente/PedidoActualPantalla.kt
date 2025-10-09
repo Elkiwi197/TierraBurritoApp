@@ -1,7 +1,9 @@
-package com.example.tierraburritoapp.ui.screens.pantallaPedidoActual
+package com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -56,12 +60,13 @@ fun PedidoActualPantalla(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = variablesViewModel.correoCliente,
+            value = variablesViewModel.correoUsuario,
             onValueChange = {
-                variablesViewModel.cambiarCorreoCliente(it)
+                variablesViewModel.cambiarCorreoUsuario(it)
             },
             label = { Text(Constantes.CORREO_ELECTRONICO) },
             modifier = Modifier
@@ -87,21 +92,23 @@ fun PedidoActualPantalla(
             items(pedido.platos) { plato ->
                 PlatoPedidoCard(
                     plato = plato,
-                    eliminarPlato = { variablesViewModel.eliminarPlatoDelPedido(plato) }
+                    eliminarPlato = { variablesViewModel.eliminarPlatoDelPedido(plato) },
+                    colorPrimario = MaterialTheme.colorScheme.primary,
+                    colorSecundario = MaterialTheme.colorScheme.secondary,
+                    titulo = MaterialTheme.typography.titleLarge,
+                    apartado = MaterialTheme.typography.titleMedium,
+                    contenido = MaterialTheme.typography.bodySmall
                 )
             }
         }
         Column {
             Text(
-                text = pedido.precio.toString() + "€"
+                text = pedido.precio.toString() + Constantes.SIMBOLO_EURO,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleLarge
             )
-//        Text(
-//            text = pedido.estado.toString()
-//        )
             Button(
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                 onClick = {
                     viewModel.handleEvent(PedidoActualContract.PedidoActualEvent.HacerPedido(pedido))
                     variablesViewModel.resetearPedido()
@@ -119,12 +126,15 @@ fun PedidoActualPantalla(
 @Composable
 fun PlatoPedidoCard(
     plato: Plato,
-    eliminarPlato: (plato: Plato) -> Unit = {}, // todo probar a borrar el argumento
+    eliminarPlato: (plato: Plato) -> Unit = {},
+    colorPrimario: Color,
+    colorSecundario: Color,
+    titulo: TextStyle,
+    apartado: TextStyle,
+    contenido: TextStyle,
 ) {
     Card(
         modifier = Modifier
-            .width(300.dp)
-            .height(350.dp)
             .padding(8.dp)
             .background(color = MaterialTheme.colorScheme.background),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -141,50 +151,54 @@ fun PlatoPedidoCard(
             )
             Text(
                 text = plato.nombre,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary
+                style = titulo,
+                color = colorPrimario
             )
-            Text(
-                text = "Ingredientes",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-            plato.ingredientes.forEach{ ingrediente ->
-                Text(
-                    text = ingrediente.nombre.replace("_", " "),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+            Row {
+                Column {
+                    Text(
+                        text = Constantes.INGREDIENTES,
+                        style = apartado,
+                        color = colorPrimario
+                    )
+                    plato.ingredientes.forEach { ingrediente ->
+                        Text(
+                            text = ingrediente.nombre.replace("_", " "),
+                            style = contenido,
+                            color = colorSecundario
+                        )
+                    }
+                }
+                Column {
+                    Text(
+                        text = Constantes.EXTRAS ,
+                        style = apartado,
+                        color = colorPrimario
+                    )
+                    plato.extras.forEach { extra ->
+                        Text(
+                            text = extra.nombre.replace("_", " ") + ": " + extra.precio + Constantes.SIMBOLO_EURO,
+                            style = contenido,
+                            color = colorSecundario
+                        )
+                    }
+                }
             }
+
             Text(
-                text = "Extras",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-            plato.extras.forEach{ extra ->
-                Text(
-                    text = extra.nombre.replace("_", " ") + ": " + extra.precio + "€",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-            Text(
-                text = plato.precio.toString() + "€",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary
+                text = plato.precio.toString() + Constantes.SIMBOLO_EURO,
+                style = titulo,
+                color = colorPrimario
             )
         }
         Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .background(Color.Red),
+            colors = ButtonDefaults.buttonColors(containerColor = colorPrimario),
             onClick = {
                 eliminarPlato(plato)
             }
         ) {
             Text(
-                text = "Eliminar"
+                text = Constantes.ELIMINAR
             )
         }
     }

@@ -15,5 +15,8 @@ data class DetallePlato(val idPlato: Int)
 object PedidoActual
 
 @Serializable
-data object MisPedidos
+object MisPedidos
+
+@Serializable
+object SeleccionPedidos
 

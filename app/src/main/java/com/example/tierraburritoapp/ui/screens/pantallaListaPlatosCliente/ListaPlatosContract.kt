@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaListaPlatos
+package com.example.tierraburritoapp.ui.screens.pantallaListaPlatosCliente
 
 import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.ui.common.UiEvent

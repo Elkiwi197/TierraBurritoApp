@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaListaPlatos
+package com.example.tierraburritoapp.ui.screens.pantallaListaPlatosCliente
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

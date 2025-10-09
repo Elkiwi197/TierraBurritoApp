@@ -1,9 +1,10 @@
-package com.example.tierraburritoapp.ui.screens.pantallaDetallePlato
+package com.example.tierraburritoapp.ui.screens.pantallaDetallePlatoCliente
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -113,8 +114,7 @@ fun DetallePlatoPantalla(
                             if (estaIncluido) remove(ingrediente) else add(ingrediente)
                         }
                         platoPedirState.value = platoPedir.copy(ingredientes = nuevaLista)
-                    },
-                    modifier = Modifier.padding(end = 8.dp),
+                    }
                 )
             }
         }
@@ -144,12 +144,11 @@ fun DetallePlatoPantalla(
                         }
                         platoPedirState.value = platoPedir.copy(extras = nuevaLista)
                     },
-                    modifier = Modifier.padding(end = 8.dp),
                 )
             }
         }
         Text(
-            text = platoPedir.precio.toString() + "€",
+            text = platoPedir.precio.toString() + Constantes.SIMBOLO_EURO,
             modifier = Modifier.fillMaxWidth()
         )
         Button(
@@ -160,7 +159,7 @@ fun DetallePlatoPantalla(
                 showSnackbar(Constantes.PLATO_ANADIDO_A_PEDIDO)
             }
         ) {
-            Text("Añadir plato al pedido")
+            Text(Constantes.ANADIR_PLATO_A_PEDIDO)
         }
     }
 }
@@ -172,10 +171,9 @@ fun IngredienteCard(
     colorAnadir: Color,
     colorEliminar: Color,
     onToggle: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
+        modifier = Modifier
             .width(200.dp)
             .padding(8.dp)
             .background(color = MaterialTheme.colorScheme.background),
@@ -199,8 +197,9 @@ fun IngredienteCard(
                 onClick = onToggle,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (estaIncluido) colorEliminar else colorAnadir
-                )            ) {
-                Text(text = if (estaIncluido) "Eliminar" else "Añadir")
+                )
+            ) {
+                Text(text = if (estaIncluido) Constantes.ELIMINAR else Constantes.ANADIR)
             }
         }
     }
@@ -214,12 +213,11 @@ fun ExtraCard(
     colorAnadir: Color,
     colorEliminar: Color,
     onToggle: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .width(200.dp)
+        modifier = Modifier
             .padding(8.dp)
+            .fillMaxHeight()
             .background(color = MaterialTheme.colorScheme.background),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -236,13 +234,13 @@ fun ExtraCard(
                     .width(100.dp)
             )
             Text(text = extra.nombre.replace("_", " "))
-            Text(text = extra.precio.toString() + "€")
+            Text(text = extra.precio.toString() + Constantes.SIMBOLO_EURO)
             Button(
                 onClick = onToggle,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (estaIncluido) colorEliminar else colorAnadir
                 )            ) {
-                Text(text = if (estaIncluido) "Eliminar" else "Añadir")
+                Text(text = if (estaIncluido) Constantes.ELIMINAR else Constantes.ANADIR)
             }
         }
     }

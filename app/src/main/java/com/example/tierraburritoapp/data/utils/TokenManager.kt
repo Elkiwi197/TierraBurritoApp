@@ -4,20 +4,21 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.tierraburritoapp.common.Constantes
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private val Context.dataStore by preferencesDataStore(name = "datastore")
+private val Context.dataStore by preferencesDataStore(name = Constantes.DATASTORE)
 
 @Singleton
 class TokenManager @Inject constructor(@ApplicationContext private val context: Context) {
 
     companion object {
-        private val ACCESS_TOKEN = stringPreferencesKey("ACCESS_TOKEN")
-        private val REFRESH_TOKEN = stringPreferencesKey("REFRESH_TOKEN")
+        private val ACCESS_TOKEN = stringPreferencesKey(Constantes.ACCESS_TOKEN)
+        private val REFRESH_TOKEN = stringPreferencesKey(Constantes.REFRESH_TOKEN)
     }
 
     fun getAccessToken(): Flow<String?> {

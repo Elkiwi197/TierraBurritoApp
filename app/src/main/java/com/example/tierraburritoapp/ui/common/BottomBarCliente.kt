@@ -15,7 +15,7 @@ import com.example.tierraburritoapp.ui.navigation.PedidoActual
 
 
 @Composable
-fun BottomBar(navController: NavController) {
+fun BottomBarCliente(navController: NavController) {
     NavigationBar {
         NavigationBarItem(
             icon = { Icon(

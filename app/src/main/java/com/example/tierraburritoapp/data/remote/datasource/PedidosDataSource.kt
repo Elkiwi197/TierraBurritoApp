@@ -1,7 +1,6 @@
 package com.example.tierraburritoapp.data.remote.datasource
 
 import com.example.tierraburritoapp.common.Constantes
-import com.example.tierraburritoapp.data.model.TipoUsuario
 import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.data.remote.apiservices.PedidosService
 import com.example.tierraburritoapp.data.remote.datasource.utils.BaseApiResponse
@@ -31,5 +30,10 @@ class PedidosDataSource @Inject constructor(
     suspend fun getPedidosByCorreo(correo: String) =
         safeApiCall {
             pedidosService.getPedidosByCorreo(correo)
+        }
+
+    suspend fun getPedidosEnPreparacion(): NetworkResult<List<Pedido>> =
+        safeApiCall {
+            pedidosService.getPedidosEnPreparacion()
         }
 }

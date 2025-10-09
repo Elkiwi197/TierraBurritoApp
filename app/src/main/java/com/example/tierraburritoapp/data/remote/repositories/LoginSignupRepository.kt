@@ -1,6 +1,7 @@
 package com.example.tierraburritoapp.data.remote.repositories
 
 import com.example.tierraburritoapp.common.Constantes
+import com.example.tierraburritoapp.data.model.TokenResponse
 import com.example.tierraburritoapp.data.model.UsuarioLogin
 import com.example.tierraburritoapp.data.model.UsuarioSignup
 import com.example.tierraburritoapp.data.remote.NetworkResult
@@ -18,7 +19,7 @@ class LoginSignupRepository @Inject constructor(
         return loginSignupDataSource.signUpUsuario(request)
     }
 
-    suspend fun iniciarSesionUsuario(request: UsuarioLogin): NetworkResult<String> {
+    suspend fun iniciarSesionUsuario(request: UsuarioLogin): NetworkResult<TokenResponse> {
         var code = 0
         return try {
             val resultado = loginSignupDataSource.logInUsuario(request)
@@ -28,7 +29,7 @@ class LoginSignupRepository @Inject constructor(
                     resultado.data?.let {
                         tokenManager.saveTokens(it.accessToken, it.refreshToken)
                     }
-                    NetworkResult.Success(Constantes.SESION_INICIADA, code = code)
+                    NetworkResult.Success(resultado.data!!, code = code)
                 }
                 is NetworkResult.Error -> {
                     NetworkResult.Error(resultado.message ?: Constantes.ERROR_DESCONOCIDO, code = code)

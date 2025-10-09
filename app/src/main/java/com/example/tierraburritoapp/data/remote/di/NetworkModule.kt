@@ -2,6 +2,7 @@ package com.example.tierraburritoapp.data.remote.di
 
 
 import com.example.tierraburritoapp.BuildConfig
+import com.example.tierraburritoapp.data.remote.apiservices.AuthApiService
 import com.example.tierraburritoapp.data.remote.apiservices.LoginSignupService
 import com.example.tierraburritoapp.data.remote.apiservices.PedidosService
 import com.example.tierraburritoapp.data.remote.apiservices.PlatosService
@@ -10,6 +11,7 @@ import com.example.tierraburritoapp.data.remote.repositories.LoginSignupReposito
 import com.example.tierraburritoapp.data.remote.repositories.PedidosRepository
 import com.example.tierraburritoapp.data.remote.repositories.PlatosRepository
 import com.example.tierraburritoapp.data.remote.repositories.ProductosRepository
+import com.example.tierraburritoapp.data.utils.AuthAuthenticator
 import com.example.tierraburritoapp.data.utils.AuthInterceptor
 import com.example.tierraburritoapp.domain.usecases.ingredientes.GetExtrasByPlatoUseCase
 import com.example.tierraburritoapp.domain.usecases.ingredientes.GetIngredientesByPlatoUseCase
@@ -17,6 +19,7 @@ import com.example.tierraburritoapp.domain.usecases.loginsignup.LogInUseCase
 import com.example.tierraburritoapp.domain.usecases.loginsignup.SignUpUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.AnadirPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidosByCorreoUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidosEnPreparacionUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatoByIdUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatosUseCase
 import dagger.Module
@@ -34,6 +37,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
+    @Provides
+    fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
+        return retrofit.create(AuthApiService::class.java)
+    }
 
     @Provides
     fun provideHTTPLoggingInterceptor(): HttpLoggingInterceptor {
@@ -46,13 +53,14 @@ object NetworkModule {
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
         authInterceptor: AuthInterceptor,
-        //  authenticator: AuthAuthenticator
+        authenticator: AuthAuthenticator
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
-            //  .authenticator(authenticator)
+            .authenticator(authenticator)
             .build()
+        //todo mandar el access token todo el rato, y poner e refresh token cuando de un 403 (forbidden)
     }
 
     @Provides
@@ -139,6 +147,12 @@ object NetworkModule {
             repo: PedidosRepository
         ): GetPedidosByCorreoUseCase {
             return GetPedidosByCorreoUseCase(repo)
+        }
+        @Provides
+        fun provideGetPedidosEnPreparacionUseCase(
+            repo: PedidosRepository
+        ): GetPedidosEnPreparacionUseCase {
+            return GetPedidosEnPreparacionUseCase(repo)
         }
     }
 

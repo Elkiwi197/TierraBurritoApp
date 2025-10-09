@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaMisPedidos
+package com.example.tierraburritoapp.ui.screens.pantallaMisPedidosCliente
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,6 @@ import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidosByCorreoUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
-import com.example.tierraburritoapp.ui.screens.pantallaListaPlatos.ListaPlatosContract
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

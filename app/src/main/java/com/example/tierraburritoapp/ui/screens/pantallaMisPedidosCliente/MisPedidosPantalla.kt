@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaMisPedidos
+package com.example.tierraburritoapp.ui.screens.pantallaMisPedidosCliente
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +18,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,7 +39,7 @@ fun MisPedidosPantalla(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
 
-    val correo = variablesViewModel.correoCliente
+    val correo = variablesViewModel.correoUsuario
 
     LaunchedEffect(Unit) {
         viewModel.handleEvent(MisPedidosContract.MisPedidosEvent.LoadPedidos(correo = correo))
@@ -73,7 +75,13 @@ fun MisPedidosPantalla(
             ) {
                 items(uiState.pedidos) { pedido ->
                     PedidoCard(
-                        pedido = pedido
+                        pedido = pedido,
+                        colorPrimario = MaterialTheme.colorScheme.primary,
+                        colorSecundario = MaterialTheme.colorScheme.secondary,
+                        colorTerciario = MaterialTheme.colorScheme.tertiary,
+                        titulo = MaterialTheme.typography.titleLarge,
+                        apartado = MaterialTheme.typography.titleMedium,
+                        contenido = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -84,6 +92,12 @@ fun MisPedidosPantalla(
 @Composable
 fun PedidoCard(
     pedido: Pedido,
+    colorPrimario: Color,
+    colorSecundario: Color,
+    colorTerciario: Color,
+    titulo: TextStyle,
+    apartado: TextStyle,
+    contenido: TextStyle,
 ) {
     Card(
         modifier = Modifier
@@ -98,64 +112,67 @@ fun PedidoCard(
         ) {
             Text(
                 text = pedido.id.toString(),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary
+                style = titulo,
+                color = colorPrimario
             )
             Text(
                 text = pedido.correoCliente,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary
+                style = apartado,
+                color = colorSecundario
             )
             Text(
                 text = pedido.direccion,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary
+                style = apartado,
+                color = colorSecundario
             )
             pedido.platos.forEach { plato ->
-                Column(
-
-                ) {
+                Column {
                     Text(
                         text = plato.nombre,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary
+                        style = apartado,
+                        color = colorSecundario
                     )
                     Text(
-                        text = "Ingredientes",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary
+                        text = Constantes.INGREDIENTES,
+                        style = contenido,
+                        color = colorSecundario
                     )
-                    plato.ingredientes.forEach{ingrediente ->
+                    plato.ingredientes.forEach { ingrediente ->
                         Text(
                             text = ingrediente.nombre.replace("_", " "),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary
+                            style = contenido,
+                            color = colorTerciario
                         )
                     }
                     Text(
-                        text = "Extras",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary
+                        text = Constantes.EXTRAS,
+                        style = contenido,
+                        color = colorSecundario
                     )
-                    plato.extras.forEach{extra ->
+                    plato.extras.forEach { extra ->
                         Text(
-                            text = extra.nombre.replace("_", " ") + ": " + extra.precio + "€",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary
+                            text = extra.nombre.replace("_", " ") + ": " + extra.precio + Constantes.SIMBOLO_EURO,
+                            style = contenido,
+                            color = colorTerciario
                         )
                     }
 
                     Text(
-                        text = plato.precio.toString() + "€",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary
+                        text = plato.precio.toString() + Constantes.SIMBOLO_EURO,
+                        style = contenido,
+                        color = colorSecundario
                     )
                 }
             }
             Text(
-                text = "Total: " + pedido.precio.toString() + "€",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.secondary
+                text = Constantes.TOTAL + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
+                style = titulo,
+                color = colorPrimario
+            )
+            Text(
+                text = Constantes.ESTADO + pedido.estado.name.replace("_", " "),
+                style = titulo,
+                color = colorSecundario
             )
         }
     }

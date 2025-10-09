@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaDetallePlato
+package com.example.tierraburritoapp.ui.screens.pantallaDetallePlatoCliente
 
 import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.domain.model.Producto

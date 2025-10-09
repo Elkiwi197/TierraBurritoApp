@@ -17,5 +17,8 @@ interface PedidosService {
     @GET("/pedidos/usuario/{correoCliente}")
     suspend fun getPedidosByCorreo(@Path("correoCliente") correo: String): Response<List<Pedido>>
 
+    @GET("/pedidos/enPreparacion")
+    suspend fun getPedidosEnPreparacion(): Response<List<Pedido>>
+
 
 }

@@ -1,5 +1,6 @@
 package com.example.tierraburritoapp.data.utils
 
+import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.model.TokenResponse
 import com.example.tierraburritoapp.data.remote.apiservices.AuthApiService
 import kotlinx.coroutines.flow.first
@@ -31,7 +32,7 @@ class AuthAuthenticator @Inject constructor(
             newTokenResponse.body()?.let {
                 tokenManager.saveTokens(it.accessToken, it.refreshToken)
                 response.request.newBuilder()
-                    .header("Authorization", "Bearer ${it.accessToken}")
+                    .header(Constantes.AUTHORIZATION, Constantes.BEARER + it.accessToken)
                     .build()
             }
         }
@@ -41,7 +42,7 @@ class AuthAuthenticator @Inject constructor(
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
-        return service.get().refreshToken("Bearer $refreshToken")
+        return service.get().refreshToken(Constantes.BEARER + refreshToken)
     }
 
 }

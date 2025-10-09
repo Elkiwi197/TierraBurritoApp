@@ -16,5 +16,8 @@ class PedidosRepository @Inject constructor(
         return pedidosDataSource.getPedidosByCorreo(correo)
     }
 
+    suspend fun getPedidosEnPreparacion(): NetworkResult<List<Pedido>> {
+        return pedidosDataSource.getPedidosEnPreparacion()
+    }
 
 }

@@ -2,6 +2,7 @@ package com.example.tierraburritoapp.ui.common
 
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.*
+import com.example.tierraburritoapp.data.model.TipoUsuario
 import com.example.tierraburritoapp.domain.model.EstadoPedido
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.domain.model.Plato
@@ -10,7 +11,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VariablesViewModel @Inject constructor() : ViewModel() {
-    var correoCliente by mutableStateOf("")
+    var correoUsuario by mutableStateOf("")
+        private set
+
+    var tipoUsuario by mutableStateOf(TipoUsuario.CLIENTE)
         private set
 
     var pedidoActual by mutableStateOf(
@@ -26,8 +30,8 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
     )
         private set
 
-    fun cambiarCorreoCliente(correo: String) {
-        correoCliente = correo
+    fun cambiarCorreoUsuario(correo: String) {
+        correoUsuario = correo
         pedidoActual = pedidoActual.copy(correoCliente = correo)
     }
 
@@ -67,6 +71,10 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
             precio = 0.0,
             correoCliente = ""
         )
+    }
+
+    fun cambiarTipoUsuario(usuario: TipoUsuario) {
+        tipoUsuario = usuario
     }
 
 }

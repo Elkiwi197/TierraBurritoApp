@@ -1,5 +1,6 @@
 package com.example.tierraburritoapp.data.utils
 
+import com.example.tierraburritoapp.common.Constantes
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -14,7 +15,7 @@ class AuthInterceptor @Inject constructor(
             tokenManager.getRefreshToken().first()
         }
         val request = chain.request().newBuilder()
-        request.addHeader("Authorization", "Bearer $token")
+        request.addHeader(Constantes.AUTHORIZATION, Constantes.BEARER + token)
         return chain.proceed(request.build())
     }
 }

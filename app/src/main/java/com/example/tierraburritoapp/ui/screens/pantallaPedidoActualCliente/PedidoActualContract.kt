@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaPedidoActual
+package com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente
 
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.UiEvent

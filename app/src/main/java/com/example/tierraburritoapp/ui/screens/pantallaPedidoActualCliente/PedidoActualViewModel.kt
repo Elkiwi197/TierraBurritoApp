@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaPedidoActual
+package com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

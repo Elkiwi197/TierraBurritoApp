@@ -94,16 +94,20 @@ constructor(
                 logInUseCase(UsuarioLogin(correo = correo, contrasena = contrasena))) {
                 is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
                 is NetworkResult.Success -> {
-                    if (result.data.equals(Constantes.SESION_INICIADA)) {
-                        _uiState.value =
-                            _uiState.value.copy(isLoading = false, uiEvent = UiEvent.Navigate())
+                    val tipoUsuario = result.data?.tipoUsuario
+                    if (tipoUsuario != null) {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            uiEvent = UiEvent.Navigate(),
+                            tipoUsuario = tipoUsuario
+                        )
                     } else {
-                        _uiState.value =
-                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
-                                UiEvent.ShowSnackbar(it)
-                            })
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            uiEvent = result.message?.let { UiEvent.ShowSnackbar(it) })
                     }
                 }
+
 
                 is NetworkResult.Error -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
