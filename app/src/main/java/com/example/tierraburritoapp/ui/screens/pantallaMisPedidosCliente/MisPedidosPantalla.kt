@@ -138,7 +138,7 @@ fun PedidoCard(
                         color = colorSecundario
                     )
                     plato.ingredientes.forEach { ingrediente ->
-                        ingrediente.nombre?.replace("_", " ")?.let {
+                        ingrediente.nombre.replace("_", " ").let {
                             Text(
                                 text = it,
                                 style = contenido,
@@ -153,7 +153,10 @@ fun PedidoCard(
                     )
                     plato.extras.forEach { extra ->
                         Text(
-                            text = extra.nombre.replace("_", " ") + ": " + extra.precio + Constantes.SIMBOLO_EURO,
+                            text = extra.nombre.replace(
+                                "_",
+                                " "
+                            ) + ": " + extra.precio + Constantes.SIMBOLO_EURO,
                             style = contenido,
                             color = colorTerciario
                         )

@@ -34,7 +34,7 @@ class SeleccionPedidosViewModel @Inject constructor(
                 is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
                 is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    anPedidos = result.data ?: emptyList()
+                    pedidos = result.data ?: emptyList()
                 )
                 is NetworkResult.Error -> {
                     if (result.code == 401) {

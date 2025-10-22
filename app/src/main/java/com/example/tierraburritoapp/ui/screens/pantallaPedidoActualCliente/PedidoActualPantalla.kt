@@ -63,16 +63,16 @@ fun PedidoActualPantalla(
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedTextField(
-            value = variablesViewModel.correoUsuario,
-            onValueChange = {
-                variablesViewModel.cambiarCorreoUsuario(it)
-            },
-            label = { Text(Constantes.CORREO_ELECTRONICO) },
-            modifier = Modifier
-                .fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
-        )
+//        OutlinedTextField(
+//            value = variablesViewModel.correoUsuario,
+//            onValueChange = {
+//                variablesViewModel.cambiarCorreoUsuario(it)
+//            },
+//            label = { Text(Constantes.CORREO_ELECTRONICO) },
+//            modifier = Modifier
+//                .fillMaxWidth(),
+//            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
+//        )
         OutlinedTextField(
             value = variablesViewModel.pedido.direccion,
             onValueChange = {

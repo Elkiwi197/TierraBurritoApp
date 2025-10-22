@@ -11,11 +11,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.toRoute
+import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.BottomBarCliente
 import com.example.tierraburritoapp.ui.common.BottomBarRepartidor
 import com.example.tierraburritoapp.ui.common.TopBar
@@ -28,6 +32,7 @@ import com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente.Pedid
 import com.example.tierraburritoapp.ui.screens.pantallaPedidoSeleccionadoRepartidor.PedidoSeleccionadoPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosPantalla
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 @Composable
 fun Navigation() {
@@ -57,10 +62,11 @@ fun Navigation() {
             }
         },
         bottomBar = {
-            if (screen == PedidoActualDestination ||screen == MisPedidosDestination ||
-                screen == ListaPlatosDestination || screen == DetallePlatoDestination) {
+            if (screen == PedidoActualDestination || screen == MisPedidosDestination ||
+                screen == ListaPlatosDestination || screen == DetallePlatoDestination
+            ) {
                 BottomBarCliente(navController = navController)
-            } else if (screen == SeleccionPedidosDestination){
+            } else if (screen == SeleccionPedidosDestination) {
                 BottomBarRepartidor(navController = navController)
 
             }
@@ -131,8 +137,9 @@ fun Navigation() {
 
             composable<SeleccionPedidos> {
                 SeleccionPedidosPantalla(
-                    onNavigateToPedidoSeleccionado = { pedido ->
-                        navController.navigate(PedidoSeleccionado(pedido = pedido))
+                    navController = navController,
+                    onNavigateToPedidoSeleccionado = {
+                        navController.navigate(PedidoSeleccionado)
                     },
                     onNavigateToLoginSignup = {
                         navController.navigate(Login)
@@ -141,8 +148,16 @@ fun Navigation() {
                 )
             }
 
-            composable<PedidoSeleccionado> {
-                PedidoSeleccionadoPantalla (
+            composable(
+                route = "pedidoSeleccionadoPantalla/{pedidoJson}",
+                arguments = listOf(navArgument("pedidoJson") {
+                    type = NavType.StringType
+                })
+            ) { backStackEntry ->
+                val json = backStackEntry.arguments?.getString("pedidoJson") ?: ""
+                val pedido = Json.decodeFromString<Pedido>(json)
+                PedidoSeleccionadoPantalla(
+                    pedido = pedido,
                     onNavigateToLoginSignup = {
                         navController.navigate(Login)
                     },

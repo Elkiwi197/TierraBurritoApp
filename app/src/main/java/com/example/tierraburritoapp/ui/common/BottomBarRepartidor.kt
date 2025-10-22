@@ -31,7 +31,7 @@ fun BottomBarRepartidor(navController: NavController) {
                 Constantes.PEDIDO_SELECCIONADO) },
             label = { Text(Constantes.PEDIDO_SELECCIONADO) },
             selected = false,
-            onClick = { navController.navigate(PedidoSeleccionado) }
+            onClick = { navController.navigate(PedidoSeleccionado) } //todo cambiar a pedido ACEPTADO
         )
         NavigationBarItem(
             icon = { Icon(

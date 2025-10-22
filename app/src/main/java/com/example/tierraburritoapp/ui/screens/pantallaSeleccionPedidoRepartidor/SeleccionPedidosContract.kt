@@ -12,7 +12,7 @@ interface SeleccionPedidosContract {
 
     data class SeleccionPedidosState(
         val isLoading: Boolean = false,
-        val anPedidos: List<Pedido> = emptyList(),
+        val pedidos: List<Pedido> = emptyList(),
         val uiEvent: UiEvent? = null
     )
 }

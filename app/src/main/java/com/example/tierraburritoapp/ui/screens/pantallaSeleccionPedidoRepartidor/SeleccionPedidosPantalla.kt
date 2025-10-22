@@ -1,5 +1,6 @@
 package com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor
 
+import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,17 +24,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.navArgument
+import com.example.tierraburritoapp.R
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.UiEvent
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun SeleccionPedidosPantalla(
+    navController: NavController,
     viewModel: SeleccionPedidosViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
-    onNavigateToPedidoSeleccionado: (pedido: Pedido) -> Unit,
+    onNavigateToPedidoSeleccionado: (bundle: Bundle) -> Unit,
     onNavigateToLoginSignup: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,13 +77,15 @@ fun SeleccionPedidosPantalla(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(uiState.anPedidos) { pedido ->
+                items(uiState.pedidos) { pedido ->
                     PedidoCard(
                         pedido = pedido,
                         colorPrimario = MaterialTheme.colorScheme.primary,
                         colorSecundario = MaterialTheme.colorScheme.secondary,
-                        onNavigateToPedidoSeleccionado = onNavigateToPedidoSeleccionado
-                    )
+                        onNavigateToPedidoSeleccionado = { pedido ->
+                            val jsonPedido = Json.encodeToString(pedido)
+                            navController.navigate("pedidoSeleccionadoPantalla/{$jsonPedido}")
+                        })
                 }
             }
         }

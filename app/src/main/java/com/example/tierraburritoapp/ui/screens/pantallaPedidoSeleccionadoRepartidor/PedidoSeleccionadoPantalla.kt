@@ -34,9 +34,10 @@ import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor
 
 @Composable
 fun PedidoSeleccionadoPantalla(
+    pedido: Pedido,
     viewModel: PedidoSeleccionadoViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
-    onNavigateToLoginSignup: () -> Unit
+    onNavigateToLoginSignup: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -66,13 +67,13 @@ fun PedidoSeleccionadoPantalla(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-//            PedidoCard(
-//                pedido = viewModel.pedido,
-//                colorPrimario = MaterialTheme.colorScheme.primary,
-//                colorSecundario = MaterialTheme.colorScheme.secondary,
-//            )
-
-
+            viewModel.pedido?.let {
+                PedidoCard(
+                    pedido = it,
+                    colorPrimario = MaterialTheme.colorScheme.primary,
+                    colorSecundario = MaterialTheme.colorScheme.secondary,
+                )
+            }
         }
 
 

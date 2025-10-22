@@ -1,5 +1,6 @@
 package com.example.tierraburritoapp.ui.screens.pantallaPedidoSeleccionadoRepartidor
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tierraburritoapp.common.Constantes
@@ -15,11 +16,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PedidoSeleccionadoViewModel @Inject constructor(
-     //val pedido: Pedido,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PedidoSeleccionadoContract.PedidoSeleccionadoState())
     val uiState: StateFlow<PedidoSeleccionadoContract.PedidoSeleccionadoState> = _uiState
+    val pedido = savedStateHandle.get<Pedido>("pedido")
 
     fun handleEvent(event: PedidoSeleccionadoContract.PedidoSeleccionadoEvent) {
         when (event) {

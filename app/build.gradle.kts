@@ -30,7 +30,7 @@ android {
     productFlavors {
         create("development") {
             dimension = "env"
-            buildConfigField("String", "API_URL", "\"http://10.6.66.80:8080\"")
+            buildConfigField("String", "API_URL", "\"http://192.168.100.138:8080\"")
 
             testInstrumentationRunner = "dagger.hilt.android.testing.HiltAndroidJUnitRunner"
 
@@ -38,7 +38,7 @@ android {
         }
         create("production") {
             dimension = "env"
-            buildConfigField("String", "API_URL", "\"http://10.6.66.80:8080\"")
+            buildConfigField("String", "API_URL", "\"http://192.168.100.138:8080\"")
 
         }
     }
