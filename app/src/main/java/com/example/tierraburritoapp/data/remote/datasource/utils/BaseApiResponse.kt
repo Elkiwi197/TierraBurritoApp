@@ -2,7 +2,6 @@ package com.example.tierraburritoapp.data.remote.datasource.utils
 
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.remote.NetworkResult
-import com.example.tierraburritoapp.domain.model.Pedido
 import org.json.JSONObject
 import retrofit2.Response
 
@@ -41,8 +40,7 @@ abstract class BaseApiResponse {
         }
     }
 
-
-    private fun <T> error(errorMessage: String, code: Int): NetworkResult<T> =
+    private fun <T> error(errorMessage: String, code: kotlin.Int): NetworkResult<T> =
         NetworkResult.Error(message = errorMessage, code = code)
 
 }

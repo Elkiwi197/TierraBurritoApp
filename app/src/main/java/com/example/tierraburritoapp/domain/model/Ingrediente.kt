@@ -1,5 +1,6 @@
 package com.example.tierraburritoapp.domain.model
 
+
 enum class Ingrediente {
     STEAK, CARNITAS, CARNE_BBQ, POLLO, ARROZ_BLANCO, ARROZ_INTEGRAL, FRIJOLES, VERDURAS,
     PICO_DE_GALLO, SALSA_DE_QUESO, SALSA_CHIPOTLE, CREMA_AGRIA, SALSA_666, SALSA_MEDIA,

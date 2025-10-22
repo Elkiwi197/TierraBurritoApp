@@ -5,7 +5,7 @@ import com.example.tierraburritoapp.ui.common.UiEvent
 
 interface PedidoActualContract {
     sealed class PedidoActualEvent {
-        data class HacerPedido(val pedido: Pedido) : PedidoActualEvent()
+        data class HacerPedido(val anPedido: Pedido) : PedidoActualEvent()
         data object UiEventDone : PedidoActualEvent()
 
     }

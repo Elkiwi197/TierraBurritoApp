@@ -15,7 +15,9 @@ val appDestinationList = listOf(
     DetallePlatoDestination,
     PedidoActualDestination,
     MisPedidosDestination,
-    SeleccionPedidosDestination
+    SeleccionPedidosDestination,
+    PedidoSeleccionadoDestination,
+    PedidosRepartidosDestination
 )
 
 interface AppDestination {
@@ -88,12 +90,10 @@ object MisPedidosDestination : AppDestination {
 }
 
 object SeleccionPedidosDestination : AppMainBottomDestination {
-    override val onBottomBar: Boolean
-        get() = TODO("Not yet implemented")
-    override val icon: ImageVector
-        get() = TODO("Not yet implemented")
     override val route = SeleccionPedidos
     override val title = Constantes.SELECCION_PEDIDOS
+    override val onBottomBar = true
+    override val icon = Icons.Filled.Favorite
 
     override val scaffoldState = ScaffoldState(
         topBarState = TopBarState(
@@ -104,4 +104,28 @@ object SeleccionPedidosDestination : AppMainBottomDestination {
     )
 }
 
+object PedidoSeleccionadoDestination : AppDestination {
+    override val route = PedidoSeleccionado
+    override val title = Constantes.PEDIDO_SELECCIONADO
 
+    override val scaffoldState = ScaffoldState(
+        topBarState = TopBarState(
+            showNavigationIcon = false,
+            arrangement = Arrangement.Start
+        ),
+        fabVisible = true
+    )
+}
+
+object PedidosRepartidosDestination : AppDestination {
+    override val route = PedidosRepartidos
+    override val title = Constantes.PEDIDOS_REPARTIDOS
+
+    override val scaffoldState = ScaffoldState(
+        topBarState = TopBarState(
+            showNavigationIcon = false,
+            arrangement = Arrangement.Start
+        ),
+        fabVisible = true
+    )
+}

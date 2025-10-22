@@ -2,6 +2,9 @@ package com.example.tierraburritoapp.common
 
 object Constantes {
 
+    const val PEDIDO_SELECCIONADO = "Pedido seleccionado"
+    const val PEDIDOS_REPARTIDOS = "Pedidos repartidos"
+    const val PEDIDO_ACEPTADO = "Pedido aceptado"
     const val SELECCION_PEDIDOS = "Selección de pedidos"
     const val BEARER = "Bearer "
     const val ACCESS_TOKEN = "ACCESS_TOKEN"

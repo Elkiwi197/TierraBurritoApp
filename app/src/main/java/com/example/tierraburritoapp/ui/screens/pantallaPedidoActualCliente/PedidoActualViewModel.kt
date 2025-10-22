@@ -24,7 +24,7 @@ constructor(
 
     fun handleEvent(event: PedidoActualContract.PedidoActualEvent) {
         when (event) {
-            is PedidoActualContract.PedidoActualEvent.HacerPedido -> hacerPedido(pedido = event.pedido)
+            is PedidoActualContract.PedidoActualEvent.HacerPedido -> hacerPedido(pedido = event.anPedido)
             PedidoActualContract.PedidoActualEvent.UiEventDone -> clearUiEvents()
         }
     }

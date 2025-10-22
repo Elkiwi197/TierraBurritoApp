@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente
+package com.example.tierraburritoapp.ui.screens.pantallaDetallePedidoRepartidor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -31,20 +31,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.tierraburritoapp.common.Constantes
+import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.ui.common.UiEvent
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
 
 @Composable
-fun PedidoActualPantalla(
-    viewModel: PedidoActualViewModel = hiltViewModel(),
+fun DetallePedidoRepartidorPantalla(
+    viewModel: DetallePedidoRepartidorViewModel = hiltViewModel(),
     variablesViewModel: VariablesViewModel,
     showSnackbar: (String) -> Unit,
     onNavigateToLoginSignup: () -> Unit,
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val pedido = variablesViewModel.pedido
+    val pedido: Pedido = variablesViewModel.pedido
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
@@ -54,7 +55,7 @@ fun PedidoActualPantalla(
                 onNavigateToLoginSignup()
                 showSnackbar(it.mensaje)
             }
-            viewModel.handleEvent(PedidoActualContract.PedidoActualEvent.UiEventDone)
+            viewModel.handleEvent(DetallePedidoRepartidorContract.DetallePedidoRepartidorEvent.UiEventDoneDetalle)
         }
     }
 
@@ -107,17 +108,6 @@ fun PedidoActualPantalla(
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleLarge
             )
-            Button(
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                onClick = {
-                    viewModel.handleEvent(PedidoActualContract.PedidoActualEvent.HacerPedido(pedido))
-                    variablesViewModel.resetearPedido()
-                }
-            ) {
-                Text(
-                    text = Constantes.CONFIRMAR_PEDIDO
-                )
-            }
         }
 
     }
@@ -203,5 +193,3 @@ fun PlatoPedidoCard(
         }
     }
 }
-
-

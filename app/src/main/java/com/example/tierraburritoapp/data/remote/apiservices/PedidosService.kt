@@ -12,7 +12,7 @@ import retrofit2.http.Path
 interface PedidosService {
 
     @POST("/pedidos/anadirPedido")
-    suspend fun anadirPedido(@Body pedido: Pedido): Response<ResponseBody>
+    suspend fun anadirPedido(@Body anPedido: Pedido): Response<ResponseBody>
 
     @GET("/pedidos/usuario/{correoCliente}")
     suspend fun getPedidosByCorreo(@Path("correoCliente") correo: String): Response<List<Pedido>>
@@ -20,5 +20,6 @@ interface PedidosService {
     @GET("/pedidos/enPreparacion")
     suspend fun getPedidosEnPreparacion(): Response<List<Pedido>>
 
-
+    @POST("/pedidos/aceptarPedido")
+    suspend fun aceptarPedido(@Body idInt: kotlin.Int): Response<ResponseBody>
 }

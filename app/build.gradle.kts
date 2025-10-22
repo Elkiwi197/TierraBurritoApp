@@ -5,8 +5,10 @@ plugins {
     alias(libs.plugins.kapt)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-
+    alias(libs.plugins.parcelize)
+    alias(libs.plugins.kotlinCompose)
 }
+
 
 android {
     namespace = "com.example.tierraburritoapp"
@@ -62,7 +64,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
+        kotlinCompilerExtensionVersion = "1.6.10"
     }
     packaging {
         resources {
@@ -109,6 +111,11 @@ dependencies {
 
     implementation(libs.coil)
     implementation(libs.coil.compose)
+
+    // Google Maps
+    implementation(libs.google.maps)
+    implementation(libs.maps.compose)
+
 
     // Hilt
     implementation(libs.hilt.core)

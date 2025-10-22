@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TierraBurritoApp</string>
+    <string name="gmaps_api_key">AIzaSyCa8lS92VbTB1mNvhJpke0b9IYFL6cnzV0</string>
 </resources>

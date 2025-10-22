@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor
+package com.example.tierraburritoapp.ui.screens.pantallaPedidoSeleccionadoRepartidor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,18 +28,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.UiEvent
+import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosContract
+import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosViewModel
+
 
 @Composable
-fun SeleccionPedidosPantalla(
-    viewModel: SeleccionPedidosViewModel = hiltViewModel(),
+fun PedidoSeleccionadoPantalla(
+    viewModel: PedidoSeleccionadoViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
-    onNavigateToPedidoSeleccionado: (pedido: Pedido) -> Unit,
     onNavigateToLoginSignup: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.handleEvent(SeleccionPedidosContract.SeleccionPedidosEvent.LoadPedidos)
+        viewModel.handleEvent(PedidoSeleccionadoContract.PedidoSeleccionadoEvent.LoadPedido)
     }
 
     LaunchedEffect(uiState.uiEvent) {
@@ -50,7 +52,7 @@ fun SeleccionPedidosPantalla(
                 onNavigateToLoginSignup()
                 showSnackbar(it.mensaje)
             }
-            viewModel.handleEvent(SeleccionPedidosContract.SeleccionPedidosEvent.UiEventDone)
+            viewModel.handleEvent(PedidoSeleccionadoContract.PedidoSeleccionadoEvent.UiEventDone)
         }
     }
 
@@ -60,24 +62,27 @@ fun SeleccionPedidosPantalla(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+//            PedidoCard(
+//                pedido = viewModel.pedido,
+//                colorPrimario = MaterialTheme.colorScheme.primary,
+//                colorSecundario = MaterialTheme.colorScheme.secondary,
+//            )
+
+
+        }
+
+
+
+
         if (uiState.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.testTag(Constantes.LOADING_INDICATOR)
             )
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(uiState.anPedidos) { pedido ->
-                    PedidoCard(
-                        pedido = pedido,
-                        colorPrimario = MaterialTheme.colorScheme.primary,
-                        colorSecundario = MaterialTheme.colorScheme.secondary,
-                        onNavigateToPedidoSeleccionado = onNavigateToPedidoSeleccionado
-                    )
-                }
-            }
         }
     }
 }
@@ -87,30 +92,30 @@ fun PedidoCard(
     pedido: Pedido,
     colorPrimario: Color,
     colorSecundario: Color,
-    onNavigateToPedidoSeleccionado: (Pedido) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(color = MaterialTheme.colorScheme.background)
-            .clickable { onNavigateToPedidoSeleccionado(pedido) },
+            .background(color = MaterialTheme.colorScheme.background),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp)
         ) {
+            Column {
+
+                Text(
+                    text = pedido.precio.toString() + Constantes.SIMBOLO_EURO,
+                    color = colorPrimario
+                )
+            }
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = pedido.direccion,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = colorPrimario
-                )
-                Text(
                     text = pedido.correoCliente,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.titleLarge,
                     color = colorPrimario
                 )
                 Column {
@@ -122,11 +127,6 @@ fun PedidoCard(
                         )
                     }
                 }
-                Text(
-                    text = pedido.precio.toString() + Constantes.SIMBOLO_EURO,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = colorPrimario
-                )
             }
         }
     }

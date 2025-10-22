@@ -2,14 +2,13 @@ package com.example.tierraburritoapp.domain.usecases.pedidos
 
 import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.data.remote.repositories.PedidosRepository
-import com.example.tierraburritoapp.domain.model.Pedido
 import javax.inject.Inject
 
 
-class AnadirPedidoUseCase @Inject constructor(
+class AceptarPedidoUseCase @Inject constructor(
     private val pedidosRepository: PedidosRepository
 ) {
-    suspend operator fun invoke(anPedido: Pedido): NetworkResult<String> {
-        return pedidosRepository.anadirPedido(anPedido)
+    suspend operator fun invoke(idPedido: Int): NetworkResult<String> {
+        return pedidosRepository.aceptarPedido(idPedido)
     }
 }

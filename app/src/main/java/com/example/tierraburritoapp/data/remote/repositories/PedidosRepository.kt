@@ -8,8 +8,8 @@ import javax.inject.Inject
 class PedidosRepository @Inject constructor(
     private val pedidosDataSource: PedidosDataSource,
 ) {
-    suspend fun anadirPedido(pedido: Pedido): NetworkResult<String> {
-        return pedidosDataSource.anadirPedido(pedido)
+    suspend fun anadirPedido(anPedido: Pedido): NetworkResult<String> {
+        return pedidosDataSource.anadirPedido(anPedido)
     }
 
     suspend fun getPedidosByCorreo(correo: String): NetworkResult<List<Pedido>> {
@@ -18,6 +18,10 @@ class PedidosRepository @Inject constructor(
 
     suspend fun getPedidosEnPreparacion(): NetworkResult<List<Pedido>> {
         return pedidosDataSource.getPedidosEnPreparacion()
+    }
+
+    suspend fun aceptarPedido(idInt: kotlin.Int): NetworkResult<String> {
+        return pedidosDataSource.aceptarPedido(idInt)
     }
 
 }

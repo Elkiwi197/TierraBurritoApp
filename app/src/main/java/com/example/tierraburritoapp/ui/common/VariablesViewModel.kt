@@ -17,7 +17,7 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
     var tipoUsuario by mutableStateOf(TipoUsuario.CLIENTE)
         private set
 
-    var pedidoActual by mutableStateOf(
+    var pedido by mutableStateOf(
         Pedido(
             id = 0,
             platos = mutableListOf(),
@@ -32,37 +32,37 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
 
     fun cambiarCorreoUsuario(correo: String) {
         correoUsuario = correo
-        pedidoActual = pedidoActual.copy(correoCliente = correo)
+        pedido = pedido.copy(correoCliente = correo)
     }
 
     fun cambiarDireccionPedido(direccion: String) {
-        pedidoActual = pedidoActual.copy(direccion = direccion)
+        pedido = pedido.copy(direccion = direccion)
     }
 
     fun anadirPlatoAlPedido(plato: Plato) {
-        val platosAnadir = pedidoActual.platos.toMutableList().apply { add(plato) }
-        pedidoActual = pedidoActual.copy(platos = platosAnadir)
-        pedidoActual.precio = 0.0
+        val platosAnadir = pedido.platos.toMutableList().apply { add(plato) }
+        pedido = pedido.copy(platos = platosAnadir)
+        pedido.precio = 0.0
         platosAnadir.forEach { p ->
-            pedidoActual.precio += p.precio
+            pedido.precio += p.precio
         }
     }
 
     fun eliminarPlatoDelPedido(plato: Plato) {
-        val platosAnadir = pedidoActual.platos.toMutableList().apply { remove(plato) }
-        pedidoActual = pedidoActual.copy(platos = platosAnadir)
-        pedidoActual.precio = 0.0
+        val platosAnadir = pedido.platos.toMutableList().apply { remove(plato) }
+        pedido = pedido.copy(platos = platosAnadir)
+        pedido.precio = 0.0
         platosAnadir.forEach { p ->
-            pedidoActual.precio += p.precio
+            pedido.precio += p.precio
         }
     }
 
     fun cambiarEstadoPedido(estado: EstadoPedido) {
-        pedidoActual = pedidoActual.copy(estado = estado)
+        pedido = pedido.copy(estado = estado)
     }
 
     fun resetearPedido() {
-        pedidoActual = pedidoActual.copy(
+        pedido = pedido.copy(
             id = 0,
             platos = mutableListOf(),
             otros = mutableListOf(),
