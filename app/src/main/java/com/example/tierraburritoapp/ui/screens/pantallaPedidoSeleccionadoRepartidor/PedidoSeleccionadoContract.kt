@@ -4,7 +4,6 @@ import com.example.tierraburritoapp.ui.common.UiEvent
 
 interface PedidoSeleccionadoContract {
     sealed class PedidoSeleccionadoEvent {
-        data object LoadPedido : PedidoSeleccionadoEvent()
         data object UiEventDone : PedidoSeleccionadoEvent()
     }
 

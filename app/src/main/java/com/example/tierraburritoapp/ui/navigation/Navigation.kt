@@ -148,16 +148,13 @@ fun Navigation() {
                 )
             }
 
-            composable(
-                route = "pedidoSeleccionadoPantalla/{pedidoJson}",
-                arguments = listOf(navArgument("pedidoJson") {
-                    type = NavType.StringType
-                })
-            ) { backStackEntry ->
-                val json = backStackEntry.arguments?.getString("pedidoJson") ?: ""
-                val pedido = Json.decodeFromString<Pedido>(json)
+            composable("pedidoSeleccionadoPantalla") {
+                val pedido =
+                    navController.previousBackStackEntry?.savedStateHandle?.get<Pedido>("pedido")
+                        ?: error("Pedido no recibido")
                 PedidoSeleccionadoPantalla(
                     pedido = pedido,
+                    navController = navController,
                     onNavigateToLoginSignup = {
                         navController.navigate(Login)
                     },

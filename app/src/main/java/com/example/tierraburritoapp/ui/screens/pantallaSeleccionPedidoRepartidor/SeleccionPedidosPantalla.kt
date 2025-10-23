@@ -41,7 +41,7 @@ fun SeleccionPedidosPantalla(
     navController: NavController,
     viewModel: SeleccionPedidosViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
-    onNavigateToPedidoSeleccionado: (bundle: Bundle) -> Unit,
+    onNavigateToPedidoSeleccionado: () -> Unit,
     onNavigateToLoginSignup: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -83,8 +83,8 @@ fun SeleccionPedidosPantalla(
                         colorPrimario = MaterialTheme.colorScheme.primary,
                         colorSecundario = MaterialTheme.colorScheme.secondary,
                         onNavigateToPedidoSeleccionado = { pedido ->
-                            val jsonPedido = Json.encodeToString(pedido)
-                            navController.navigate("pedidoSeleccionadoPantalla/{$jsonPedido}")
+                            navController.currentBackStackEntry?.savedStateHandle?.set("pedido", pedido)
+                            navController.navigate("pedidoSeleccionadoPantalla")
                         })
                 }
             }

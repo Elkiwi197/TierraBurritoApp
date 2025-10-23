@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.UiEvent
@@ -35,15 +36,12 @@ import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor
 @Composable
 fun PedidoSeleccionadoPantalla(
     pedido: Pedido,
+    navController: NavController,
     viewModel: PedidoSeleccionadoViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
     onNavigateToLoginSignup: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.handleEvent(PedidoSeleccionadoContract.PedidoSeleccionadoEvent.LoadPedido)
-    }
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
@@ -67,7 +65,7 @@ fun PedidoSeleccionadoPantalla(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            viewModel.pedido?.let {
+            pedido?.let {
                 PedidoCard(
                     pedido = it,
                     colorPrimario = MaterialTheme.colorScheme.primary,

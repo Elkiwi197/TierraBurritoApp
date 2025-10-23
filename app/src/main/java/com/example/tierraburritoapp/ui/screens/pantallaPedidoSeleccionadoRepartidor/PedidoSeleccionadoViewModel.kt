@@ -25,7 +25,7 @@ class PedidoSeleccionadoViewModel @Inject constructor(
 
     fun handleEvent(event: PedidoSeleccionadoContract.PedidoSeleccionadoEvent) {
         when (event) {
-            PedidoSeleccionadoContract.PedidoSeleccionadoEvent.LoadPedido -> cargarPedido()
+         //   PedidoSeleccionadoContract.PedidoSeleccionadoEvent.LoadPedido -> cargarPedido()
             PedidoSeleccionadoContract.PedidoSeleccionadoEvent.UiEventDone -> clearUiEvents()
         }
     }
