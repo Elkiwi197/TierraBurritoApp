@@ -138,28 +138,18 @@ fun PedidoCard(
                         color = colorSecundario
                     )
                     plato.ingredientes.forEach { ingrediente ->
+                        val precio = if (ingrediente.precio != 0.0) {
+                            "+ " + ingrediente.precio.toString() + "€"
+                        } else {
+                            ""
+                        }
                         ingrediente.nombre.replace("_", " ").let {
                             Text(
-                                text = it,
+                                text = it + precio,
                                 style = contenido,
                                 color = colorTerciario
                             )
                         }
-                    }
-                    Text(
-                        text = Constantes.EXTRAS,
-                        style = contenido,
-                        color = colorSecundario
-                    )
-                    plato.extras.forEach { extra ->
-                        Text(
-                            text = extra.nombre.replace(
-                                "_",
-                                " "
-                            ) + ": " + extra.precio + Constantes.SIMBOLO_EURO,
-                            style = contenido,
-                            color = colorTerciario
-                        )
                     }
 
                     Text(

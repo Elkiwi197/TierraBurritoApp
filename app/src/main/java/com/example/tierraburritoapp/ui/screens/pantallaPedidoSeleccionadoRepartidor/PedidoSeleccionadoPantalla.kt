@@ -1,36 +1,53 @@
 package com.example.tierraburritoapp.ui.screens.pantallaPedidoSeleccionadoRepartidor
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.example.tierraburritoapp.R
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.domain.model.Pedido
+import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.ui.common.UiEvent
-import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosContract
-import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosViewModel
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 
 @Composable
@@ -42,6 +59,14 @@ fun PedidoSeleccionadoPantalla(
     onNavigateToLoginSignup: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val barrio = LatLng(40.434192, -3.606442)
+    val barrioState = MarkerState(position = barrio)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(barrio, 17f)
+    }
+    val titulo = "Mapa Demo"
+    var tipoDeMapa by remember { mutableStateOf(MapType.NORMAL) }
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
@@ -65,68 +90,173 @@ fun PedidoSeleccionadoPantalla(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            pedido?.let {
-                PedidoCard(
-                    pedido = it,
-                    colorPrimario = MaterialTheme.colorScheme.primary,
-                    colorSecundario = MaterialTheme.colorScheme.secondary,
-                )
-            }
+            PedidoView(
+                pedido = pedido,
+                colorPrimario = MaterialTheme.colorScheme.primary,
+                colorSecundario = MaterialTheme.colorScheme.secondary,
+            )
         }
 
 
+//        if (uiState.isLoading) {
+//            CircularProgressIndicator(
+//                modifier = Modifier.testTag(Constantes.LOADING_INDICATOR)
+//            )
+//        } else {
+        Mapa(
+            cameraPositionState = cameraPositionState,
+            markerState = barrioState,
+            modifier = Modifier.fillMaxSize(),
+        )
+//        }
+    }
+}
 
+@Composable
+fun Mapa(
+    cameraPositionState: CameraPositionState,
+    markerState: MarkerState,
+    modifier: Modifier
+) {
+    val context = LocalContext.current
+    var mapLoaded by remember { mutableStateOf(false) }
 
-        if (uiState.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.testTag(Constantes.LOADING_INDICATOR)
-            )
-        } else {
+    // Cargar icono solo cuando el mapa está listo
+    val markerIcon = remember(mapLoaded) {
+        if (mapLoaded) {
+            BitmapDescriptorFactory.fromResource(R.mipmap.restaurante)
+        } else null
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxHeight(0.3f)
+    ) {
+        GoogleMap(
+            modifier  = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+            cameraPositionState = cameraPositionState,
+            onMapLoaded = { mapLoaded = true }, // mapa listo
+        ) {
+            if (markerIcon != null) {
+                Marker(
+                    state = markerState,
+                    title = "Restaurante",
+                    icon = markerIcon
+                )
+            }
         }
     }
 }
 
 @Composable
-fun PedidoCard(
+fun PedidoView(
     pedido: Pedido,
     colorPrimario: Color,
     colorSecundario: Color,
 ) {
-    Card(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .fillMaxHeight(0.6f)
             .background(color = MaterialTheme.colorScheme.background),
-        elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp)
+        LazyRow {
+            items(pedido.platos) { plato ->
+                PlatoPedidoCard(
+                    plato = plato,
+                    colorPrimario = MaterialTheme.colorScheme.primary,
+                    colorSecundario = MaterialTheme.colorScheme.secondary,
+                    titulo = MaterialTheme.typography.titleLarge,
+                    apartado = MaterialTheme.typography.titleMedium,
+                    contenido = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column {
-
-                Text(
-                    text = pedido.precio.toString() + Constantes.SIMBOLO_EURO,
-                    color = colorPrimario
-                )
-            }
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = pedido.correoCliente,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = colorPrimario
-                )
-                Column {
-                    pedido.platos.forEach { plato ->
-                        Text(
-                            text = plato.nombre,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = colorSecundario
-                        )
-                    }
-                }
-            }
+            Text(
+                text = Constantes.TOTAL + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
+                color = colorPrimario
+            )
+            Text(
+                text = pedido.direccion,
+                style = MaterialTheme.typography.titleLarge,
+                color = colorSecundario
+            )
         }
     }
 }
+
+
+@Composable
+fun PlatoPedidoCard(
+    plato: Plato,
+    colorPrimario: Color,
+    colorSecundario: Color,
+    titulo: TextStyle,
+    apartado: TextStyle,
+    contenido: TextStyle,
+) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.background),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            AsyncImage(
+                model = plato.rutaFoto,
+                contentDescription = Constantes.FOTO_PLATO,
+                modifier = Modifier
+                    .height(120.dp)
+                    .width(120.dp)
+            )
+            Text(
+                text = plato.nombre,
+                style = titulo,
+                color = colorPrimario
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = Constantes.INGREDIENTES,
+                        style = apartado,
+                        color = colorPrimario
+                    )
+                    LazyColumn {
+                        items(plato.ingredientes) {
+                            Text(
+                                text = it.nombre.replace("_", " "),
+                                style = contenido,
+                                color = colorSecundario
+                            )
+                        }
+                    }
+                }
+            }
+
+            Text(
+                text = plato.precio.toString() + Constantes.SIMBOLO_EURO,
+                style = titulo,
+                color = colorPrimario
+            )
+        }
+
+    }
+}
+
+

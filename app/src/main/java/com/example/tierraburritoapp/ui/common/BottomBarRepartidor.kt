@@ -28,7 +28,7 @@ fun BottomBarRepartidor(navController: NavController) {
         NavigationBarItem(
             icon = { Icon(
                 painterResource(R.drawable.outline_shopping_cart_24), contentDescription =
-                Constantes.PEDIDO_SELECCIONADO) },
+                Constantes.PEDIDO_ACEPTADO) },
             label = { Text(Constantes.PEDIDO_SELECCIONADO) },
             selected = false,
             onClick = { navController.navigate(PedidoSeleccionado) } //todo cambiar a pedido ACEPTADO

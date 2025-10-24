@@ -11,13 +11,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.toRoute
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.BottomBarCliente
@@ -32,7 +29,6 @@ import com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente.Pedid
 import com.example.tierraburritoapp.ui.screens.pantallaPedidoSeleccionadoRepartidor.PedidoSeleccionadoPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosPantalla
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 @Composable
 fun Navigation() {
@@ -151,15 +147,18 @@ fun Navigation() {
             composable("pedidoSeleccionadoPantalla") {
                 val pedido =
                     navController.previousBackStackEntry?.savedStateHandle?.get<Pedido>("pedido")
-                        ?: error("Pedido no recibido")
-                PedidoSeleccionadoPantalla(
-                    pedido = pedido,
-                    navController = navController,
-                    onNavigateToLoginSignup = {
-                        navController.navigate(Login)
-                    },
-                    showSnackbar = { showSnackbar(it) }
-                )
+                if (pedido == null) {
+                    navController.navigate(SeleccionPedidos)
+                } else {
+                    PedidoSeleccionadoPantalla(
+                        pedido = pedido,
+                        navController = navController,
+                        onNavigateToLoginSignup = {
+                            navController.navigate(Login)
+                        },
+                        showSnackbar = { showSnackbar(it) }
+                    )
+                }
             }
         }
     }

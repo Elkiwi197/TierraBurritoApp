@@ -3,14 +3,15 @@ package com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -25,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -63,16 +64,6 @@ fun PedidoActualPantalla(
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-//        OutlinedTextField(
-//            value = variablesViewModel.correoUsuario,
-//            onValueChange = {
-//                variablesViewModel.cambiarCorreoUsuario(it)
-//            },
-//            label = { Text(Constantes.CORREO_ELECTRONICO) },
-//            modifier = Modifier
-//                .fillMaxWidth(),
-//            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
-//        )
         OutlinedTextField(
             value = variablesViewModel.pedido.direccion,
             onValueChange = {
@@ -81,12 +72,12 @@ fun PedidoActualPantalla(
             label = { Text(Constantes.DIRECCION) },
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(8.dp)
         )
 
         LazyRow(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             items(pedido.platos) { plato ->
@@ -101,17 +92,28 @@ fun PedidoActualPantalla(
                 )
             }
         }
-        Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
-                text = pedido.precio.toString() + Constantes.SIMBOLO_EURO,
+                text = Constantes.TOTAL + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                //     textAlign = TextAlign.Center,
             )
             Button(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                 onClick = {
-                    viewModel.handleEvent(PedidoActualContract.PedidoActualEvent.HacerPedido(pedido))
-                    variablesViewModel.resetearPedido()
+                    if (pedido.direccion.isEmpty()) {
+                        showSnackbar(Constantes.INTRODUZCA_DIRECCION)
+                    } else {
+                        viewModel.handleEvent(
+                            PedidoActualContract.PedidoActualEvent.HacerPedido(
+                                pedido
+                            )
+                        )
+                        variablesViewModel.resetearPedido()
+                    }
                 }
             ) {
                 Text(
@@ -136,7 +138,9 @@ fun PlatoPedidoCard(
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .background(color = MaterialTheme.colorScheme.background),
+            .background(color = MaterialTheme.colorScheme.background)
+            .fillMaxHeight(0.85f)
+            .width(300.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
@@ -148,60 +152,81 @@ fun PlatoPedidoCard(
                 modifier = Modifier
                     .height(120.dp)
                     .width(120.dp)
+                    .align(alignment = Alignment.CenterHorizontally)
             )
             Text(
                 text = plato.nombre,
                 style = titulo,
                 color = colorPrimario
             )
-            Row {
-                Column {
+            Row(
+                modifier = Modifier.fillMaxHeight(0.75f)
+            ) {
+                // todo ponerle margin
+                Column(
+                ) {
                     Text(
                         text = Constantes.INGREDIENTES,
                         style = apartado,
                         color = colorPrimario
                     )
-                    plato.ingredientes.forEach { ingrediente ->
-                        Text(
-                            text = ingrediente.nombre.replace("_", " "),
-                            style = contenido,
-                            color = colorSecundario
-                        )
+                    LazyColumn {
+                        items(plato.ingredientes) {
+                            Text(
+                                text = it.nombre.replace("_", " "),
+                                style = contenido,
+                                color = colorSecundario
+                            )
+                        }
                     }
                 }
                 Column {
                     Text(
-                        text = Constantes.EXTRAS ,
+                        text = Constantes.EXTRAS,
                         style = apartado,
                         color = colorPrimario
                     )
-                    plato.extras.forEach { extra ->
-                        Text(
-                            text = extra.nombre.replace("_", " ") + ": " + extra.precio + Constantes.SIMBOLO_EURO,
-                            style = contenido,
-                            color = colorSecundario
-                        )
+                    LazyColumn {
+                        items(plato.extras) {
+                            val texto = if (it.precio == 0.0) {
+                                it.nombre.replace(
+                                    "_",
+                                    " "
+                                ) + ": GRATIS"
+                            } else {
+                                it.nombre.replace(
+                                    "_",
+                                    " "
+                                ) + ": " + it.precio + Constantes.SIMBOLO_EURO
+                            }
+                            Text(
+                                text = texto,
+                                style = contenido,
+                                color = colorSecundario
+                            )
+                        }
                     }
                 }
             }
-
-            Text(
-                text = plato.precio.toString() + Constantes.SIMBOLO_EURO,
-                style = titulo,
-                color = colorPrimario
-            )
-        }
-        Button(
-            colors = ButtonDefaults.buttonColors(containerColor = colorPrimario),
-            onClick = {
-                eliminarPlato(plato)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = plato.precio.toString() + Constantes.SIMBOLO_EURO,
+                    style = titulo,
+                    color = colorPrimario
+                )
+                Button(
+                    colors = ButtonDefaults.buttonColors(containerColor = colorPrimario),
+                    onClick = {
+                        eliminarPlato(plato)
+                    }
+                ) {
+                    Text(
+                        text = Constantes.ELIMINAR
+                    )
+                }
             }
-        ) {
-            Text(
-                text = Constantes.ELIMINAR
-            )
         }
     }
 }
-
-
