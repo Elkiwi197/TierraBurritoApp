@@ -1,7 +1,6 @@
 package com.example.tierraburritoapp.ui.screens.pantallaPedidoSeleccionadoRepartidor
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,9 +42,7 @@ import com.example.tierraburritoapp.ui.common.UiEvent
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -60,13 +58,6 @@ fun PedidoSeleccionadoPantalla(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val barrio = LatLng(40.434192, -3.606442)
-    val barrioState = MarkerState(position = barrio)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(barrio, 17f)
-    }
-    val titulo = "Mapa Demo"
-    var tipoDeMapa by remember { mutableStateOf(MapType.NORMAL) }
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
@@ -86,9 +77,10 @@ fun PedidoSeleccionadoPantalla(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxHeight(0.55f)
+                .background(color = Color.Green),
         ) {
             PedidoView(
                 pedido = pedido,
@@ -96,59 +88,58 @@ fun PedidoSeleccionadoPantalla(
                 colorSecundario = MaterialTheme.colorScheme.secondary,
             )
         }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color.Red)
+        ) {
+            Mapa(
+            )
+            FloatingActionButton(
+                modifier = Modifier
+                    .height(30.dp)
+                    .width(100.dp)
+                    .align(alignment = Alignment.BottomCenter)
+                    .padding(5.dp),
+                onClick = { UiEvent.ShowSnackbar("boton pulsado") }
+            ) {
+                Text(
+                    text = "Aceptar pedido",
+                    color = Color.Red,
+                )
+            }
+        }
 
 
-//        if (uiState.isLoading) {
-//            CircularProgressIndicator(
-//                modifier = Modifier.testTag(Constantes.LOADING_INDICATOR)
-//            )
-//        } else {
-        Mapa(
-            cameraPositionState = cameraPositionState,
-            markerState = barrioState,
-            modifier = Modifier.fillMaxSize(),
-        )
-//        }
     }
 }
 
 @Composable
-fun Mapa(
-    cameraPositionState: CameraPositionState,
-    markerState: MarkerState,
-    modifier: Modifier
-) {
+fun Mapa() {
     val context = LocalContext.current
     var mapLoaded by remember { mutableStateOf(false) }
-
-    // Cargar icono solo cuando el mapa está listo
-    val markerIcon = remember(mapLoaded) {
-        if (mapLoaded) {
-            BitmapDescriptorFactory.fromResource(R.mipmap.restaurante)
-        } else null
+    val coordenadasRestaurante = LatLng(40.434192, -3.606442)
+    val restauranteMarkerState = MarkerState(position = coordenadasRestaurante)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(coordenadasRestaurante, 17f)
     }
-
-    Box(
-        modifier = Modifier
-            .fillMaxHeight(0.3f)
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState,
+        onMapLoaded = { mapLoaded = true }
     ) {
-        GoogleMap(
-            modifier  = Modifier
-                .fillMaxWidth()
-                .height(300.dp),
-            cameraPositionState = cameraPositionState,
-            onMapLoaded = { mapLoaded = true }, // mapa listo
-        ) {
-            if (markerIcon != null) {
-                Marker(
-                    state = markerState,
-                    title = "Restaurante",
-                    icon = markerIcon
-                )
-            }
+        if (mapLoaded) {
+            val markerIconRestaurante = BitmapDescriptorFactory.fromResource(R.drawable.marker)
+            Marker(
+                state = restauranteMarkerState,
+                title = "Restaurante",
+                icon = markerIconRestaurante,
+
+            )
         }
     }
 }
+
 
 @Composable
 fun PedidoView(
@@ -158,8 +149,7 @@ fun PedidoView(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.6f)
+            .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background),
     ) {
         LazyRow {
@@ -191,7 +181,6 @@ fun PedidoView(
         }
     }
 }
-
 
 @Composable
 fun PlatoPedidoCard(
@@ -227,7 +216,7 @@ fun PlatoPedidoCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(80.dp)
             ) {
                 Column(
                     horizontalAlignment = Alignment.Start
@@ -258,5 +247,4 @@ fun PlatoPedidoCard(
 
     }
 }
-
 
