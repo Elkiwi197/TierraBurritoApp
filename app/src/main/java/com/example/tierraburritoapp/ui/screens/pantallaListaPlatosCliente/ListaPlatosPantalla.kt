@@ -42,7 +42,7 @@ fun ListaPlatosPantalla(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.handleEvent(ListaPlatosContract.ListaPlatosEvent.LoadPlatos)
+        viewModel.handleEvent(ListaPlatosContract.ListaPlatosEvent.CargarPlatos)
     }
 
     LaunchedEffect(uiState.uiEvent) {

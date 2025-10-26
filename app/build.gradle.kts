@@ -31,7 +31,9 @@ android {
     productFlavors {
         create("development") {
             dimension = "env"
-            buildConfigField("String", "API_URL", "\"http://192.168.100.138:8080\"")
+            buildConfigField("String", "URL_TIERRA_BURRITO", "\"http://192.168.100.138:8080\"")
+            buildConfigField("String", "URL_API_GOOGLE", "\"https://maps.googleapis.com/\"")
+            buildConfigField("String", "URL_API_OPENROUTE_SERVICE", "\"tutaopenroute\"")
 
             testInstrumentationRunner = "dagger.hilt.android.testing.HiltAndroidJUnitRunner"
 
@@ -39,7 +41,9 @@ android {
         }
         create("production") {
             dimension = "env"
-            buildConfigField("String", "API_URL", "\"http://192.168.100.138:8080\"")
+            buildConfigField("String", "URL_TIERRA_BURRITO", "\"http://192.168.100.138:8080\"")
+            buildConfigField("String", "URL_API_GOOGLE", "\"https://maps.googleapis.com/\"")
+            buildConfigField("String", "URL_API_OPENROUTE_SERVICE", "\"tutaopenroute\"")
 
         }
     }

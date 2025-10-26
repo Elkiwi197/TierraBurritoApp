@@ -39,6 +39,8 @@ import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.ui.common.UiEvent
+import com.example.tierraburritoapp.ui.screens.pantallaListaPlatosCliente.ListaPlatosContract
+import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosPantalla
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -50,13 +52,20 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun PedidoSeleccionadoPantalla(
-    pedido: Pedido,
+    pedido: Pedido?,
     navController: NavController,
     viewModel: PedidoSeleccionadoViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
     onNavigateToLoginSignup: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(pedido) {
+        pedido?.let {
+            viewModel.setPedido(it)
+            viewModel.handleEvent(PedidoSeleccionadoContract.PedidoSeleccionadoEvent.CargarRuta)
+        }
+    }
 
 
     LaunchedEffect(uiState.uiEvent) {
@@ -82,11 +91,13 @@ fun PedidoSeleccionadoPantalla(
                 .fillMaxHeight(0.55f)
                 .background(color = Color.Green),
         ) {
-            PedidoView(
-                pedido = pedido,
-                colorPrimario = MaterialTheme.colorScheme.primary,
-                colorSecundario = MaterialTheme.colorScheme.secondary,
-            )
+            if (pedido != null) {
+                PedidoView(
+                    pedido = pedido,
+                    colorPrimario = MaterialTheme.colorScheme.primary,
+                    colorSecundario = MaterialTheme.colorScheme.secondary,
+                )
+            }
         }
         Box(
             modifier = Modifier
@@ -94,6 +105,8 @@ fun PedidoSeleccionadoPantalla(
                 .background(color = Color.Red)
         ) {
             Mapa(
+                latDestino = uiState.latDestino,
+                lngDestino = uiState.lngDestino
             )
             FloatingActionButton(
                 modifier = Modifier
@@ -109,19 +122,32 @@ fun PedidoSeleccionadoPantalla(
                 )
             }
         }
-
-
     }
 }
 
 @Composable
-fun Mapa() {
+fun Mapa(
+    latDestino: Double?,
+    lngDestino: Double?
+) {
     val context = LocalContext.current
     var mapLoaded by remember { mutableStateOf(false) }
-    val coordenadasRestaurante = LatLng(40.434192, -3.606442)
+    val latRestaurante = 40.434192
+    val lngRestaurante = -3.606442
+    val coordenadasRestaurante = LatLng(latRestaurante, lngRestaurante)
     val restauranteMarkerState = MarkerState(position = coordenadasRestaurante)
-    val cameraPositionState = rememberCameraPositionState {
+    var destinoMarkerState: MarkerState? = null
+    var cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(coordenadasRestaurante, 17f)
+    }
+    if (latDestino != null && lngDestino != null) {
+        val coordenadasDestino = LatLng(latDestino, lngDestino)
+        destinoMarkerState = MarkerState(position = coordenadasDestino)
+        val latCamara = (latDestino + latRestaurante) / 2
+        val lngCamara = (lngDestino + lngRestaurante) / 2
+        cameraPositionState = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(LatLng(latCamara, lngCamara), calcularZoom(latRestaurante, lngRestaurante, latDestino, lngDestino))
+        }
     }
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
@@ -134,10 +160,81 @@ fun Mapa() {
                 state = restauranteMarkerState,
                 title = "Restaurante",
                 icon = markerIconRestaurante,
-
             )
+            destinoMarkerState?.let {
+                Marker(
+                    state = it,
+                    title = "Restaurante",
+                )
+            }
         }
     }
+}
+
+private fun calcularZoom(
+    latInicial: Double,
+    lngInicial: Double,
+    latFinal: Double,
+    lngFinal: Double
+): Float {
+    var lat = (latInicial - latFinal) //la latitud son 180 y la longitud 360
+    var lng = lngInicial - lngFinal
+    var comparar: Double
+    if (lat < 0) {
+        lat = lat - 2 * lat
+    }
+    if (lng < 0) {
+        lng = lat - 2 * lat
+    }
+    if (lat > lng) {
+        comparar = lat
+    } else {
+        comparar = lng
+    }
+
+    var zoom: Float = 0f
+    if (comparar < 0.00015) {
+        zoom = 20f
+    } else if (comparar < 0.000450) {
+        zoom = 19f
+    } else if (comparar < 0.000900) {
+        zoom = 18f
+    } else if (comparar < 0.001600) {
+        zoom = 17f
+    } else if (comparar < 0.003200) {
+        zoom = 16f
+    } else if (comparar < 0.006400) {
+        zoom = 15f
+    } else if (comparar < 0.012800) {
+        zoom = 14f
+    } else if (comparar < 0.025000) {
+        zoom = 13f
+    } else if (comparar < 0.050000) {
+        zoom = 12f
+    } else if (comparar < 0.1) {
+        zoom = 11f
+    } else if (comparar < 0.2) {
+        zoom = 10f
+    } else if (comparar < 0.4) {
+        zoom = 9f
+    } else if (comparar < 0.8) {
+        zoom = 8f
+    } else if (comparar < 1.6) {
+        zoom = 7f
+    } else if (comparar < 3.2) {
+        zoom = 6f
+    } else if (comparar < 6.4) {
+        zoom = 5f
+    } else if (comparar < 12.8) {
+        zoom = 4f
+    } else if (comparar < 25.6) {
+        zoom = 3f
+    } else if (comparar < 50) {
+        zoom = 2f
+    } else if (comparar < 100) {
+        zoom = 1f
+    }
+    return zoom
 }
 
 

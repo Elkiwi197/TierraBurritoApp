@@ -6,7 +6,7 @@ import com.example.tierraburritoapp.ui.common.UiEvent
 interface ListaPlatosContract {
 
     sealed class ListaPlatosEvent {
-        data object LoadPlatos : ListaPlatosEvent()
+        data object CargarPlatos : ListaPlatosEvent()
         data object UiEventDone : ListaPlatosEvent()
     }
 

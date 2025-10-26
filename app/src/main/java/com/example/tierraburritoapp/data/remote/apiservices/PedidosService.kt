@@ -22,4 +22,5 @@ interface PedidosService {
 
     @POST("/pedidos/aceptarPedido")
     suspend fun aceptarPedido(@Body idInt: kotlin.Int): Response<ResponseBody>
+
 }

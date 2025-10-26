@@ -3,16 +3,19 @@ package com.example.tierraburritoapp.data.remote.di
 
 import com.example.tierraburritoapp.BuildConfig
 import com.example.tierraburritoapp.data.remote.apiservices.AuthApiService
+import com.example.tierraburritoapp.data.remote.apiservices.GoogleService
 import com.example.tierraburritoapp.data.remote.apiservices.LoginSignupService
 import com.example.tierraburritoapp.data.remote.apiservices.PedidosService
 import com.example.tierraburritoapp.data.remote.apiservices.PlatosService
 import com.example.tierraburritoapp.data.remote.apiservices.ProductosService
+import com.example.tierraburritoapp.data.remote.repositories.GoogleRepository
 import com.example.tierraburritoapp.data.remote.repositories.LoginSignupRepository
 import com.example.tierraburritoapp.data.remote.repositories.PedidosRepository
 import com.example.tierraburritoapp.data.remote.repositories.PlatosRepository
 import com.example.tierraburritoapp.data.remote.repositories.ProductosRepository
 import com.example.tierraburritoapp.data.utils.AuthAuthenticator
 import com.example.tierraburritoapp.data.utils.AuthInterceptor
+import com.example.tierraburritoapp.domain.usecases.coordenadas.GetCoordenadasUseCase
 import com.example.tierraburritoapp.domain.usecases.ingredientes.GetExtrasByPlatoUseCase
 import com.example.tierraburritoapp.domain.usecases.ingredientes.GetIngredientesByPlatoUseCase
 import com.example.tierraburritoapp.domain.usecases.loginsignup.LogInUseCase
@@ -31,6 +34,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -38,7 +42,10 @@ import javax.inject.Singleton
 object NetworkModule {
 
     @Provides
-    fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
+    fun provideAuthApiService(
+        @Named("ServidorTierraBurrito")
+        retrofit: Retrofit
+    ): AuthApiService {
         return retrofit.create(AuthApiService::class.java)
     }
 
@@ -64,36 +71,52 @@ object NetworkModule {
     }
 
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @Named("ServidorTierraBurrito")
+    fun provideRetrofitTierraBurritoServidor(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.API_URL)
+            .baseUrl(BuildConfig.URL_TIERRA_BURRITO)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
     }
 
     @Provides
+    @Named("GoogleMaps")
+    fun provideRetrofitGoogle(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.URL_API_GOOGLE)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
     @Singleton
-    fun provideLoginSignupService(retrofit: Retrofit): LoginSignupService {
+    fun provideLoginSignupService(@Named("ServidorTierraBurrito") retrofit: Retrofit): LoginSignupService {
         return retrofit.create(LoginSignupService::class.java)
     }
 
     @Provides
     @Singleton
-    fun providePlatosService(retrofit: Retrofit): PlatosService {
+    fun providePlatosService(@Named("ServidorTierraBurrito") retrofit: Retrofit): PlatosService {
         return retrofit.create(PlatosService::class.java)
     }
 
     @Provides
     @Singleton
-    fun providePedidosService(retrofit: Retrofit): PedidosService {
+    fun providePedidosService(@Named("ServidorTierraBurrito") retrofit: Retrofit): PedidosService {
         return retrofit.create(PedidosService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideProductosService(retrofit: Retrofit): ProductosService {
+    fun provideProductosService(@Named("ServidorTierraBurrito") retrofit: Retrofit): ProductosService {
         return retrofit.create(ProductosService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGoogleService(@Named("GoogleMaps") retrofit: Retrofit): GoogleService {
+        return retrofit.create(GoogleService::class.java)
     }
 
 
@@ -115,23 +138,23 @@ object NetworkModule {
         }
     }
 
-     @Module
-     @InstallIn(ViewModelComponent::class)
-     object PlatosUseCaseModule {
-         @Provides
-         fun provideGetPlatosUseCase(
-             repo: PlatosRepository
-         ): GetPlatosUseCase {
-             return GetPlatosUseCase(repo)
-         }
+    @Module
+    @InstallIn(ViewModelComponent::class)
+    object PlatosUseCaseModule {
+        @Provides
+        fun provideGetPlatosUseCase(
+            repo: PlatosRepository
+        ): GetPlatosUseCase {
+            return GetPlatosUseCase(repo)
+        }
 
-         @Provides
-         fun provideGetPlatoById(
-             repo: PlatosRepository
-         ): GetPlatoByIdUseCase {
-             return GetPlatoByIdUseCase(repo)
-         }
-     }
+        @Provides
+        fun provideGetPlatoById(
+            repo: PlatosRepository
+        ): GetPlatoByIdUseCase {
+            return GetPlatoByIdUseCase(repo)
+        }
+    }
 
     @Module
     @InstallIn(ViewModelComponent::class)
@@ -142,12 +165,14 @@ object NetworkModule {
         ): AnadirPedidoUseCase {
             return AnadirPedidoUseCase(repo)
         }
+
         @Provides
         fun provideGetPedidosByCorreoUseCase(
             repo: PedidosRepository
         ): GetPedidosByCorreoUseCase {
             return GetPedidosByCorreoUseCase(repo)
         }
+
         @Provides
         fun provideGetPedidosEnPreparacionUseCase(
             repo: PedidosRepository
@@ -171,6 +196,17 @@ object NetworkModule {
             repo: ProductosRepository
         ): GetExtrasByPlatoUseCase {
             return GetExtrasByPlatoUseCase(repo)
+        }
+    }
+
+    @Module
+    @InstallIn(ViewModelComponent::class)
+    object CoordenadasGoogleUseCaseModule {
+        @Provides
+        fun provideGetCoordenadas(
+            repo: GoogleRepository
+        ): GetCoordenadasUseCase {
+            return GetCoordenadasUseCase(repo)
         }
     }
 

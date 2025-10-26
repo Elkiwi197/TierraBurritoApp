@@ -6,7 +6,7 @@ import com.example.tierraburritoapp.domain.model.Plato
 import javax.inject.Inject
 
 class PlatosRepository @Inject constructor(
-    private val platosDataSource: PlatosDataSource,
+    private val platosDataSource: PlatosDataSource
 ) {
     suspend fun getAllPlatos(): NetworkResult<List<Plato>> {
         return platosDataSource.getAllPlatos()

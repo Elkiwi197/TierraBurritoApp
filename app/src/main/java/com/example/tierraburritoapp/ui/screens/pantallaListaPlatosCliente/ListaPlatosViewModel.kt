@@ -22,7 +22,7 @@ class ListaPlatosViewModel @Inject constructor(
 
     fun handleEvent(event: ListaPlatosContract.ListaPlatosEvent) {
         when (event) {
-            ListaPlatosContract.ListaPlatosEvent.LoadPlatos -> getPlatos()
+            ListaPlatosContract.ListaPlatosEvent.CargarPlatos -> getPlatos()
             ListaPlatosContract.ListaPlatosEvent.UiEventDone -> clearUiEvents()
         }
     }
