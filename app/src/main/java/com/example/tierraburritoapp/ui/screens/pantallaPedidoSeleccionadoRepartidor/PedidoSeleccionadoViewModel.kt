@@ -119,7 +119,7 @@ class PedidoSeleccionadoViewModel @Inject constructor(
             is NetworkResult.Error -> {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    uiEvent = UiEvent.ShowSnackbar(result.code.toString() + result.message.toString() + result.data.toString())
+                    uiEvent = UiEvent.ShowSnackbar(Constantes.ERROR_RUTA + result.message.toString())
                 )
             }
         }

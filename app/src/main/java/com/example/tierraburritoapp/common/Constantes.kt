@@ -2,6 +2,7 @@ package com.example.tierraburritoapp.common
 
 object Constantes {
 
+    const val ERROR_RUTA = "Error creando la ruta: "
     const val DIRECCION_INVALIDA = "La dirección del pedido es inválida"
     const val PEDIDO_NULO = "El pedido seleccionado es nulo"
     const val INTRODUZCA_DIRECCION = "Introduzca la dirección de entrega"

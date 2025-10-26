@@ -169,11 +169,11 @@ fun Mapa(
             destinoMarkerState?.let {
                 Marker(
                     state = it,
-                    title = "Restaurante",
+                    title = "Destino",
                 )
             }
             ruta?.let {
-                var coordenadasRuta: MutableList<LatLng> = mutableListOf()
+                val coordenadasRuta: MutableList<LatLng> = mutableListOf()
                 it.forEach{latlng -> coordenadasRuta.add(LatLng(latlng[1], latlng[0]))}
                 Polyline(
                     points = coordenadasRuta
