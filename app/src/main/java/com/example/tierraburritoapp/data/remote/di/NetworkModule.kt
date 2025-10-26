@@ -5,17 +5,20 @@ import com.example.tierraburritoapp.BuildConfig
 import com.example.tierraburritoapp.data.remote.apiservices.AuthApiService
 import com.example.tierraburritoapp.data.remote.apiservices.GoogleService
 import com.example.tierraburritoapp.data.remote.apiservices.LoginSignupService
+import com.example.tierraburritoapp.data.remote.apiservices.OpenRouteServiceService
 import com.example.tierraburritoapp.data.remote.apiservices.PedidosService
 import com.example.tierraburritoapp.data.remote.apiservices.PlatosService
 import com.example.tierraburritoapp.data.remote.apiservices.ProductosService
 import com.example.tierraburritoapp.data.remote.repositories.GoogleRepository
 import com.example.tierraburritoapp.data.remote.repositories.LoginSignupRepository
+import com.example.tierraburritoapp.data.remote.repositories.OpenRouteServiceRepository
 import com.example.tierraburritoapp.data.remote.repositories.PedidosRepository
 import com.example.tierraburritoapp.data.remote.repositories.PlatosRepository
 import com.example.tierraburritoapp.data.remote.repositories.ProductosRepository
 import com.example.tierraburritoapp.data.utils.AuthAuthenticator
 import com.example.tierraburritoapp.data.utils.AuthInterceptor
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetCoordenadasUseCase
+import com.example.tierraburritoapp.domain.usecases.coordenadas.GetRutaUseCase
 import com.example.tierraburritoapp.domain.usecases.ingredientes.GetExtrasByPlatoUseCase
 import com.example.tierraburritoapp.domain.usecases.ingredientes.GetIngredientesByPlatoUseCase
 import com.example.tierraburritoapp.domain.usecases.loginsignup.LogInUseCase
@@ -46,7 +49,8 @@ object NetworkModule {
         @Named("ServidorTierraBurrito")
         retrofit: Retrofit
     ): AuthApiService {
-        return retrofit.create(AuthApiService::class.java)
+        return retrofit
+            .create(AuthApiService::class.java)
     }
 
     @Provides
@@ -90,6 +94,15 @@ object NetworkModule {
     }
 
     @Provides
+    @Named("OpenRouteService")
+    fun provideRetrofitOpenRouteService(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.URL_API_OPENROUTE_SERVICE)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
     @Singleton
     fun provideLoginSignupService(@Named("ServidorTierraBurrito") retrofit: Retrofit): LoginSignupService {
         return retrofit.create(LoginSignupService::class.java)
@@ -117,6 +130,12 @@ object NetworkModule {
     @Singleton
     fun provideGoogleService(@Named("GoogleMaps") retrofit: Retrofit): GoogleService {
         return retrofit.create(GoogleService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOpenRouteServiceService(@Named("OpenRouteService") retrofit: Retrofit): OpenRouteServiceService {
+        return retrofit.create(OpenRouteServiceService::class.java)
     }
 
 
@@ -207,6 +226,17 @@ object NetworkModule {
             repo: GoogleRepository
         ): GetCoordenadasUseCase {
             return GetCoordenadasUseCase(repo)
+        }
+    }
+
+    @Module
+    @InstallIn(ViewModelComponent::class)
+    object RutaOpenRouteServiceUseCaseModule {
+        @Provides
+        fun provideGetRuta(
+            repo: OpenRouteServiceRepository
+        ): GetRutaUseCase {
+            return GetRutaUseCase(repo)
         }
     }
 

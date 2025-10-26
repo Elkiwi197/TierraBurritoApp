@@ -47,6 +47,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 
 
@@ -105,8 +106,11 @@ fun PedidoSeleccionadoPantalla(
                 .background(color = Color.Red)
         ) {
             Mapa(
+                latRestaurante = uiState.latRestaurante,
+                lngRestaurante = uiState.lngRestaurante,
                 latDestino = uiState.latDestino,
-                lngDestino = uiState.lngDestino
+                lngDestino = uiState.lngDestino,
+                ruta = uiState.ruta
             )
             FloatingActionButton(
                 modifier = Modifier
@@ -127,13 +131,14 @@ fun PedidoSeleccionadoPantalla(
 
 @Composable
 fun Mapa(
+    latRestaurante: Double,
+    lngRestaurante: Double,
     latDestino: Double?,
-    lngDestino: Double?
+    lngDestino: Double?,
+    ruta: List<List<Double>>?
 ) {
     val context = LocalContext.current
     var mapLoaded by remember { mutableStateOf(false) }
-    val latRestaurante = 40.434192
-    val lngRestaurante = -3.606442
     val coordenadasRestaurante = LatLng(latRestaurante, lngRestaurante)
     val restauranteMarkerState = MarkerState(position = coordenadasRestaurante)
     var destinoMarkerState: MarkerState? = null
@@ -167,10 +172,18 @@ fun Mapa(
                     title = "Restaurante",
                 )
             }
+            ruta?.let {
+                var coordenadasRuta: MutableList<LatLng> = mutableListOf()
+                it.forEach{latlng -> coordenadasRuta.add(LatLng(latlng[1], latlng[0]))}
+                Polyline(
+                    points = coordenadasRuta
+                )
+            }
         }
     }
 }
 
+//todo Este metodo podria mejorarse aunque funciona bien
 private fun calcularZoom(
     latInicial: Double,
     lngInicial: Double,

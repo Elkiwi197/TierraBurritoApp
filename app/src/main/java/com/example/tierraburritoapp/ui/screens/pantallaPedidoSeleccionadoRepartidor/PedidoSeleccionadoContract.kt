@@ -11,7 +11,10 @@ interface PedidoSeleccionadoContract {
     data class PedidoSeleccionadoState(
         val isLoading: Boolean = false,
         val uiEvent: UiEvent? = null,
+        val latRestaurante: Double = 40.434192,
+        val lngRestaurante: Double = -3.606442,
         val latDestino: Double?  = null,
-        val lngDestino : Double? = null
+        val lngDestino : Double? = null,
+        val ruta: List<List<Double>>? = null
     )
 }

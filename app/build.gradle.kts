@@ -33,7 +33,7 @@ android {
             dimension = "env"
             buildConfigField("String", "URL_TIERRA_BURRITO", "\"http://192.168.100.138:8080\"")
             buildConfigField("String", "URL_API_GOOGLE", "\"https://maps.googleapis.com/\"")
-            buildConfigField("String", "URL_API_OPENROUTE_SERVICE", "\"tutaopenroute\"")
+            buildConfigField("String", "URL_API_OPENROUTE_SERVICE", "\"https://api.openrouteservice.org/\"")
 
             testInstrumentationRunner = "dagger.hilt.android.testing.HiltAndroidJUnitRunner"
 
