@@ -20,7 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -111,63 +114,95 @@ fun PedidoCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = pedido.id.toString(),
+                text = Constantes.ID_ + pedido.id.toString(),
                 style = titulo,
                 color = colorPrimario
             )
+//            Text(
+//                text = pedido.correoCliente,
+//                style = apartado,
+//                color = colorSecundario
+//            )
             Text(
-                text = pedido.correoCliente,
-                style = apartado,
-                color = colorSecundario
+                style = titulo,
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = colorPrimario)) {
+                        append(Constantes.DIRECCION_)
+                    }
+                    withStyle(style = SpanStyle(color = colorSecundario)) {
+                        append(pedido.direccion)
+                    }
+                }
             )
-            Text(
-                text = pedido.direccion,
-                style = apartado,
-                color = colorSecundario
-            )
+            pedido.correoRepartidor?.let {
+                Text(
+                    style = titulo,
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = colorPrimario)) {
+                            append(Constantes.REPARTIDOR_)
+                        }
+                        withStyle(style = SpanStyle(color = colorSecundario)) {
+                            append(it)
+                        }
+                    }
+                )
+            }
+
             pedido.platos.forEach { plato ->
                 Column {
                     Text(
                         text = plato.nombre,
                         style = apartado,
-                        color = colorSecundario
+                        color = colorTerciario
                     )
-                    Text(
-                        text = Constantes.INGREDIENTES,
-                        style = contenido,
-                        color = colorSecundario
-                    )
+//                    Text(
+//                        text = Constantes.INGREDIENTES,
+//                        style = contenido,
+//                        color = colorSecundario
+//                    )
                     plato.ingredientes.forEach { ingrediente ->
                         val precio = if (ingrediente.precio != 0.0) {
-                            "+ " + ingrediente.precio.toString() + "€"
+                            " + " + ingrediente.precio.toString() + "€"
                         } else {
                             ""
                         }
                         ingrediente.nombre.replace("_", " ").let {
                             Text(
-                                text = it + precio,
                                 style = contenido,
-                                color = colorTerciario
+                                text = buildAnnotatedString {
+                                    withStyle(style = SpanStyle(color = colorSecundario)) {
+                                        append(it)
+                                    }
+                                    withStyle(style = SpanStyle(color = colorTerciario)) {
+                                        append(precio)
+                                    }
+                                }
                             )
                         }
                     }
 
                     Text(
                         text = plato.precio.toString() + Constantes.SIMBOLO_EURO,
-                        style = contenido,
+                        style = apartado,
                         color = colorSecundario
                     )
                 }
             }
             Text(
-                text = Constantes.TOTAL + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
+                text = Constantes.TOTAL_ + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
                 style = titulo,
                 color = colorPrimario
             )
             Text(
-                text = Constantes.ESTADO + pedido.estado.name.replace("_", " "),
                 style = titulo,
-                color = colorSecundario
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = colorPrimario)) {
+                        append(Constantes.ESTADO_)
+                    }
+                    withStyle(style = SpanStyle(color = colorSecundario)) {
+                        append( pedido.estado.name.replace("_", " "))
+                    }
+                },
             )
         }
     }

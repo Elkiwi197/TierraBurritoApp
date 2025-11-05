@@ -31,7 +31,6 @@ class SeleccionPedidosViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
             when (val result = getPedidosEnPreparacionUseCase()) {
-                is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
                 is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     pedidos = result.data ?: emptyList()

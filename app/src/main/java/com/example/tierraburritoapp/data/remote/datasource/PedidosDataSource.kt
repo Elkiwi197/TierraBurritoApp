@@ -35,9 +35,9 @@ class PedidosDataSource @Inject constructor(
             pedidosService.getPedidosEnPreparacion()
         }
 
-    suspend fun aceptarPedido(idInt: kotlin.Int): NetworkResult<String> {
+    suspend fun aceptarPedido(idPedido: Int, correoRepartidor: String): NetworkResult<String> {
         val result = safeApiCall {
-            val response = pedidosService.aceptarPedido(idInt)
+            val response = pedidosService.aceptarPedido(idPedido, correoRepartidor)
             val message = response.body()?.string() ?: Constantes.ERROR_MAPEANDO
             if (response.isSuccessful) {
                 Response.success(message)

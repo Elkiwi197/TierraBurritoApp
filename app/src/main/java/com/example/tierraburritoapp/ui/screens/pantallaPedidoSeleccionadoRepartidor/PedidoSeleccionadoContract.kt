@@ -6,6 +6,7 @@ interface PedidoSeleccionadoContract {
     sealed class PedidoSeleccionadoEvent {
         data object UiEventDone : PedidoSeleccionadoEvent()
         data object CargarRuta: PedidoSeleccionadoEvent()
+        data class AceptarPedido(val idPedido: Int, val correoRepartidor: String): PedidoSeleccionadoEvent()
     }
 
     data class PedidoSeleccionadoState(

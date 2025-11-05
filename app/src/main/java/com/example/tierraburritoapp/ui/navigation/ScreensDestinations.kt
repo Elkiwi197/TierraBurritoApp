@@ -22,7 +22,7 @@ object MisPedidos
 object SeleccionPedidos
 
 @Serializable
-data class PedidoSeleccionado(val pedido: Pedido)
+data class PedidoAceptado(val pedido: Pedido)
 
 @Serializable
 object PedidosRepartidos

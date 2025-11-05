@@ -31,7 +31,6 @@ class ListaPlatosViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
             when (val result = getPlatosUseCase()) {
-                is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
                 is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     platos = result.data ?: emptyList()

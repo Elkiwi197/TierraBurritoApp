@@ -20,8 +20,8 @@ class PedidosRepository @Inject constructor(
         return pedidosDataSource.getPedidosEnPreparacion()
     }
 
-    suspend fun aceptarPedido(idInt: kotlin.Int): NetworkResult<String> {
-        return pedidosDataSource.aceptarPedido(idInt)
+    suspend fun aceptarPedido(idPedido: Int, correoRepartidor: String): NetworkResult<String> {
+        return pedidosDataSource.aceptarPedido(idPedido, correoRepartidor)
     }
 
 

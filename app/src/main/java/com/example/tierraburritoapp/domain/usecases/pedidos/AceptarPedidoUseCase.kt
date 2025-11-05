@@ -8,7 +8,7 @@ import javax.inject.Inject
 class AceptarPedidoUseCase @Inject constructor(
     private val pedidosRepository: PedidosRepository
 ) {
-    suspend operator fun invoke(idPedido: Int): NetworkResult<String> {
-        return pedidosRepository.aceptarPedido(idPedido)
+    suspend operator fun invoke(idPedido: Int, correoRepartidor: String): NetworkResult<String> {
+        return pedidosRepository.aceptarPedido(idPedido, correoRepartidor)
     }
 }

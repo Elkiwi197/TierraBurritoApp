@@ -9,7 +9,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.example.tierraburritoapp.R
 import com.example.tierraburritoapp.common.Constantes
-import com.example.tierraburritoapp.ui.navigation.PedidoSeleccionado
+import com.example.tierraburritoapp.ui.navigation.PedidoAceptado
 import com.example.tierraburritoapp.ui.navigation.PedidosRepartidos
 import com.example.tierraburritoapp.ui.navigation.SeleccionPedidos
 
@@ -29,9 +29,9 @@ fun BottomBarRepartidor(navController: NavController) {
             icon = { Icon(
                 painterResource(R.drawable.outline_shopping_cart_24), contentDescription =
                 Constantes.PEDIDO_ACEPTADO) },
-            label = { Text(Constantes.PEDIDO_SELECCIONADO) },
+            label = { Text(Constantes.PEDIDO_ACEPTADO) },
             selected = false,
-            onClick = { navController.navigate(PedidoSeleccionado) } //todo cambiar a pedido ACEPTADO
+            onClick = { navController.navigate(PedidoAceptado) }
         )
         NavigationBarItem(
             icon = { Icon(

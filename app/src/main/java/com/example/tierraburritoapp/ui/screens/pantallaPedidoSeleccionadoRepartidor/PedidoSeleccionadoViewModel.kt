@@ -9,7 +9,9 @@ import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetCoordenadasUseCase
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetRutaUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.AceptarPedidoUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
+import com.example.tierraburritoapp.ui.common.VariablesViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,19 +22,63 @@ import javax.inject.Inject
 class PedidoSeleccionadoViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getCoordenadasUseCase: GetCoordenadasUseCase,
-    private val getRutaUseCase: GetRutaUseCase
+    private val getRutaUseCase: GetRutaUseCase,
+    private val aceptarPedidoUseCase: AceptarPedidoUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PedidoSeleccionadoContract.PedidoSeleccionadoState())
     val uiState: StateFlow<PedidoSeleccionadoContract.PedidoSeleccionadoState> = _uiState
     private var pedido: Pedido? = savedStateHandle["pedido"]
-//    private var latDestino: Double? = null
-//    private var lngDestino: Double? = null
+
 
     fun handleEvent(event: PedidoSeleccionadoContract.PedidoSeleccionadoEvent) {
         when (event) {
             PedidoSeleccionadoContract.PedidoSeleccionadoEvent.CargarRuta -> cargarRuta()
             PedidoSeleccionadoContract.PedidoSeleccionadoEvent.UiEventDone -> clearUiEvents()
+            is PedidoSeleccionadoContract.PedidoSeleccionadoEvent.AceptarPedido -> aceptarPedido(
+                event.idPedido,
+                event.correoRepartidor
+            )
+        }
+    }
+
+    private fun aceptarPedido(idPedido: Int, correoRepartidor: String) {
+        _uiState.value = _uiState.value.copy(isLoading = true)
+        viewModelScope.launch {
+            when (val result =
+                pedido?.let {
+                    aceptarPedidoUseCase(
+                        idPedido,
+                        correoRepartidor
+                    )
+                }) {
+                is NetworkResult.Success -> {
+                    result.let {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            uiEvent = UiEvent.ShowSnackbar(result.data.toString())
+                        )
+                    }
+                }
+
+                is NetworkResult.Error -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        uiEvent = UiEvent.ShowSnackbar(
+                            result.message.toString()
+                        )
+                    )
+                }
+
+                null -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        uiEvent = UiEvent.ShowSnackbar(
+                            Constantes.PEDIDO_NULO
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -46,11 +92,8 @@ class PedidoSeleccionadoViewModel @Inject constructor(
                         BuildConfig.google_maps_api_key
                     )
                 }) {
-                is NetworkResult.Loading -> _uiState.value =
-                    _uiState.value.copy(isLoading = true)
 
                 is NetworkResult.Success -> {
-                    //todo preguntar a Oscar como hacer una llamada que depende de otra
                     result.let {
                         val results = result.data?.results
                         if (results.isNullOrEmpty()) {
@@ -104,10 +147,6 @@ class PedidoSeleccionadoViewModel @Inject constructor(
             coordenadasInicio = "${lngOrigen},${latOrigen}",
             coordenadasFinal = "${lngDestino},${latDestino}"
         )) {
-            is NetworkResult.Loading -> {
-                _uiState.value = _uiState.value.copy(isLoading = true)
-            }
-
             is NetworkResult.Success -> {
 
                 _uiState.value = _uiState.value.copy(

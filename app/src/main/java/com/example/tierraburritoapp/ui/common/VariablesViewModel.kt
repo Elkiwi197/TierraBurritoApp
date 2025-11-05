@@ -25,7 +25,8 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
             direccion = "",
             estado = EstadoPedido.CLIENTE_ELIGIENDO,
             precio = 0.0,
-            correoCliente = ""
+            correoCliente = "",
+            correoRepartidor = ""
         )
     )
         private set
@@ -69,7 +70,8 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
             direccion = "",
             estado = EstadoPedido.CLIENTE_ELIGIENDO,
             precio = 0.0,
-            correoCliente = ""
+            correoCliente = "",
+            correoRepartidor = ""
         )
     }
 

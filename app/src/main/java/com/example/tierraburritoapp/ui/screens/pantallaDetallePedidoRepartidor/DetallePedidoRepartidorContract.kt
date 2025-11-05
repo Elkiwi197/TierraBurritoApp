@@ -6,14 +6,14 @@ import com.example.tierraburritoapp.ui.common.UiEvent
 
 interface DetallePedidoRepartidorContract {
     sealed class DetallePedidoRepartidorEvent {
-        data class AceptarDetallePedido(val idPedido: Int) : DetallePedidoRepartidorEvent()
+        data class AceptarPedido(val idPedido: Int, val correoRepartidor: String) : DetallePedidoRepartidorEvent()
         data object UiEventDoneDetalle : DetallePedidoRepartidorEvent()
 
     }
 
     data class DetallePedidoRepartidorState(
         val isLoading: Boolean = false,
-        val pedido: Pedido = Pedido(0, "", "", emptyList(), emptyList(), 0.0, EstadoPedido.EN_PREPARACION),
+        val pedido: Pedido = Pedido(0, "", "", emptyList(), emptyList(), 0.0, EstadoPedido.EN_PREPARACION, ""),
         val uiEvent: UiEvent? = null,
     )
 }

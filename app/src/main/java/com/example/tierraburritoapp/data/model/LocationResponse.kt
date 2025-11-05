@@ -2,6 +2,7 @@ package com.example.tierraburritoapp.data.model
 
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class AddressComponent(
     val long_name: String,

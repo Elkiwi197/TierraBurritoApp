@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -96,7 +95,7 @@ fun PedidoActualPantalla(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = Constantes.TOTAL + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
+                text = Constantes.TOTAL_ + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleLarge,
                 //     textAlign = TextAlign.Center,
@@ -182,7 +181,7 @@ fun PlatoPedidoCard(
                 }
                 Column {
                     Text(
-                        text = Constantes.EXTRAS,
+                        text = Constantes.EXTRAS_,
                         style = apartado,
                         color = colorPrimario
                     )

@@ -9,7 +9,5 @@ sealed class NetworkResult<T>(
     class Success<T>(data: T, code: Int) : NetworkResult<T>(data = data, code = code)
     class Error<T>(message: String, data: T? = null, code: Int) :
         NetworkResult<T>(data = data, message = message, code = code)
-    class Loading<T>(code: Int) : NetworkResult<T>(code = code)
-
 }
 

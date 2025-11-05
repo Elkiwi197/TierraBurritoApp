@@ -72,7 +72,6 @@ constructor(
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
             when (val result = signUpUseCase(usuarioSignup)) {
-                is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
                 is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     uiEvent = UiEvent.ShowSnackbar(result.data ?: Constantes.USUARIO_ANADIDO)
@@ -92,7 +91,6 @@ constructor(
         viewModelScope.launch {
             when (val result =
                 logInUseCase(UsuarioLogin(correo = correo, contrasena = contrasena))) {
-                is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
                 is NetworkResult.Success -> {
                     val tipoUsuario = result.data?.tipoUsuario
                     if (tipoUsuario != null) {

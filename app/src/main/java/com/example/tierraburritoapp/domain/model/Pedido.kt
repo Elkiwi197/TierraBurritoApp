@@ -15,5 +15,6 @@ data class Pedido(
     var platos: List<Plato>,
     var otros: List<Producto>,
     var precio: Double,
-    var estado: EstadoPedido
+    var estado: EstadoPedido,
+    var correoRepartidor: String?
 ): Parcelable

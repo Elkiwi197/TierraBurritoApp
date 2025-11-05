@@ -17,5 +17,8 @@ interface LoginSignupService {
     suspend fun signUpCliente(@Body usuarioSignup: UsuarioSignup): Response<ResponseBody>
 
     @POST("/login")
-    suspend fun loginUser(@Query("correo") correo: String, @Query("contrasena") contrasena:String): Response<TokenResponse>
+    suspend fun loginUser(
+        @Query("correo") correo: String,
+        @Query("contrasena") contrasena: String
+    ): Response<TokenResponse>
 }

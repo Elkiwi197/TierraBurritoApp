@@ -16,7 +16,7 @@ val appDestinationList = listOf(
     PedidoActualDestination,
     MisPedidosDestination,
     SeleccionPedidosDestination,
-    PedidoSeleccionadoDestination,
+    PedidoAceptadoDestination,
     PedidosRepartidosDestination
 )
 
@@ -104,8 +104,8 @@ object SeleccionPedidosDestination : AppMainBottomDestination {
     )
 }
 
-object PedidoSeleccionadoDestination : AppDestination {
-    override val route = PedidoSeleccionado
+object PedidoAceptadoDestination : AppDestination {
+    override val route = PedidoAceptado
     override val title = Constantes.PEDIDO_SELECCIONADO
 
     override val scaffoldState = ScaffoldState(

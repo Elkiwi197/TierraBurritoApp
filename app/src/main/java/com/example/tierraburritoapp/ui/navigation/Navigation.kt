@@ -135,7 +135,7 @@ fun Navigation() {
                 SeleccionPedidosPantalla(
                     navController = navController,
                     onNavigateToPedidoSeleccionado = {
-                        navController.navigate(PedidoSeleccionado)
+                        navController.navigate(PedidoAceptado)
                     },
                     onNavigateToLoginSignup = {
                         navController.navigate(Login)
@@ -153,6 +153,7 @@ fun Navigation() {
                     PedidoSeleccionadoPantalla(
                         pedido = pedido,
                         navController = navController,
+                        variablesViewModel = variablesViewModel,
                         onNavigateToLoginSignup = {
                             navController.navigate(Login)
                         },

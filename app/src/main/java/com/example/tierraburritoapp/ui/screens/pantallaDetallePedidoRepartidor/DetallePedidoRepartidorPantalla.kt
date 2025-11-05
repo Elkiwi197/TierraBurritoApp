@@ -161,7 +161,7 @@ fun PlatoPedidoCard(
                 }
                 Column {
                     Text(
-                        text = Constantes.EXTRAS ,
+                        text = Constantes.EXTRAS_ ,
                         style = apartado,
                         color = colorPrimario
                     )

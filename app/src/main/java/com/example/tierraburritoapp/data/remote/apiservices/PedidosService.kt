@@ -7,6 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 
 interface PedidosService {
@@ -21,6 +22,9 @@ interface PedidosService {
     suspend fun getPedidosEnPreparacion(): Response<List<Pedido>>
 
     @POST("/pedidos/aceptarPedido")
-    suspend fun aceptarPedido(@Body idInt: kotlin.Int): Response<ResponseBody>
+    suspend fun aceptarPedido(
+        @Query("idPedido") idPedido: Int,
+        @Query("correoRepartidor") correoRepartidor: String
+    ): Response<ResponseBody>
 
 }

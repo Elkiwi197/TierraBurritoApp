@@ -79,8 +79,6 @@ class DetallePlatoViewModel @Inject constructor(
                         )
                     }
                 }
-
-                is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
             }
         }
     }
@@ -112,8 +110,6 @@ class DetallePlatoViewModel @Inject constructor(
                         )
                     }
                 }
-
-                is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
             }
         }
     }
@@ -145,12 +141,9 @@ class DetallePlatoViewModel @Inject constructor(
                         )
                     }
                 }
-
-                is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
             }
         }
     }
-
     private fun clearUiEvents() {
         _uiState.value = _uiState.value.copy(uiEvent = null)
     }

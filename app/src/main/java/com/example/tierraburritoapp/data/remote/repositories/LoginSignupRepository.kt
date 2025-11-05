@@ -34,7 +34,6 @@ class LoginSignupRepository @Inject constructor(
                 is NetworkResult.Error -> {
                     NetworkResult.Error(resultado.message ?: Constantes.ERROR_DESCONOCIDO, code = code)
                 }
-                is NetworkResult.Loading -> NetworkResult.Loading(code = resultado.code)
             }
         } catch (e: Exception) {
             NetworkResult.Error(e.message ?: Constantes.ERROR_INICIANDO_SESION, code = code)

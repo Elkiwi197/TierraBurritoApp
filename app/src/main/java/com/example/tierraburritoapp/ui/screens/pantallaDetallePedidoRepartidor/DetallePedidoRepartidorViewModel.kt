@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.domain.usecases.pedidos.AceptarPedidoUseCase
-import com.example.tierraburritoapp.domain.usecases.pedidos.AnadirPedidoUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,16 +23,15 @@ constructor(
 
     fun handleEvent(event: DetallePedidoRepartidorContract.DetallePedidoRepartidorEvent) {
         when (event) {
-            is DetallePedidoRepartidorContract.DetallePedidoRepartidorEvent.AceptarDetallePedido -> aceptarPedido(idPedido = event.idPedido)
+            is DetallePedidoRepartidorContract.DetallePedidoRepartidorEvent.AceptarPedido -> aceptarPedido(idPedido = event.idPedido, correoRepartidor = event.correoRepartidor)
             DetallePedidoRepartidorContract.DetallePedidoRepartidorEvent.UiEventDoneDetalle -> clearUiEvents()
         }
     }
 
-    private fun aceptarPedido(idPedido: Int) {
+    private fun aceptarPedido(idPedido: Int, correoRepartidor: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
-            when (val result = aceptarPedidoUseCase(idPedido)) {
-                is NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
+            when (val result = aceptarPedidoUseCase(idPedido, correoRepartidor)) {
                 is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     uiEvent = UiEvent.ShowSnackbar(result.data ?: Constantes.PEDIDO_ACEPTADO)

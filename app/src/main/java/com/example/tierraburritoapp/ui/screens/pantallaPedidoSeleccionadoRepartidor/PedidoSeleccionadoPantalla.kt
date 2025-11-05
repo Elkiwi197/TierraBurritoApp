@@ -39,8 +39,7 @@ import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.ui.common.UiEvent
-import com.example.tierraburritoapp.ui.screens.pantallaListaPlatosCliente.ListaPlatosContract
-import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosPantalla
+import com.example.tierraburritoapp.ui.common.VariablesViewModel
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -55,6 +54,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 fun PedidoSeleccionadoPantalla(
     pedido: Pedido?,
     navController: NavController,
+    variablesViewModel: VariablesViewModel,
     viewModel: PedidoSeleccionadoViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
     onNavigateToLoginSignup: () -> Unit,
@@ -118,7 +118,14 @@ fun PedidoSeleccionadoPantalla(
                     .width(100.dp)
                     .align(alignment = Alignment.BottomCenter)
                     .padding(5.dp),
-                onClick = { UiEvent.ShowSnackbar("boton pulsado") }
+                onClick = {
+                    pedido?.let {
+                        PedidoSeleccionadoContract.PedidoSeleccionadoEvent.AceptarPedido(
+                            idPedido = it.id,
+                            correoRepartidor = variablesViewModel.correoUsuario
+                        )
+                    }?.let { viewModel.handleEvent(it) }
+                }
             ) {
                 Text(
                     text = "Aceptar pedido",
@@ -151,7 +158,10 @@ fun Mapa(
         val latCamara = (latDestino + latRestaurante) / 2
         val lngCamara = (lngDestino + lngRestaurante) / 2
         cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(LatLng(latCamara, lngCamara), calcularZoom(latRestaurante, lngRestaurante, latDestino, lngDestino))
+            position = CameraPosition.fromLatLngZoom(
+                LatLng(latCamara, lngCamara),
+                calcularZoom(latRestaurante, lngRestaurante, latDestino, lngDestino)
+            )
         }
     }
     GoogleMap(
@@ -174,7 +184,7 @@ fun Mapa(
             }
             ruta?.let {
                 val coordenadasRuta: MutableList<LatLng> = mutableListOf()
-                it.forEach{latlng -> coordenadasRuta.add(LatLng(latlng[1], latlng[0]))}
+                it.forEach { latlng -> coordenadasRuta.add(LatLng(latlng[1], latlng[0])) }
                 Polyline(
                     points = coordenadasRuta
                 )
@@ -280,7 +290,7 @@ fun PedidoView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = Constantes.TOTAL + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
+                text = Constantes.TOTAL_ + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
                 color = colorPrimario
             )
             Text(
