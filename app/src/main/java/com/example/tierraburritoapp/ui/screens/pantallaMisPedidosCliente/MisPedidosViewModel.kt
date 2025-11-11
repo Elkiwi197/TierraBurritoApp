@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.remote.NetworkResult
+import com.example.tierraburritoapp.domain.usecases.pedidos.CancelarPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidosByCorreoUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MisPedidosViewModel @Inject constructor(
-    private val getPedidosByCorreoUseCase: GetPedidosByCorreoUseCase
+    private val getPedidosByCorreoUseCase: GetPedidosByCorreoUseCase,
+    private val cancelarPedidoUseCase: CancelarPedidoUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MisPedidosContract.MisPedidosState())
@@ -25,6 +27,37 @@ class MisPedidosViewModel @Inject constructor(
         when (event) {
             is MisPedidosContract.MisPedidosEvent.LoadPedidos -> getPedidos(correo = event.correo)
             MisPedidosContract.MisPedidosEvent.UiEventDone -> clearUiEvents()
+            is MisPedidosContract.MisPedidosEvent.CancelarPedido -> cancelarPedido(event.id, event.correo)
+        }
+    }
+
+    private fun cancelarPedido(idPedido: Int, correo: String) {
+        _uiState.value = _uiState.value.copy(isLoading = true)
+        viewModelScope.launch {
+            when (val result = cancelarPedidoUseCase(idPedido, correo)) {
+                is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    uiEvent = UiEvent.ShowSnackbar(
+                        result.data ?: Constantes.ERROR_DESCONOCIDO
+                    )
+                )
+
+                is NetworkResult.Error -> {
+                    if (result.code == 401) {
+                        _uiState.value =
+                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
+                                UiEvent.Navigate(mensaje = it)
+                            })
+                    } else {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            uiEvent = UiEvent.ShowSnackbar(
+                                result.message ?: Constantes.ERROR_DESCONOCIDO
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 

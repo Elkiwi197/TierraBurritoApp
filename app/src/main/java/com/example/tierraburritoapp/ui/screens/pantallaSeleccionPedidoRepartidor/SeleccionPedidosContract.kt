@@ -8,7 +8,22 @@ interface SeleccionPedidosContract {
     sealed class SeleccionPedidosEvent {
         data object LoadPedidos : SeleccionPedidosEvent()
         data object UiEventDone : SeleccionPedidosEvent()
+        data class AceptarPedido(
+            val idPedido: Int,
+            val correo: String
+        ) : SeleccionPedidosEvent()
+
+        data class CancelarPedido(
+            val idPedido: Int,
+            val correo: String
+        ) : SeleccionPedidosEvent()
+
+        data class CargarMapa(
+            val pedido: Pedido,
+            val onResult: (List<List<Double>>?, Double?, Double?) -> Unit
+        ) : SeleccionPedidosEvent()
     }
+
 
     data class SeleccionPedidosState(
         val isLoading: Boolean = false,

@@ -106,7 +106,7 @@ object SeleccionPedidosDestination : AppMainBottomDestination {
 
 object PedidoAceptadoDestination : AppDestination {
     override val route = PedidoAceptado
-    override val title = Constantes.PEDIDO_SELECCIONADO
+    override val title = Constantes.PEDIDO_ACEPTADO
 
     override val scaffoldState = ScaffoldState(
         topBarState = TopBarState(

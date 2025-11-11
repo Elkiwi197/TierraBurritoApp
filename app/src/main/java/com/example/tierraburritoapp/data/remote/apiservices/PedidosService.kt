@@ -27,4 +27,13 @@ interface PedidosService {
         @Query("correoRepartidor") correoRepartidor: String
     ): Response<ResponseBody>
 
+    @POST("/pedidos/cancelarPedido")
+    suspend fun cancelarPedido(
+        @Query("idPedido") idPedido: Int,
+        @Query("correo") correo: String
+    ): Response<ResponseBody>
+
+    @GET("/pedidos/aceptado/{correoRepartidor}")
+    suspend fun getPedidoAceptado(@Path("correoRepartidor") correoRepartidor: String): Response<Pedido>
+
 }

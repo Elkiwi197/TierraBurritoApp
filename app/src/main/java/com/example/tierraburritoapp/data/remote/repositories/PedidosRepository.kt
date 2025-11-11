@@ -24,5 +24,11 @@ class PedidosRepository @Inject constructor(
         return pedidosDataSource.aceptarPedido(idPedido, correoRepartidor)
     }
 
+    suspend fun getPedidoAceptado(correoRepartidor: String): NetworkResult<Pedido> {
+        return pedidosDataSource.getPedidoAceptado(correoRepartidor)
+    }
 
+    suspend fun cancelarPedido(idPedido: Int, correo: String): NetworkResult<String> {
+        return pedidosDataSource.cancelarPedido(idPedido, correo)
+    }
 }

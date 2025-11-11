@@ -48,5 +48,22 @@ class PedidosDataSource @Inject constructor(
         return result
     }
 
+    suspend fun cancelarPedido(idPedido: Int, correo: String): NetworkResult<String> {
+        val result = safeApiCall {
+            val response = pedidosService.cancelarPedido(idPedido, correo)
+            val message = response.body()?.string() ?: Constantes.ERROR_MAPEANDO
+            if (response.isSuccessful) {
+                Response.success(message)
+            } else {
+                Response.error(response.code(), response.body() ?: response.errorBody()!!)
+            }
+        }
+        return result
+    }
+
+    suspend fun getPedidoAceptado(correoRepartidor: String): NetworkResult<Pedido> =
+        safeApiCall {
+            pedidosService.getPedidoAceptado(correoRepartidor)
+        }
 
 }

@@ -16,17 +16,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.BottomBarCliente
 import com.example.tierraburritoapp.ui.common.BottomBarRepartidor
 import com.example.tierraburritoapp.ui.common.TopBar
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
+import com.example.tierraburritoapp.ui.screens.pantallaPedidoAceptadoRepartidor.PedidoAceptadoRepartidorPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaDetallePlatoCliente.DetallePlatoPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaListaPlatosCliente.ListaPlatosPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaLoginSignup.LoginSignupPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaMisPedidosCliente.MisPedidosPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente.PedidoActualPantalla
-import com.example.tierraburritoapp.ui.screens.pantallaPedidoSeleccionadoRepartidor.PedidoSeleccionadoPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosPantalla
 import kotlinx.coroutines.launch
 
@@ -62,9 +61,10 @@ fun Navigation() {
                 screen == ListaPlatosDestination || screen == DetallePlatoDestination
             ) {
                 BottomBarCliente(navController = navController)
-            } else if (screen == SeleccionPedidosDestination) {
+            } else if (screen == SeleccionPedidosDestination ||
+                screen == PedidoAceptadoDestination
+            ) {
                 BottomBarRepartidor(navController = navController)
-
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -134,32 +134,22 @@ fun Navigation() {
             composable<SeleccionPedidos> {
                 SeleccionPedidosPantalla(
                     navController = navController,
-                    onNavigateToPedidoSeleccionado = {
-                        navController.navigate(PedidoAceptado)
-                    },
                     onNavigateToLoginSignup = {
                         navController.navigate(Login)
                     },
+                    variablesViewModel = variablesViewModel,
                     showSnackbar = { showSnackbar(it) }
                 )
             }
 
-            composable("pedidoSeleccionadoPantalla") {
-                val pedido =
-                    navController.previousBackStackEntry?.savedStateHandle?.get<Pedido>("pedido")
-                if (pedido == null) {
-                    navController.navigate(SeleccionPedidos)
-                } else {
-                    PedidoSeleccionadoPantalla(
-                        pedido = pedido,
-                        navController = navController,
-                        variablesViewModel = variablesViewModel,
-                        onNavigateToLoginSignup = {
-                            navController.navigate(Login)
-                        },
-                        showSnackbar = { showSnackbar(it) }
-                    )
-                }
+            composable<PedidoAceptado> {
+                PedidoAceptadoRepartidorPantalla(
+                    onNavigateToLoginSignup = {
+                        navController.navigate(Login)
+                    },
+                    variablesViewModel = variablesViewModel,
+                    showSnackbar = { showSnackbar(it) }
+                )
             }
         }
     }

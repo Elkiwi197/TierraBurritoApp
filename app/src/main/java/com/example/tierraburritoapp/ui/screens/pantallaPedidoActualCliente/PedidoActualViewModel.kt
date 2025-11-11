@@ -2,9 +2,11 @@ package com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tierraburritoapp.BuildConfig
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.domain.model.Pedido
+import com.example.tierraburritoapp.domain.usecases.coordenadas.GetCoordenadasUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.AnadirPedidoUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PedidoActualViewModel @Inject
 constructor(
-    private val anadirPedidoUseCase: AnadirPedidoUseCase
+    private val anadirPedidoUseCase: AnadirPedidoUseCase,
+    private val getCoordenadasUseCase: GetCoordenadasUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PedidoActualContract.PedidoActualState())
@@ -26,8 +29,44 @@ constructor(
         when (event) {
             is PedidoActualContract.PedidoActualEvent.HacerPedido -> hacerPedido(pedido = event.pedido)
             PedidoActualContract.PedidoActualEvent.UiEventDone -> clearUiEvents()
+            is PedidoActualContract.PedidoActualEvent.CargarDireccion -> cargarDireccion(
+                event.direccion,
+                event.onResult
+            )
         }
     }
+
+    private fun cargarDireccion(
+        direccion: String,
+        onResult: (Double?, Double?) -> Unit
+    ) {
+        viewModelScope.launch {
+            when (val result =
+                getCoordenadasUseCase(direccion, BuildConfig.google_maps_api_key)) {
+                is NetworkResult.Success -> {
+                    val location = result.data?.results?.firstOrNull()?.geometry?.location
+                    location?.let {
+                        onResult(location.lat, location.lng)
+                    } ?: {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            uiEvent = UiEvent.ShowSnackbar(
+                                result.message ?: Constantes.ERROR_DESCONOCIDO
+                            )
+                        )
+                    }
+                }
+
+                is NetworkResult.Error -> _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    uiEvent = UiEvent.ShowSnackbar(
+                        result.message ?: Constantes.ERROR_DESCONOCIDO
+                    )
+                )
+            }
+        }
+    }
+
 
     private fun hacerPedido(pedido: Pedido) {
         _uiState.value = _uiState.value.copy(isLoading = true)
@@ -48,7 +87,9 @@ constructor(
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             uiEvent = UiEvent.ShowSnackbar(
-                                result.message ?: Constantes.ERROR_DESCONOCIDO))
+                                result.message ?: Constantes.ERROR_DESCONOCIDO
+                            )
+                        )
                     }
                 }
             }

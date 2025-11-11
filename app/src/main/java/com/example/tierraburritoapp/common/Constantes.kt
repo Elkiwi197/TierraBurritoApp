@@ -2,9 +2,15 @@ package com.example.tierraburritoapp.common
 
 object Constantes {
 
+    const val NO = "No"
+    const val SI = "Sí"
+    const val ACEPTAR = "Aceptar"
+    const val ES_ESTA_TU_DIRECCION = "¿Es esta tu dirección?"
+    const val DIRECCION_COMPLETA = "Dirección completa"
+    const val NO_HAY_PEDIDOS_ACEPTADOS = "No tienes ningún pedido aceptado"
+    const val PEDIDO_CANCELADO = "Pedido cancelado"
     const val PEDIDO_NULO = "El pedido seleccionado es nulo"
     const val INTRODUZCA_DIRECCION = "Introduzca la dirección de entrega"
-    const val PEDIDO_SELECCIONADO = "Pedido seleccionado"
     const val PEDIDOS_REPARTIDOS = "Pedidos repartidos"
     const val PEDIDO_ACEPTADO = "Pedido aceptado"
     const val SELECCION_PEDIDOS = "Selección de pedidos"

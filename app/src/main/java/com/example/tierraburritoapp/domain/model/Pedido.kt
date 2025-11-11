@@ -2,8 +2,9 @@ package com.example.tierraburritoapp.domain.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import kotlin.Int
+import java.time.LocalDateTime
 
 
 @Serializable
@@ -16,5 +17,7 @@ data class Pedido(
     var otros: List<Producto>,
     var precio: Double,
     var estado: EstadoPedido,
-    var correoRepartidor: String?
+    var correoRepartidor: String?,
+    @Contextual
+    var horaLlegada: LocalDateTime?
 ): Parcelable

@@ -8,7 +8,9 @@ interface MisPedidosContract {
     sealed class MisPedidosEvent {
         data class LoadPedidos(val correo: String) : MisPedidosEvent()
         data object UiEventDone : MisPedidosEvent()
+        data class CancelarPedido(val id: Int, val correo: String) : MisPedidosEvent()
     }
+
 
     data class MisPedidosState(
         val isLoading: Boolean = false,

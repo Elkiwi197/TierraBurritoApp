@@ -1,17 +1,16 @@
-package com.example.tierraburritoapp.ui.screens.pantallaPedidoSeleccionadoRepartidor
+package com.example.tierraburritoapp.ui.screens.pantallaPedidoAceptadoRepartidor
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tierraburritoapp.BuildConfig
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.remote.NetworkResult
-import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetCoordenadasUseCase
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetRutaUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.AceptarPedidoUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.CancelarPedidoUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidoAceptadoUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
-import com.example.tierraburritoapp.ui.common.VariablesViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,64 +18,92 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PedidoSeleccionadoViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+class PedidoAceptadoRepartidorViewModel @Inject
+constructor(
+    private val getPedidoAceptadoUseCase: GetPedidoAceptadoUseCase,
     private val getCoordenadasUseCase: GetCoordenadasUseCase,
     private val getRutaUseCase: GetRutaUseCase,
-    private val aceptarPedidoUseCase: AceptarPedidoUseCase
+    private val cancelarPedidoUseCase: CancelarPedidoUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(PedidoSeleccionadoContract.PedidoSeleccionadoState())
-    val uiState: StateFlow<PedidoSeleccionadoContract.PedidoSeleccionadoState> = _uiState
-    private var pedido: Pedido? = savedStateHandle["pedido"]
+    private val _uiState =
+        MutableStateFlow(PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorState())
+    val uiState: StateFlow<PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorState> =
+        _uiState
 
-
-    fun handleEvent(event: PedidoSeleccionadoContract.PedidoSeleccionadoEvent) {
+    fun handleEvent(event: PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent) {
         when (event) {
-            PedidoSeleccionadoContract.PedidoSeleccionadoEvent.CargarRuta -> cargarRuta()
-            PedidoSeleccionadoContract.PedidoSeleccionadoEvent.UiEventDone -> clearUiEvents()
-            is PedidoSeleccionadoContract.PedidoSeleccionadoEvent.AceptarPedido -> aceptarPedido(
-                event.idPedido,
+            PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.UiEventDone -> clearUiEvents()
+            is PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.LoadPedido -> cargarPedido(
                 event.correoRepartidor
+            )
+
+            is PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CargarRuta -> cargarRuta()
+            is PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CancelarPedido -> cancelarPedido(
+                event.idPedido,
+                event.correo
             )
         }
     }
 
-    private fun aceptarPedido(idPedido: Int, correoRepartidor: String) {
+    private fun cancelarPedido(idPedido: Int, correo: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
-            when (val result =
-                pedido?.let {
-                    aceptarPedidoUseCase(
-                        idPedido,
-                        correoRepartidor
+            when (val result = cancelarPedidoUseCase(idPedido, correo)) {
+                is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    uiEvent = UiEvent.ShowSnackbar(
+                        result.data ?: Constantes.ERROR_DESCONOCIDO
                     )
-                }) {
-                is NetworkResult.Success -> {
-                    result.let {
+                )
+
+                is NetworkResult.Error -> {
+                    if (result.code == 401) {
+                        _uiState.value =
+                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
+                                UiEvent.Navigate(mensaje = it)
+                            })
+                    } else {
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            uiEvent = UiEvent.ShowSnackbar(result.data.toString())
+                            uiEvent = UiEvent.ShowSnackbar(
+                                result.message ?: Constantes.ERROR_DESCONOCIDO
+                            )
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun cargarPedido(correoRepartidor: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            when (val result = getPedidoAceptadoUseCase(correoRepartidor)) {
+                is NetworkResult.Success -> _uiState.value =
+                    result.data?.let {
+                        _uiState.value.copy(
+                            isLoading = false,
+                            pedido = it
+                        )
+                    }!!
 
                 is NetworkResult.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        uiEvent = UiEvent.ShowSnackbar(
-                            result.message.toString()
+                    if (result.code == 401) {
+                        _uiState.value =
+                            _uiState.value.copy(
+                                isLoading = false,
+                                uiEvent = result.message?.let {
+                                    UiEvent.Navigate(mensaje = it)
+                                })
+                    } else {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            uiEvent = UiEvent.ShowSnackbar(
+                                result.message ?: Constantes.ERROR_DESCONOCIDO
+                            )
                         )
-                    )
-                }
-
-                null -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        uiEvent = UiEvent.ShowSnackbar(
-                            Constantes.PEDIDO_NULO
-                        )
-                    )
+                    }
                 }
             }
         }
@@ -86,7 +113,7 @@ class PedidoSeleccionadoViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
             when (val result =
-                pedido?.let {
+                _uiState.value.pedido?.let {
                     getCoordenadasUseCase(
                         it.direccion,
                         BuildConfig.google_maps_api_key
@@ -129,7 +156,7 @@ class PedidoSeleccionadoViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         uiEvent = UiEvent.ShowSnackbar(
-                            Constantes.PEDIDO_NULO
+                            Constantes.NO_HAY_PEDIDOS_ACEPTADOS
                         )
                     )
                 }
@@ -168,10 +195,4 @@ class PedidoSeleccionadoViewModel @Inject constructor(
     private fun clearUiEvents() {
         _uiState.value = _uiState.value.copy(uiEvent = null)
     }
-
-    fun setPedido(pedido: Pedido) {
-        this.pedido = pedido
-    }
-
-
 }

@@ -7,7 +7,7 @@ interface PedidoActualContract {
     sealed class PedidoActualEvent {
         data class HacerPedido(val pedido: Pedido) : PedidoActualEvent()
         data object UiEventDone : PedidoActualEvent()
-
+        data class CargarDireccion(val direccion: String, val onResult: (Double?, Double?) -> Unit) : PedidoActualEvent()
     }
 
     data class PedidoActualState(

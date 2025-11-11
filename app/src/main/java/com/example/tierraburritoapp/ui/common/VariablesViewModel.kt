@@ -26,7 +26,8 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
             estado = EstadoPedido.CLIENTE_ELIGIENDO,
             precio = 0.0,
             correoCliente = "",
-            correoRepartidor = ""
+            correoRepartidor = "",
+            horaLlegada = null
         )
     )
         private set
@@ -77,6 +78,10 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
 
     fun cambiarTipoUsuario(usuario: TipoUsuario) {
         tipoUsuario = usuario
+    }
+
+    fun cambiarPedido(pedido: Pedido){
+        this.pedido = pedido
     }
 
 }

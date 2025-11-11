@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tierraburritoapp.common.Constantes
+import com.example.tierraburritoapp.domain.model.EstadoPedido
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.UiEvent
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
@@ -78,6 +80,8 @@ fun MisPedidosPantalla(
             ) {
                 items(uiState.pedidos) { pedido ->
                     PedidoCard(
+                        viewModel = viewModel,
+                        variablesViewModel = variablesViewModel,
                         pedido = pedido,
                         colorPrimario = MaterialTheme.colorScheme.primary,
                         colorSecundario = MaterialTheme.colorScheme.secondary,
@@ -94,6 +98,8 @@ fun MisPedidosPantalla(
 
 @Composable
 fun PedidoCard(
+    viewModel: MisPedidosViewModel,
+    variablesViewModel: VariablesViewModel,
     pedido: Pedido,
     colorPrimario: Color,
     colorSecundario: Color,
@@ -118,11 +124,6 @@ fun PedidoCard(
                 style = titulo,
                 color = colorPrimario
             )
-//            Text(
-//                text = pedido.correoCliente,
-//                style = apartado,
-//                color = colorSecundario
-//            )
             Text(
                 style = titulo,
                 text = buildAnnotatedString {
@@ -200,10 +201,29 @@ fun PedidoCard(
                         append(Constantes.ESTADO_)
                     }
                     withStyle(style = SpanStyle(color = colorSecundario)) {
-                        append( pedido.estado.name.replace("_", " "))
+                        append(pedido.estado.name.replace("_", " "))
                     }
                 },
             )
+            if (pedido.estado == EstadoPedido.CLIENTE_ELIGIENDO ||
+                pedido.estado == EstadoPedido.EN_PREPARACION ||
+                pedido.estado == EstadoPedido.EN_REPARTO ||
+                pedido.estado == EstadoPedido.ACEPTADO
+            ) {
+                Button(
+                    onClick = {
+                        viewModel.handleEvent(
+                            MisPedidosContract.MisPedidosEvent.CancelarPedido(
+                                pedido.id,
+                                variablesViewModel.correoUsuario
+                            )
+                        )
+                        viewModel.handleEvent(
+                            MisPedidosContract.MisPedidosEvent.LoadPedidos(variablesViewModel.correoUsuario)
+                        )
+                    }
+                ) { Text("Cancelar") }
+            }
         }
     }
 }

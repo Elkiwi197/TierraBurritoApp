@@ -1,4 +1,4 @@
-package com.example.tierraburritoapp.ui.screens.pantallaPedidoSeleccionadoRepartidor
+package com.example.tierraburritoapp.ui.screens.pantallaPedidoAceptadoRepartidor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,12 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.tierraburritoapp.R
 import com.example.tierraburritoapp.common.Constantes
@@ -48,26 +46,29 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
-
+import kotlinx.coroutines.launch
 
 @Composable
-fun PedidoSeleccionadoPantalla(
-    pedido: Pedido?,
-    navController: NavController,
+fun PedidoAceptadoRepartidorPantalla(
+    viewModel: PedidoAceptadoRepartidorViewModel = hiltViewModel(),
     variablesViewModel: VariablesViewModel,
-    viewModel: PedidoSeleccionadoViewModel = hiltViewModel(),
     showSnackbar: (String) -> Unit,
     onNavigateToLoginSignup: () -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(pedido) {
-        pedido?.let {
-            viewModel.setPedido(it)
-            viewModel.handleEvent(PedidoSeleccionadoContract.PedidoSeleccionadoEvent.CargarRuta)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pedido = uiState.pedido
+
+    LaunchedEffect(Unit) {
+        //todo preguntar a Oscar si esto es mejor con un init{} en el viewmodel
+        launch {
+            viewModel.handleEvent(
+                PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.LoadPedido(
+                    correoRepartidor = variablesViewModel.correoUsuario
+                )
+            )
         }
     }
-
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
@@ -77,64 +78,81 @@ fun PedidoSeleccionadoPantalla(
                 onNavigateToLoginSignup()
                 showSnackbar(it.mensaje)
             }
-            viewModel.handleEvent(PedidoSeleccionadoContract.PedidoSeleccionadoEvent.UiEventDone)
+            viewModel.handleEvent(PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.UiEventDone)
         }
     }
 
+    LaunchedEffect(pedido) {
+        viewModel.handleEvent(PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CargarRuta)
+    }
+
+    pedido?.let {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight(0.55f)
+                    .background(color = Color.Green),
+            ) {
+                if (pedido != null) {
+                    PedidoView(
+                        pedido = pedido,
+                        colorPrimario = MaterialTheme.colorScheme.primary,
+                        colorSecundario = MaterialTheme.colorScheme.secondary,
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Red)
+            ) {
+                Mapa(
+                    latRestaurante = uiState.latRestaurante,
+                    lngRestaurante = uiState.lngRestaurante,
+                    latDestino = uiState.latDestino,
+
+                    lngDestino = uiState.lngDestino,
+                    ruta = uiState.ruta
+                )
+                pedido?.let {
+                    FloatingActionButton(
+                        modifier = Modifier
+                            .height(30.dp)
+                            .width(100.dp)
+                            .align(alignment = Alignment.BottomCenter)
+                            .padding(5.dp),
+                        onClick = {
+                            viewModel.handleEvent(
+                                PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CancelarPedido(
+                                    it.id, variablesViewModel.correoUsuario
+                                )
+                            )
+                        }
+                    ) {
+                        Text(
+                            text = "Cancelar pedido",
+                            color = Color.Red,
+                        )
+                    }
+                }
+            }
+        }
+    } ?:
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxHeight(0.55f)
-                .background(color = Color.Green),
-        ) {
-            if (pedido != null) {
-                PedidoView(
-                    pedido = pedido,
-                    colorPrimario = MaterialTheme.colorScheme.primary,
-                    colorSecundario = MaterialTheme.colorScheme.secondary,
-                )
-            }
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.Red)
-        ) {
-            Mapa(
-                latRestaurante = uiState.latRestaurante,
-                lngRestaurante = uiState.lngRestaurante,
-                latDestino = uiState.latDestino,
-                lngDestino = uiState.lngDestino,
-                ruta = uiState.ruta
-            )
-            FloatingActionButton(
-                modifier = Modifier
-                    .height(30.dp)
-                    .width(100.dp)
-                    .align(alignment = Alignment.BottomCenter)
-                    .padding(5.dp),
-                onClick = {
-                    pedido?.let {
-                        PedidoSeleccionadoContract.PedidoSeleccionadoEvent.AceptarPedido(
-                            idPedido = it.id,
-                            correoRepartidor = variablesViewModel.correoUsuario
-                        )
-                    }?.let { viewModel.handleEvent(it) }
-                }
-            ) {
-                Text(
-                    text = "Aceptar pedido",
-                    color = Color.Red,
-                )
-            }
-        }
+        Text("Acepta un pedido")
     }
 }
+
 
 @Composable
 fun Mapa(
@@ -144,7 +162,6 @@ fun Mapa(
     lngDestino: Double?,
     ruta: List<List<Double>>?
 ) {
-    val context = LocalContext.current
     var mapLoaded by remember { mutableStateOf(false) }
     val coordenadasRestaurante = LatLng(latRestaurante, lngRestaurante)
     val restauranteMarkerState = MarkerState(position = coordenadasRestaurante)
