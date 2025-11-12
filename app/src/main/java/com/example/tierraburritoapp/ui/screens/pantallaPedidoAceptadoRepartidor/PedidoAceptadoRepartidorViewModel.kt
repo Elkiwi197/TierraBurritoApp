@@ -38,7 +38,11 @@ constructor(
                 event.correoRepartidor
             )
 
-            is PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CargarRuta -> cargarRuta()
+            is PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CargarRuta -> cargarRuta(
+                event.latOrigen,
+                event.lngOrigen
+            )
+
             is PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CancelarPedido -> cancelarPedido(
                 event.idPedido,
                 event.correo
@@ -109,7 +113,7 @@ constructor(
         }
     }
 
-    private fun cargarRuta() {
+    private fun cargarRuta(latOrigen: Double, lngOrigen: Double) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
             when (val result =
@@ -136,8 +140,10 @@ constructor(
                             )
                             //Una vez que tengo las coordenadas hago la llamada a calcular ruta
                             getRuta(
-                                results[0].geometry.location.lat,
-                                results[0].geometry.location.lng
+                                latOrigen = latOrigen,
+                                lngOrigen = lngOrigen,
+                                latDestino = results[0].geometry.location.lat,
+                                lngDestino = results[0].geometry.location.lng
                             )
                         }
                     }
@@ -165,10 +171,12 @@ constructor(
 
     }
 
-    private suspend fun getRuta(latDestino: Double, lngDestino: Double) {
-        val latOrigen = uiState.value.latRestaurante
-        val lngOrigen = uiState.value.lngRestaurante
-
+    private suspend fun getRuta(
+        latOrigen: Double,
+        lngOrigen: Double,
+        latDestino: Double,
+        lngDestino: Double
+    ) {
         when (val result = getRutaUseCase(
             apiKey = BuildConfig.open_route_service_api_key,
             coordenadasInicio = "${lngOrigen},${latOrigen}",

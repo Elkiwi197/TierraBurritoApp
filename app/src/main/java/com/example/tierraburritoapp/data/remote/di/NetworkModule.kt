@@ -1,6 +1,7 @@
 package com.example.tierraburritoapp.data.remote.di
 
 
+import LocalDateTimeAdapter
 import com.example.tierraburritoapp.BuildConfig
 import com.example.tierraburritoapp.data.remote.apiservices.AuthApiService
 import com.example.tierraburritoapp.data.remote.apiservices.GoogleService
@@ -28,6 +29,8 @@ import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidosByCorreoUs
 import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidosEnPreparacionUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatoByIdUseCase
 import com.example.tierraburritoapp.domain.usecases.platos.GetPlatosUseCase
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +40,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.LocalDateTime
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -77,9 +81,13 @@ object NetworkModule {
     @Provides
     @Named("ServidorTierraBurrito")
     fun provideRetrofitTierraBurritoServidor(okHttpClient: OkHttpClient): Retrofit {
+        val gson: Gson = GsonBuilder()
+            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
+            .create()
+
         return Retrofit.Builder()
             .baseUrl(BuildConfig.URL_TIERRA_BURRITO)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpClient)
             .build()
     }

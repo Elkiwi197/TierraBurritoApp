@@ -43,4 +43,5 @@ abstract class BaseApiResponse {
     private fun <T> error(errorMessage: String, code: kotlin.Int): NetworkResult<T> =
         NetworkResult.Error(message = errorMessage, code = code)
 
+
 }

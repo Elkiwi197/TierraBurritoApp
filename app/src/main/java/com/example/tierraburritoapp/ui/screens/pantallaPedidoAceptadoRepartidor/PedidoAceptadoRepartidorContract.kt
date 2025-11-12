@@ -10,7 +10,10 @@ interface PedidoAceptadoRepartidorContract {
         ) : PedidoAceptadoRepartidorEvent()
 
         data object UiEventDone : PedidoAceptadoRepartidorEvent()
-        data object CargarRuta : PedidoAceptadoRepartidorEvent()
+        data class CargarRuta(
+            val latOrigen: Double,
+            val lngOrigen: Double
+        ) : PedidoAceptadoRepartidorEvent()
         data class CancelarPedido(
             val idPedido: Int,
             val correo: String
@@ -23,8 +26,6 @@ interface PedidoAceptadoRepartidorContract {
         val isLoading: Boolean = false,
         val pedido: Pedido? = null,
         val uiEvent: UiEvent? = null,
-        val latRestaurante: Double = 40.434192,
-        val lngRestaurante: Double = -3.606442,
         val latDestino: Double? = null,
         val lngDestino: Double? = null,
         val ruta: List<List<Double>>? = null

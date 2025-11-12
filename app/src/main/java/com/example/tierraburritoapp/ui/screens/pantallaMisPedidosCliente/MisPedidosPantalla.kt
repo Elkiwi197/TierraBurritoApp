@@ -195,6 +195,11 @@ fun PedidoCard(
                 color = colorPrimario
             )
             Text(
+                text = Constantes.HORA_LLEGADA_ + pedido.horaLlegada!!.hour.toString() + ":" + pedido.horaLlegada!!.minute.toString(),
+                style = titulo,
+                color = colorPrimario
+            )
+            Text(
                 style = titulo,
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(color = colorPrimario)) {

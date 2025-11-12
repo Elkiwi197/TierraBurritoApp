@@ -2,6 +2,7 @@ package com.example.tierraburritoapp.common
 
 object Constantes {
 
+    const val  HORA_LLEGADA_ = "Hora de llegada: "
     const val NO = "No"
     const val SI = "Sí"
     const val ACEPTAR = "Aceptar"

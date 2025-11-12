@@ -53,6 +53,8 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun PedidoActualPantalla(
@@ -134,6 +136,14 @@ fun PedidoActualPantalla(
                 style = MaterialTheme.typography.titleLarge,
                 //     textAlign = TextAlign.Center,
             )
+            pedido.horaLlegada?.let {
+                Text(
+                    text = Constantes.HORA_LLEGADA_ + pedido.horaLlegada!!.hour.toString() + ":" + pedido.horaLlegada!!.minute.toString(),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.titleLarge,
+                    //     textAlign = TextAlign.Center,
+                )
+            }
             Button(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                 onClick = {
@@ -146,6 +156,7 @@ fun PedidoActualPantalla(
                                     pedido
                                 )
                             )
+                            direccionConfirmada = false
                             variablesViewModel.resetearPedido()
                         } else {
                             showDialog = true
@@ -164,12 +175,24 @@ fun PedidoActualPantalla(
                     direccionConfirmada = false
                     showDialog = false
                 },
+                latDestino = latDestino,
+                lngDestino = lngDestino,
                 onConfirmRequest = {
+                    viewModel.handleEvent(
+                        PedidoActualContract.PedidoActualEvent.GetHoraLlegada(
+                            coordenadasInicio = "${variablesViewModel.lngRestaurante},${variablesViewModel.latRestaurante}",
+                            coordenadasFinal = "${lngDestino},${latDestino}",
+                            onResult = { segundos ->
+                                val tiempo = segundos + 600
+                                val horaLlegada =
+                                    LocalDateTime.now().plusSeconds(tiempo.toLong())
+                                variablesViewModel.cambiarHoraLlegada(horaLlegada)
+                            }
+                        )
+                    )
                     direccionConfirmada = true
                     showDialog = false
-                },
-                latDestino = latDestino,
-                lngDestino = lngDestino
+                }
             )
         }
     }

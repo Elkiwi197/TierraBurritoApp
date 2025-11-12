@@ -7,6 +7,7 @@ import com.example.tierraburritoapp.domain.model.EstadoPedido
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.domain.model.Plato
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,6 +32,8 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
         )
     )
         private set
+    val latRestaurante: Double = 40.434192
+    val lngRestaurante: Double = -3.606442
 
     fun cambiarCorreoUsuario(correo: String) {
         correoUsuario = correo
@@ -72,7 +75,8 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
             estado = EstadoPedido.CLIENTE_ELIGIENDO,
             precio = 0.0,
             correoCliente = "",
-            correoRepartidor = ""
+            correoRepartidor = "",
+            horaLlegada = null
         )
     }
 
@@ -80,8 +84,8 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
         tipoUsuario = usuario
     }
 
-    fun cambiarPedido(pedido: Pedido){
-        this.pedido = pedido
+    fun cambiarHoraLlegada(horaLlegada: LocalDateTime){
+        pedido = pedido.copy(horaLlegada = horaLlegada)
     }
 
 }

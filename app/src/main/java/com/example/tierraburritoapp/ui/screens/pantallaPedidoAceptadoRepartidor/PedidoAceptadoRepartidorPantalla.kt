@@ -83,7 +83,10 @@ fun PedidoAceptadoRepartidorPantalla(
     }
 
     LaunchedEffect(pedido) {
-        viewModel.handleEvent(PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CargarRuta)
+        viewModel.handleEvent(PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CargarRuta(
+            latOrigen = variablesViewModel.latRestaurante,
+            lngOrigen = variablesViewModel.lngRestaurante
+        ))
     }
 
     pedido?.let {
@@ -112,38 +115,34 @@ fun PedidoAceptadoRepartidorPantalla(
                     .background(color = Color.Red)
             ) {
                 Mapa(
-                    latRestaurante = uiState.latRestaurante,
-                    lngRestaurante = uiState.lngRestaurante,
+                    latRestaurante = variablesViewModel.latRestaurante,
+                    lngRestaurante = variablesViewModel.lngRestaurante,
                     latDestino = uiState.latDestino,
-
                     lngDestino = uiState.lngDestino,
                     ruta = uiState.ruta
                 )
-                pedido?.let {
-                    FloatingActionButton(
-                        modifier = Modifier
-                            .height(30.dp)
-                            .width(100.dp)
-                            .align(alignment = Alignment.BottomCenter)
-                            .padding(5.dp),
-                        onClick = {
-                            viewModel.handleEvent(
-                                PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CancelarPedido(
-                                    it.id, variablesViewModel.correoUsuario
-                                )
+                FloatingActionButton(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .width(100.dp)
+                        .align(alignment = Alignment.BottomCenter)
+                        .padding(5.dp),
+                    onClick = {
+                        viewModel.handleEvent(
+                            PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CancelarPedido(
+                                it.id, variablesViewModel.correoUsuario
                             )
-                        }
-                    ) {
-                        Text(
-                            text = "Cancelar pedido",
-                            color = Color.Red,
                         )
                     }
+                ) {
+                    Text(
+                        text = "Cancelar pedido",
+                        color = Color.Red,
+                    )
                 }
             }
         }
-    } ?:
-    Column(
+    } ?: Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),

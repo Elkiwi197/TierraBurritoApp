@@ -8,6 +8,10 @@ interface PedidoActualContract {
         data class HacerPedido(val pedido: Pedido) : PedidoActualEvent()
         data object UiEventDone : PedidoActualEvent()
         data class CargarDireccion(val direccion: String, val onResult: (Double?, Double?) -> Unit) : PedidoActualEvent()
+        data class GetHoraLlegada(
+            val coordenadasInicio: String,
+            val coordenadasFinal: String,
+            val onResult: (Double) -> Unit): PedidoActualEvent()
     }
 
     data class PedidoActualState(
