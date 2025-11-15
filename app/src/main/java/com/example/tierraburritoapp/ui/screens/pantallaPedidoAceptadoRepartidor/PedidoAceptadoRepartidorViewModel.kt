@@ -7,8 +7,8 @@ import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetCoordenadasUseCase
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetRutaUseCase
-import com.example.tierraburritoapp.domain.usecases.pedidos.AceptarPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.CancelarPedidoUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.EntregarPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidoAceptadoUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +23,8 @@ constructor(
     private val getPedidoAceptadoUseCase: GetPedidoAceptadoUseCase,
     private val getCoordenadasUseCase: GetCoordenadasUseCase,
     private val getRutaUseCase: GetRutaUseCase,
-    private val cancelarPedidoUseCase: CancelarPedidoUseCase
+    private val cancelarPedidoUseCase: CancelarPedidoUseCase,
+    private val entregarPedidoUseCase: EntregarPedidoUseCase
 ) : ViewModel() {
 
     private val _uiState =
@@ -47,6 +48,41 @@ constructor(
                 event.idPedido,
                 event.correo
             )
+
+            is PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.EntregarPedido -> entregarPedido(
+                event.idPedido,
+                event.correoRepartidor
+            )
+        }
+    }
+
+    private fun entregarPedido(idPedido: Int, correoRepartidor: String) {
+        _uiState.value = _uiState.value.copy(isLoading = true)
+        viewModelScope.launch {
+            when (val result = entregarPedidoUseCase(idPedido, correoRepartidor)) {
+                is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    uiEvent = UiEvent.ShowSnackbar(
+                        result.data ?: Constantes.ERROR_DESCONOCIDO
+                    )
+                )
+
+                is NetworkResult.Error -> {
+                    if (result.code == 401) {
+                        _uiState.value =
+                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
+                                UiEvent.Navigate(mensaje = it)
+                            })
+                    } else {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            uiEvent = UiEvent.ShowSnackbar(
+                                result.message ?: Constantes.ERROR_DESCONOCIDO
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -162,7 +198,7 @@ constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         uiEvent = UiEvent.ShowSnackbar(
-                            Constantes.NO_HAY_PEDIDOS_ACEPTADOS
+                            Constantes.ERROR_RUTA
                         )
                     )
                 }
@@ -193,7 +229,7 @@ constructor(
             is NetworkResult.Error -> {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    uiEvent = UiEvent.ShowSnackbar(Constantes.ERROR_RUTA + result.message.toString())
+                    uiEvent = UiEvent.ShowSnackbar(Constantes.ERROR_RUTA_ + result.message.toString())
                 )
             }
         }

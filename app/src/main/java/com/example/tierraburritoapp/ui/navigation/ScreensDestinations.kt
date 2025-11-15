@@ -1,6 +1,5 @@
 package com.example.tierraburritoapp.ui.navigation
 
-import com.example.tierraburritoapp.domain.model.Pedido
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -19,6 +19,11 @@ interface PedidoAceptadoRepartidorContract {
             val correo: String
         ) : PedidoAceptadoRepartidorEvent()
 
+        data class EntregarPedido(
+            val idPedido: Int,
+            val  correoRepartidor: String
+        ): PedidoAceptadoRepartidorEvent()
+
     }
 
 

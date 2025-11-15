@@ -1,4 +1,5 @@
-package com.example.tierraburritoapp.ui.screens.pantallaMisPedidosCliente
+package com.example.tierraburritoapp.ui.screens.pantallaPedidosRepartidos
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,25 +29,21 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tierraburritoapp.common.Constantes
-import com.example.tierraburritoapp.domain.model.EstadoPedido
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.ui.common.UiEvent
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
 
 @Composable
-fun MisPedidosPantalla(
-    viewModel: MisPedidosViewModel = hiltViewModel(),
+fun PedidosRepartidosPantalla(
+    viewModel: PedidosRepartidosViewModel = hiltViewModel(),
     variablesViewModel: VariablesViewModel,
     showSnackbar: (String) -> Unit,
     onNavigateToLoginSignup: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-
-    val correo = variablesViewModel.correoUsuario
-
     LaunchedEffect(Unit) {
-        viewModel.handleEvent(MisPedidosContract.MisPedidosEvent.LoadPedidos(correo = correo))
+        viewModel.handleEvent(PedidosRepartidosContract.PedidosRepartidosEvent.LoadPedidos(correo = variablesViewModel.correoUsuario))
     }
 
     LaunchedEffect(uiState.uiEvent) {
@@ -58,7 +54,7 @@ fun MisPedidosPantalla(
                 onNavigateToLoginSignup()
                 showSnackbar(it.mensaje)
             }
-            viewModel.handleEvent(MisPedidosContract.MisPedidosEvent.UiEventDone)
+            viewModel.handleEvent(PedidosRepartidosContract.PedidosRepartidosEvent.UiEventDone)
         }
     }
 
@@ -80,8 +76,6 @@ fun MisPedidosPantalla(
             ) {
                 items(uiState.pedidos) { pedido ->
                     PedidoCard(
-                        viewModel = viewModel,
-                        variablesViewModel = variablesViewModel,
                         pedido = pedido,
                         colorPrimario = MaterialTheme.colorScheme.primary,
                         colorSecundario = MaterialTheme.colorScheme.secondary,
@@ -98,8 +92,6 @@ fun MisPedidosPantalla(
 
 @Composable
 fun PedidoCard(
-    viewModel: MisPedidosViewModel,
-    variablesViewModel: VariablesViewModel,
     pedido: Pedido,
     colorPrimario: Color,
     colorSecundario: Color,
@@ -210,28 +202,6 @@ fun PedidoCard(
                     }
                 },
             )
-            if (pedido.estado == EstadoPedido.CLIENTE_ELIGIENDO ||
-                pedido.estado == EstadoPedido.EN_PREPARACION ||
-                pedido.estado == EstadoPedido.EN_REPARTO ||
-                pedido.estado == EstadoPedido.ACEPTADO
-            ) {
-                Button(
-                    onClick = {
-                        viewModel.handleEvent(
-                            MisPedidosContract.MisPedidosEvent.CancelarPedido(
-                                pedido.id,
-                                variablesViewModel.correoUsuario
-                            )
-                        )
-                        viewModel.handleEvent(
-                            MisPedidosContract.MisPedidosEvent.LoadPedidos(variablesViewModel.correoUsuario)
-                        )
-                    }
-                ) { Text("Cancelar") }
-            }
         }
     }
 }
-
-
-

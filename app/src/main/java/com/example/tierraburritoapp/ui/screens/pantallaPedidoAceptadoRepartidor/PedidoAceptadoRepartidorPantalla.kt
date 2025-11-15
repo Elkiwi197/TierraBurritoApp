@@ -59,8 +59,8 @@ fun PedidoAceptadoRepartidorPantalla(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pedido = uiState.pedido
 
+    //No se puede cambiar al init del viewmodel porque necesito el correo del usuario, que esta en otro viewmodel (variablesViewModel)
     LaunchedEffect(Unit) {
-        //todo preguntar a Oscar si esto es mejor con un init{} en el viewmodel
         launch {
             viewModel.handleEvent(
                 PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.LoadPedido(
@@ -125,7 +125,7 @@ fun PedidoAceptadoRepartidorPantalla(
                     modifier = Modifier
                         .height(30.dp)
                         .width(100.dp)
-                        .align(alignment = Alignment.BottomCenter)
+                        .align(alignment = Alignment.BottomStart)
                         .padding(5.dp),
                     onClick = {
                         viewModel.handleEvent(
@@ -138,6 +138,25 @@ fun PedidoAceptadoRepartidorPantalla(
                     Text(
                         text = "Cancelar pedido",
                         color = Color.Red,
+                    )
+                }
+                FloatingActionButton(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .width(100.dp)
+                        .align(alignment = Alignment.BottomEnd)
+                        .padding(5.dp),
+                    onClick = {
+                        viewModel.handleEvent(
+                            PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.EntregarPedido(
+                                it.id, variablesViewModel.correoUsuario
+                            )
+                        )
+                    }
+                ) {
+                    Text(
+                        text = "Pedido entregado",
+                        color = Color.Yellow,
                     )
                 }
             }

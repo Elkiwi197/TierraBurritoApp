@@ -31,10 +31,10 @@ class MisPedidosViewModel @Inject constructor(
         }
     }
 
-    private fun cancelarPedido(idPedido: Int, correo: String) {
+    private fun cancelarPedido(idPedido: Int, correoRepartidor: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
-            when (val result = cancelarPedidoUseCase(idPedido, correo)) {
+            when (val result = cancelarPedidoUseCase(idPedido, correoRepartidor)) {
                 is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     uiEvent = UiEvent.ShowSnackbar(

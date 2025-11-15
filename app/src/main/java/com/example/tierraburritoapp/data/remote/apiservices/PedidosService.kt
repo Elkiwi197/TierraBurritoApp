@@ -30,10 +30,19 @@ interface PedidosService {
     @POST("/pedidos/cancelarPedido")
     suspend fun cancelarPedido(
         @Query("idPedido") idPedido: Int,
-        @Query("correo") correo: String
+        @Query("correoRepartidor") correoRepartidor: String
     ): Response<ResponseBody>
 
     @GET("/pedidos/aceptado/{correoRepartidor}")
     suspend fun getPedidoAceptado(@Path("correoRepartidor") correoRepartidor: String): Response<Pedido>
+
+    @GET("/pedidos/repartidos/{correoRepartidor}")
+    suspend fun getPedidosRepartidos(@Path("correoRepartidor") correoRepartidor: String): Response<List<Pedido>>
+
+    @POST("/pedidos/entregarPedido")
+    suspend fun entregarPedido(
+        @Query("idPedido") idPedido: Int,
+        @Query("correoRepartidor") correoRepartidor: String
+    ): Response<ResponseBody>
 
 }

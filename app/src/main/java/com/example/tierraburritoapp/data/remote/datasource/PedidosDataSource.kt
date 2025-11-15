@@ -48,9 +48,9 @@ class PedidosDataSource @Inject constructor(
         return result
     }
 
-    suspend fun cancelarPedido(idPedido: Int, correo: String): NetworkResult<String> {
+    suspend fun cancelarPedido(idPedido: Int, correoRepartidor: String): NetworkResult<String> {
         val result = safeApiCall {
-            val response = pedidosService.cancelarPedido(idPedido, correo)
+            val response = pedidosService.cancelarPedido(idPedido, correoRepartidor)
             val message = response.body()?.string() ?: Constantes.ERROR_MAPEANDO
             if (response.isSuccessful) {
                 Response.success(message)
@@ -66,4 +66,21 @@ class PedidosDataSource @Inject constructor(
             pedidosService.getPedidoAceptado(correoRepartidor)
         }
 
+    suspend fun getPedidosRepartidos(correoRepartidor: String) =
+        safeApiCall {
+            pedidosService.getPedidosRepartidos(correoRepartidor)
+        }
+
+    suspend fun entregarPedido(idPedido: Int, correoRepartidor: String): NetworkResult<String> {
+        val result = safeApiCall {
+            val response = pedidosService.entregarPedido(idPedido, correoRepartidor)
+            val message = response.body()?.string() ?: Constantes.ERROR_MAPEANDO
+            if (response.isSuccessful) {
+                Response.success(message)
+            } else {
+                Response.error(response.code(), response.body() ?: response.errorBody()!!)
+            }
+        }
+        return result
+    }
 }

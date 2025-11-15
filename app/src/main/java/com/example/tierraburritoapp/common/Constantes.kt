@@ -2,7 +2,7 @@ package com.example.tierraburritoapp.common
 
 object Constantes {
 
-    const val  HORA_LLEGADA_ = "Hora de llegada: "
+    const val  HORA_ESTIMADA_LLEGADA_ = "Hora estimada de llegada: "
     const val NO = "No"
     const val SI = "Sí"
     const val ACEPTAR = "Aceptar"
@@ -35,7 +35,8 @@ object Constantes {
     const val ERROR_DESCONOCIDO = "Hubo un fallo inesperado"
     const val ERROR_INICIANDO_SESION = "Error iniciando sesión"
     const val ERROR_MAPEANDO = "Error mapeando objeto"
-    const val ERROR_RUTA = "Error creando la ruta: "
+    const val ERROR_RUTA_ = "Error creando la ruta: "
+    const val ERROR_RUTA = "Error creando la ruta"
     const val ELIMINAR = "Eliminar"
     const val ESTADO = "Estado"
     const val ESTADO_ = "Estado: "

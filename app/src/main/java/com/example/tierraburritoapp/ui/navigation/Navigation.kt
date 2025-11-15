@@ -26,6 +26,7 @@ import com.example.tierraburritoapp.ui.screens.pantallaListaPlatosCliente.ListaP
 import com.example.tierraburritoapp.ui.screens.pantallaLoginSignup.LoginSignupPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaMisPedidosCliente.MisPedidosPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaPedidoActualCliente.PedidoActualPantalla
+import com.example.tierraburritoapp.ui.screens.pantallaPedidosRepartidos.PedidosRepartidosPantalla
 import com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor.SeleccionPedidosPantalla
 import kotlinx.coroutines.launch
 
@@ -62,7 +63,8 @@ fun Navigation() {
             ) {
                 BottomBarCliente(navController = navController)
             } else if (screen == SeleccionPedidosDestination ||
-                screen == PedidoAceptadoDestination
+                screen == PedidoAceptadoDestination ||
+                screen == PedidosRepartidosDestination
             ) {
                 BottomBarRepartidor(navController = navController)
             }
@@ -148,6 +150,16 @@ fun Navigation() {
                         navController.navigate(Login)
                     },
                     variablesViewModel = variablesViewModel,
+                    showSnackbar = { showSnackbar(it) }
+                )
+            }
+
+            composable<PedidosRepartidos> {
+                PedidosRepartidosPantalla(
+                    variablesViewModel = variablesViewModel,
+                    onNavigateToLoginSignup = {
+                        navController.navigate(Login)
+                    },
                     showSnackbar = { showSnackbar(it) }
                 )
             }
