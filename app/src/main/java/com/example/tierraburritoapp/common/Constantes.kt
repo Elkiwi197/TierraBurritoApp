@@ -2,7 +2,12 @@ package com.example.tierraburritoapp.common
 
 object Constantes {
 
-    const val  HORA_ESTIMADA_LLEGADA_ = "Hora estimada de llegada: "
+    const val NO_HAY_MENSAJE = "Llamada sin mensaje"
+    const val RELLENA_TODOS_LOS_CAMPOS = "Rellena todos los campos"
+    const val CONTRASENA_INCORRECTA = "Contraseña incorrecta"
+    const val USUARIO_NO_ENCONTRADO = "Usuario no encontrado"
+    const val TOKEN_NO_RECIBIDO = "Token no recibido"
+    const val HORA_ESTIMADA_LLEGADA_ = "Hora estimada de llegada: "
     const val NO = "No"
     const val SI = "Sí"
     const val ACEPTAR = "Aceptar"

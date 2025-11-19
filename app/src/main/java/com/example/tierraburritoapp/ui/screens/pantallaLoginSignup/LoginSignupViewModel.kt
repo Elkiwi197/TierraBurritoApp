@@ -45,7 +45,6 @@ constructor(
                     ""
                 )
             )
-
             is LoginSignupContract.LoginSignupEvent.ActualizarCorreoLogIn -> updateEmailLogin(event.correoLogin)
             is LoginSignupContract.LoginSignupEvent.ActualizarCorreoSignUp -> updateEmailSignup(
                 event.correoSignup
@@ -74,7 +73,7 @@ constructor(
             when (val result = signUpUseCase(usuarioSignup)) {
                 is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    uiEvent = UiEvent.ShowSnackbar(result.data ?: Constantes.USUARIO_ANADIDO)
+                    uiEvent = UiEvent.ShowSnackbar(result.data ?: Constantes.NO_HAY_MENSAJE)
                 )
 
                 is NetworkResult.Error -> _uiState.value = _uiState.value.copy(

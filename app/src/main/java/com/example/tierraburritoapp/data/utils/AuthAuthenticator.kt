@@ -1,48 +1,100 @@
 package com.example.tierraburritoapp.data.utils
 
-import com.example.tierraburritoapp.common.Constantes
-import com.example.tierraburritoapp.data.model.TokenResponse
 import com.example.tierraburritoapp.data.remote.apiservices.AuthApiService
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
-import okhttp3.*
-import retrofit2.Response
+import okhttp3.Authenticator
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.Route
+import timber.log.Timber
 import javax.inject.Inject
-import dagger.Lazy
-import okhttp3.logging.HttpLoggingInterceptor
 
 class AuthAuthenticator @Inject constructor(
     private val tokenManager: TokenManager,
-    private val service: Lazy<AuthApiService>,
+    private val authApiService: AuthApiService,
 ) : Authenticator {
 
-    override fun authenticate(route: Route?, response: okhttp3.Response): Request? {
-        val refreshToken = runBlocking {
-            tokenManager.getRefreshToken().first()
+
+    override fun authenticate(route: Route?, response: Response): Request? {
+        Timber.i("AUTHENTICATOR", "Autenticando...")
+
+        // Evitar bucles infinitos
+        if (responseCount(response) >= 2) {
+            Timber.e("AUTHENTICATOR", "Demasiados reintentos. Sesión expirada.")
+            signalSessionExpired()
+            return null
         }
 
-        return runBlocking {
-            val newTokenResponse = getNewToken(refreshToken)
+        val refreshToken = runBlocking { tokenManager.getRefreshToken().firstOrNull() }
+        if (refreshToken.isNullOrEmpty()) {
+            Timber.e("AUTHENTICATOR", "No hay refresh token. Sesión expirada.")
+            signalSessionExpired()
+            return null
+        }
 
-            if (!newTokenResponse.isSuccessful || newTokenResponse.body() == null) {
-                tokenManager.deleteTokens()
-                return@runBlocking null
-            }
-
-            newTokenResponse.body()?.let {
-                tokenManager.saveTokens(it.accessToken, it.refreshToken)
-                response.request.newBuilder()
-                    .header(Constantes.AUTHORIZATION, Constantes.BEARER + it.accessToken)
-                    .build()
+        // --- Intentar refrescar tokens ---
+        val newTokens = runBlocking {
+            val res = authApiService.refreshToken("Bearer $refreshToken")
+            if (res.isSuccessful) {
+                res.body()?.also {
+                    tokenManager.saveTokens(it.accessToken, it.refreshToken)
+                }
+            } else {
+                null
             }
         }
+
+        // Si refresh falla → sesión expirada
+        if (newTokens == null) {
+            Timber.e("AUTHENTICATOR", "Refresh fallido. Marcando sesión expirada.")
+            signalSessionExpired()
+            return null
+        }
+
+        // Reintentar con token renovado
+        return response.request.newBuilder()
+            .header("Authorization", "Bearer ${newTokens.accessToken}")
+            .build()
     }
 
-    private suspend fun getNewToken(refreshToken: String?): Response<TokenResponse> {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
-        return service.get().refreshToken(Constantes.BEARER + refreshToken)
+    private fun signalSessionExpired() = runBlocking {
+        tokenManager.deleteTokens()
+        tokenManager.setSessionExpired()
     }
 
+    private fun responseCount(response: Response): Int {
+        var count = 1
+        var prior = response.priorResponse
+        while (prior != null) {
+            count++
+            prior = prior.priorResponse
+        }
+        return count
+    }
 }
+
+
+/*
+    private fun getNewToken(refreshToken: String): Response<TokenResponse> {
+        return try {
+            val response = runBlocking {
+                authApiService.get().refreshToken("Bearer $refreshToken")
+            }
+
+            val body = response.body()
+            if (response.isSuccessful && body != null && body.contentLength() > 0) {
+                val token = Gson().fromJson(body.string(), TokenResponse::class.java)
+                Response.success(token)
+            } else {
+                Response.error(
+                    response.code(),
+                    response.errorBody() ?: ResponseBody.create(null, "Error desconocido")
+                )
+            }
+        } catch (e: Exception) {
+            Response.error(500, ResponseBody.create(null, e.message ?: "Error desconocido"))
+        }
+    }
+}
+*/

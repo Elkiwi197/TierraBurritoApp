@@ -3,6 +3,7 @@ package com.example.tierraburritoapp.data.remote.di
 
 import LocalDateTimeAdapter
 import com.example.tierraburritoapp.BuildConfig
+import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.remote.apiservices.AuthApiService
 import com.example.tierraburritoapp.data.remote.apiservices.GoogleService
 import com.example.tierraburritoapp.data.remote.apiservices.LoginSignupService
@@ -49,13 +50,25 @@ import javax.inject.Singleton
 object NetworkModule {
 
     @Provides
+    @Singleton
     fun provideAuthApiService(
-        @Named("ServidorTierraBurrito")
+        @Named("RefreshRetrofit")
         retrofit: Retrofit
     ): AuthApiService {
         return retrofit
             .create(AuthApiService::class.java)
     }
+
+    @Provides
+    @Singleton
+    @Named("RefreshRetrofit")
+    fun provideRefreshRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.URL_TIERRA_BURRITO)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
 
     @Provides
     fun provideHTTPLoggingInterceptor(): HttpLoggingInterceptor {
@@ -71,11 +84,13 @@ object NetworkModule {
         authenticator: AuthAuthenticator
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
             .authenticator(authenticator)
+            .addInterceptor(loggingInterceptor.apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
             .build()
-        //todo mandar el access token todo el rato, y poner e refresh token cuando de un 403 (forbidden)
+        //todo mandar el access token todo el rato, y poner e refresh token cuando de un 401 (unauthorized)
     }
 
     @Provides

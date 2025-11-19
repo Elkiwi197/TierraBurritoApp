@@ -20,6 +20,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -38,10 +40,10 @@ fun LoginSignupPantalla(
     onNavigateToListaPlatos: () -> Unit,
     onNavigateToSeleccionPedidos: () -> Unit,
     showSnackbar: (String) -> Unit,
-
-    ) {
+) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
@@ -75,10 +77,10 @@ fun LoginSignupPantalla(
         verticalArrangement = Arrangement.Center,
     ) {
         LogInBundle(
-            modifier = Modifier,
             colorPrimario = MaterialTheme.colorScheme.primary,
             colorSecundario = MaterialTheme.colorScheme.secondary,
             uiState = uiState,
+            keyboardController = keyboardController,
             actualizarCorreoLogIn = {
                 viewModel.handleEvent(
                     LoginSignupContract.LoginSignupEvent.ActualizarCorreoLogIn(
@@ -94,19 +96,23 @@ fun LoginSignupPantalla(
                 )
             },
             hacerLogIn = {
-                viewModel.handleEvent(
-                    LoginSignupContract.LoginSignupEvent.Login(
-                        correo = uiState.correoLogin,
-                        contrasena = uiState.contrasenaLogin,
+                if (viewModel.uiState.value.correoLogin.isNotBlank() && viewModel.uiState.value.contrasenaLogin.isNotBlank()) {
+                    viewModel.handleEvent(
+                        LoginSignupContract.LoginSignupEvent.Login(
+                            correo = uiState.correoLogin,
+                            contrasena = uiState.contrasenaLogin,
+                        )
                     )
-                )
+                } else {
+                    showSnackbar(Constantes.RELLENA_TODOS_LOS_CAMPOS)
+                }
             }
         )
         SignUpBundle(
-            modifier = Modifier,
             uiState = uiState,
             colorPrimario = MaterialTheme.colorScheme.primary,
             colorSecundario = MaterialTheme.colorScheme.secondary,
+            keyboardController = keyboardController,
             actualizarNombreSignUp = {
                 viewModel.handleEvent(
                     LoginSignupContract.LoginSignupEvent.ActualizarNombreSignUp(
@@ -136,14 +142,20 @@ fun LoginSignupPantalla(
                 )
             },
             hacerSignUp = {
-                viewModel.handleEvent(
-                    LoginSignupContract.LoginSignupEvent.SignUp(
-                        nombre = uiState.nombreSignup,
-                        correo = uiState.correoSignup,
-                        contrasena = uiState.contrasenaSignup,
-                        tipoUsuario = uiState.tipoUsuario
+                if (viewModel.uiState.value.correoSignup.isNotBlank() &&
+                    viewModel.uiState.value.contrasenaSignup.isNotBlank() &&
+                    viewModel.uiState.value.nombreSignup.isNotBlank()) {
+                    viewModel.handleEvent(
+                        LoginSignupContract.LoginSignupEvent.SignUp(
+                            nombre = uiState.nombreSignup,
+                            correo = uiState.correoSignup,
+                            contrasena = uiState.contrasenaSignup,
+                            tipoUsuario = uiState.tipoUsuario
+                        )
                     )
-                )
+                } else {
+                    showSnackbar(Constantes.RELLENA_TODOS_LOS_CAMPOS)
+                }
             }
         )
     }
@@ -151,13 +163,13 @@ fun LoginSignupPantalla(
 
 @Composable
 fun LogInBundle(
-    modifier: Modifier,
     colorPrimario: Color,
     colorSecundario: Color,
     uiState: LoginSignupContract.LoginSignupState,
     actualizarCorreoLogIn: (String) -> Unit = {},
     actualizarContrasenaLogIn: (String) -> Unit = {},
-    hacerLogIn: () -> Unit = {}
+    hacerLogIn: () -> Unit = {},
+    keyboardController: SoftwareKeyboardController?,
 ) {
     Column(
     ) {
@@ -202,6 +214,7 @@ fun LogInBundle(
         )
         Button(
             onClick = {
+                keyboardController?.hide()
                 hacerLogIn()
             },
             colors = ButtonDefaults.buttonColors(colorPrimario)
@@ -213,10 +226,10 @@ fun LogInBundle(
 
 @Composable
 fun SignUpBundle(
-    modifier: Modifier,
     colorPrimario: Color,
     colorSecundario: Color,
     uiState: LoginSignupContract.LoginSignupState,
+    keyboardController: SoftwareKeyboardController?,
     actualizarNombreSignUp: (String) -> Unit = {},
     actualizarCorreoSignUp: (String) -> Unit = {},
     actualizarContrasenaSignUp: (String) -> Unit = {},
@@ -224,7 +237,6 @@ fun SignUpBundle(
     hacerSignUp: () -> Unit = {},
 ) {
     Column(
-        modifier = modifier
     ) {
         Text(
             text = Constantes.REGISTRARSE,
@@ -301,6 +313,7 @@ fun SignUpBundle(
         }
         Button(
             onClick = {
+                keyboardController?.hide()
                 hacerSignUp()
             },
             colors = ButtonDefaults.buttonColors(colorPrimario)

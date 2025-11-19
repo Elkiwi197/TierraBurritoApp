@@ -31,8 +31,12 @@ class LoginSignupRepository @Inject constructor(
                     }
                     NetworkResult.Success(resultado.data!!, code = code)
                 }
+
                 is NetworkResult.Error -> {
-                    NetworkResult.Error(resultado.message ?: Constantes.ERROR_DESCONOCIDO, code = code)
+                    NetworkResult.Error(
+                        resultado.message ?: Constantes.ERROR_DESCONOCIDO,
+                        code = code
+                    )
                 }
             }
         } catch (e: Exception) {

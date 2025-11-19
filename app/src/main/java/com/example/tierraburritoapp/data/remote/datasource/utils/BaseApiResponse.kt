@@ -11,7 +11,7 @@ abstract class BaseApiResponse {
     suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): NetworkResult<T> {
         var code = 0
         try {
-                val response = apiCall()
+            val response = apiCall()
             code = response.code()
             if (response.isSuccessful) {
                 if (code < 299) {
@@ -27,11 +27,18 @@ abstract class BaseApiResponse {
                 }
             }
             val errorBody = response.errorBody()?.string()
-            val json = errorBody?.let { JSONObject(it) }
-            val mensaje = json?.getString(Constantes.MESSAGE) ?: Constantes.ERROR_DESCONOCIDO
-
-            // al lanzar la excepcion en un filter devuelve un 500 cuando deberia ser un 401
-            if (code == 500 && mensaje.contains(Constantes.TOKEN_CADUCADO)){
+            var mensaje: String
+            if (errorBody?.startsWith("{") == true) {
+                try {
+                    val json = JSONObject(errorBody)
+                    mensaje = json.optString(Constantes.MESSAGE, Constantes.ERROR_DESCONOCIDO)
+                } catch (e: Exception) {
+                    mensaje = errorBody
+                }
+            } else {
+                mensaje = errorBody?: Constantes.ERROR_DESCONOCIDO
+            }
+            if (code == 500 && mensaje.contains(Constantes.TOKEN_CADUCADO)) {
                 code = 401
             }
 
@@ -43,7 +50,6 @@ abstract class BaseApiResponse {
 
     private fun <T> error(errorMessage: String, code: kotlin.Int): NetworkResult<T> =
         NetworkResult.Error(message = errorMessage, code = code)
-
 
 
 }

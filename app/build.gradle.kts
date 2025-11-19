@@ -31,7 +31,7 @@ android {
     productFlavors {
         create("development") {
             dimension = "env"
-            buildConfigField("String", "URL_TIERRA_BURRITO", "\"http://192.168.100.138:8080\"")
+            buildConfigField("String", "URL_TIERRA_BURRITO", "\"http://10.6.66.80:8080\"")
             buildConfigField("String", "URL_API_GOOGLE", "\"https://maps.googleapis.com/\"")
             buildConfigField(
                 "String",
@@ -43,7 +43,7 @@ android {
         }
         create("production") {
             dimension = "env"
-            buildConfigField("String", "URL_TIERRA_BURRITO", "\"http://192.168.100.138:8080\"")
+            buildConfigField("String", "URL_TIERRA_BURRITO", "\"http://10.6.66.80:8080\"")
             buildConfigField("String", "URL_API_GOOGLE", "\"https://maps.googleapis.com/\"")
             buildConfigField(
                 "String",
