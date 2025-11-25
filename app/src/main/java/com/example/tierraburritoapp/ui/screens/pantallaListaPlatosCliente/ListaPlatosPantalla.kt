@@ -2,32 +2,27 @@ package com.example.tierraburritoapp.ui.screens.pantallaListaPlatosCliente
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.elevatedCardElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.tierraburritoapp.R
 import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.ui.common.UiEvent
@@ -39,6 +34,7 @@ fun ListaPlatosPantalla(
     onNavigateToDetallePlato: (idPlato: Int) -> Unit,
     onNavigateToLoginSignup: () -> Unit
 ) {
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -47,37 +43,86 @@ fun ListaPlatosPantalla(
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
-            if (it is UiEvent.ShowSnackbar) {
-                showSnackbar(it.message)
-            } else if (it is UiEvent.Navigate) {
-                onNavigateToLoginSignup()
-                showSnackbar(it.mensaje)
+            when (it) {
+                is UiEvent.ShowSnackbar -> showSnackbar(it.message)
+                is UiEvent.Navigate -> {
+                    onNavigateToLoginSignup()
+                    showSnackbar(it.mensaje)
+                }
             }
             viewModel.handleEvent(ListaPlatosContract.ListaPlatosEvent.UiEventDone)
         }
     }
 
+
     Column(
-        modifier = Modifier
+        Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
+            .background(MaterialTheme.colorScheme.background)
     ) {
+
+        Text(
+            text = "Nuestros Platos",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         if (uiState.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.testTag(Constantes.LOADING_INDICATOR)
-            )
+            Box(
+                Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.testTag(Constantes.LOADING_INDICATOR),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        } else if (uiState.platos.isEmpty()){
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Icon(
+                    painter = painterResource(R.drawable.baseline_playlist_remove_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 1f),
+                    modifier = Modifier
+                        .size(250.dp)
+                        .padding(bottom = 24.dp)
+                )
+
+                Text(
+                    text = Constantes.NO_SE_PUDO_ACCEDER_A_PLATOS,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(20.dp)
+                )
+
+                Text(
+                    text = Constantes.INTENTA_DE_NUEVO_MAS_TARDE,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
         } else {
+
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(uiState.platos) { plato ->
                     PlatoCard(
                         plato = plato,
-                        colorPrimario = MaterialTheme.colorScheme.primary,
-                        colorSecundario = MaterialTheme.colorScheme.secondary,
-                        onNavigateToDetallePlato = onNavigateToDetallePlato
+                        onClick = { onNavigateToDetallePlato(plato.id) }
                     )
                 }
             }
@@ -85,54 +130,79 @@ fun ListaPlatosPantalla(
     }
 }
 
+
+
 @Composable
 fun PlatoCard(
     plato: Plato,
-    colorPrimario: Color,
-    colorSecundario: Color,
-    onNavigateToDetallePlato: (Int) -> Unit
+    onClick: () -> Unit
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .background(color = MaterialTheme.colorScheme.background)
-            .clickable { onNavigateToDetallePlato(plato.id) },
-        elevation = CardDefaults.cardElevation(4.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = elevatedCardElevation(6.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .padding(14.dp)
+                .height(IntrinsicSize.Min)
         ) {
-            Column {
-                AsyncImage(
-                    model = plato.rutaFoto,
-                    contentDescription = Constantes.FOTO_PLATO,
-                    modifier = Modifier
-                        .height(120.dp)
-                        .width(120.dp)
-                )
-                Text(
-                    text = plato.precio.toString() + Constantes.SIMBOLO_EURO,
-                    color = colorPrimario
-                )
-            }
+
+            AsyncImage(
+                model = plato.rutaFoto,
+                contentDescription = Constantes.FOTO_PLATO,
+                modifier = Modifier
+                    .size(110.dp)
+                    .clip(RoundedCornerShape(14.dp))
+            )
+
+            Spacer(Modifier.width(16.dp))
+
             Column(
-                modifier = Modifier.padding(16.dp)
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
             ) {
                 Text(
                     text = plato.nombre,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = colorPrimario
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary,
                 )
-                Column {
-                    plato.ingredientes.forEach { ingrediente ->
+
+                Spacer(Modifier.height(6.dp))
+
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    plato.ingredientes.take(3).forEach { ingrediente ->
                         Text(
-                            text = ingrediente.nombre.replace("_", " "),
+                            text = "• " + ingrediente.nombre.replace("_", " "),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = colorSecundario
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+
+                    if (plato.ingredientes.size > 3) {
+                        Text(
+                            text = "+ ${plato.ingredientes.size - 3} más…",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f)
                         )
                     }
                 }
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = "${plato.precio}${Constantes.SIMBOLO_EURO}",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.tertiary
+                )
             }
         }
     }

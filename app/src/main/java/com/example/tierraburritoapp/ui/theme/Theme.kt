@@ -1,6 +1,5 @@
 package com.example.tierraburritoapp.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,13 +8,25 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
+    primary = naranja,            // destaca muy bien
+    onPrimary = Color.Black,      // el naranja en oscuro necesita texto negro
+    secondary = verdeOscuro,      // mejora muchísimo el contraste
+    onSecondary = Color.White,
+    tertiary = naranjaSuave,
+    background = pizarra,
+    surface = Color(0xFF2E3543),  // un poco más claro que pizarra
+    onBackground = blanco,
+
+    /*
     primary = naranja,
     secondary = verdeSuave,
     tertiary = naranjaSuave,
     background = pizarra
+     */
 )
 
 private val LightColorScheme = lightColorScheme(

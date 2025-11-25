@@ -83,4 +83,17 @@ class PedidosDataSource @Inject constructor(
         }
         return result
     }
+
+    suspend fun noRepartirEstePedido(idPedido: Int): NetworkResult<String> {
+        val result = safeApiCall {
+            val response = pedidosService.noRepartirEstePedido(idPedido)
+            val message = response.body()?.string() ?: Constantes.ERROR_MAPEANDO
+            if (response.isSuccessful) {
+                Response.success(message)
+            } else {
+                Response.error(response.code(), response.body() ?: response.errorBody()!!)
+            }
+        }
+        return result
+    }
 }

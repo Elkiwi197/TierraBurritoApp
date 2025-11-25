@@ -10,6 +10,7 @@ import com.example.tierraburritoapp.domain.usecases.coordenadas.GetRutaUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.CancelarPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.EntregarPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidoAceptadoUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.NoRepartirEstePedidoUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,7 @@ constructor(
     private val getPedidoAceptadoUseCase: GetPedidoAceptadoUseCase,
     private val getCoordenadasUseCase: GetCoordenadasUseCase,
     private val getRutaUseCase: GetRutaUseCase,
-    private val cancelarPedidoUseCase: CancelarPedidoUseCase,
+    private val noRepartirEstePedidoUseCase: NoRepartirEstePedidoUseCase,
     private val entregarPedidoUseCase: EntregarPedidoUseCase
 ) : ViewModel() {
 
@@ -44,7 +45,7 @@ constructor(
                 event.lngOrigen
             )
 
-            is PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CancelarPedido -> cancelarPedido(
+            is PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.NoRepartirEstePedido -> noRepartirEstePedido(
                 event.idPedido,
                 event.correo
             )
@@ -64,7 +65,8 @@ constructor(
                     isLoading = false,
                     uiEvent = UiEvent.ShowSnackbar(
                         result.data ?: Constantes.ERROR_DESCONOCIDO
-                    )
+                    ),
+                    pedido = null
                 )
 
                 is NetworkResult.Error -> {
@@ -86,16 +88,20 @@ constructor(
         }
     }
 
-    private fun cancelarPedido(idPedido: Int, correo: String) {
+    private fun noRepartirEstePedido(idPedido: Int, correo: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
-            when (val result = cancelarPedidoUseCase(idPedido, correo)) {
-                is NetworkResult.Success -> _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    uiEvent = UiEvent.ShowSnackbar(
-                        result.data ?: Constantes.ERROR_DESCONOCIDO
+            when (val result = noRepartirEstePedidoUseCase(idPedido)) {
+                is NetworkResult.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        uiEvent = UiEvent.ShowSnackbar(
+                            result.data ?: Constantes.ERROR_DESCONOCIDO
+                        ),
+                        pedido = null
                     )
-                )
+
+                }
 
                 is NetworkResult.Error -> {
                     if (result.code == 401) {
@@ -222,7 +228,7 @@ constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    ruta = result.data?.features?.first()?.geometryOpenRoutesService?.coordinates
+                    ruta = result.data?.features?.first()?.geometry?.coordinates
                 )
             }
 

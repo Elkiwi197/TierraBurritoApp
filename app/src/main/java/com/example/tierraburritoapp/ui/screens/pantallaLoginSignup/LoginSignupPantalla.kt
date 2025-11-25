@@ -4,15 +4,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -33,118 +40,129 @@ import com.example.tierraburritoapp.data.model.TipoUsuario
 import com.example.tierraburritoapp.ui.common.UiEvent
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
 
+//-------------------------------------
+// PANTALLA COMPLETA
+//-------------------------------------
+
 @Composable
 fun LoginSignupPantalla(
     viewModel: LoginSignupViewModel = hiltViewModel(),
     variablesViewModel: VariablesViewModel,
     onNavigateToListaPlatos: () -> Unit,
     onNavigateToSeleccionPedidos: () -> Unit,
-    showSnackbar: (String) -> Unit,
+    showSnackbar: (String) -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    // Eventos
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
             when (it) {
                 is UiEvent.Navigate -> {
                     variablesViewModel.cambiarCorreoUsuario(uiState.correoLogin)
                     variablesViewModel.cambiarTipoUsuario(uiState.tipoUsuario)
-                    variablesViewModel.tipoUsuario.let {
-                        when (it) {
-                            TipoUsuario.CLIENTE -> onNavigateToListaPlatos()
-                            TipoUsuario.REPARTIDOR -> onNavigateToSeleccionPedidos()
-                        }
-
+                    when (variablesViewModel.tipoUsuario) {
+                        TipoUsuario.CLIENTE -> onNavigateToListaPlatos()
+                        TipoUsuario.REPARTIDOR -> onNavigateToSeleccionPedidos()
                     }
                 }
-
                 is UiEvent.ShowSnackbar -> showSnackbar(it.message)
             }
-
             viewModel.handleEvent(LoginSignupContract.LoginSignupEvent.UiEventDone)
         }
     }
 
+    //-------------------------------------
+    // DISEÑO VISUAL COMPLETO
+    //-------------------------------------
 
     Column(
         modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.background)
             .fillMaxSize()
-            .padding(50.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 24.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LogInBundle(
+
+        Spacer(Modifier.height(30.dp))
+
+        // TITULO PRINCIPAL
+        Text(
+            text = "Bienvenido a Tierra Burrito",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.primary,
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        //-------------------------------------
+        // LOGIN
+        //-------------------------------------
+        LoginCard(
+            uiState,
             colorPrimario = MaterialTheme.colorScheme.primary,
             colorSecundario = MaterialTheme.colorScheme.secondary,
-            uiState = uiState,
             keyboardController = keyboardController,
-            actualizarCorreoLogIn = {
+            actualizarCorreo = {
                 viewModel.handleEvent(
-                    LoginSignupContract.LoginSignupEvent.ActualizarCorreoLogIn(
-                        correoLogin = it
-                    )
+                    LoginSignupContract.LoginSignupEvent.ActualizarCorreoLogIn(it)
                 )
             },
-            actualizarContrasenaLogIn = {
+            actualizarContrasena = {
                 viewModel.handleEvent(
-                    LoginSignupContract.LoginSignupEvent.ActualizarContrasenaLogIn(
-                        contrasenaLogin = it
-                    )
+                    LoginSignupContract.LoginSignupEvent.ActualizarContrasenaLogIn(it)
                 )
             },
-            hacerLogIn = {
-                if (viewModel.uiState.value.correoLogin.isNotBlank() && viewModel.uiState.value.contrasenaLogin.isNotBlank()) {
+            hacerLogin = {
+                if (uiState.correoLogin.isNotBlank() && uiState.contrasenaLogin.isNotBlank()) {
                     viewModel.handleEvent(
                         LoginSignupContract.LoginSignupEvent.Login(
                             correo = uiState.correoLogin,
-                            contrasena = uiState.contrasenaLogin,
+                            contrasena = uiState.contrasenaLogin
                         )
                     )
-                } else {
-                    showSnackbar(Constantes.RELLENA_TODOS_LOS_CAMPOS)
-                }
+                } else showSnackbar(Constantes.RELLENA_TODOS_LOS_CAMPOS)
             }
         )
-        SignUpBundle(
-            uiState = uiState,
+
+        Spacer(Modifier.height(28.dp))
+
+        //-------------------------------------
+        // SIGNUP
+        //-------------------------------------
+        SignUpCard(
+            uiState,
             colorPrimario = MaterialTheme.colorScheme.primary,
             colorSecundario = MaterialTheme.colorScheme.secondary,
             keyboardController = keyboardController,
-            actualizarNombreSignUp = {
+            actualizarNombre = {
                 viewModel.handleEvent(
-                    LoginSignupContract.LoginSignupEvent.ActualizarNombreSignUp(
-                        nombreSignup = it
-                    )
+                    LoginSignupContract.LoginSignupEvent.ActualizarNombreSignUp(it)
                 )
             },
-            actualizarCorreoSignUp = {
+            actualizarCorreo = {
                 viewModel.handleEvent(
-                    LoginSignupContract.LoginSignupEvent.ActualizarCorreoSignUp(
-                        correoSignup = it
-                    )
+                    LoginSignupContract.LoginSignupEvent.ActualizarCorreoSignUp(it)
                 )
             },
-            actualizarContrasenaSignUp = {
+            actualizarContrasena = {
                 viewModel.handleEvent(
-                    LoginSignupContract.LoginSignupEvent.ActualizarContrasenaSignUp(
-                        contrasenaSignup = it
-                    )
+                    LoginSignupContract.LoginSignupEvent.ActualizarContrasenaSignUp(it)
                 )
             },
             actualizarTipoUsuario = {
                 viewModel.handleEvent(
-                    LoginSignupContract.LoginSignupEvent.ActualizarTipoUsuario(
-                        tipoUsuario = it
-                    )
+                    LoginSignupContract.LoginSignupEvent.ActualizarTipoUsuario(it)
                 )
             },
-            hacerSignUp = {
-                if (viewModel.uiState.value.correoSignup.isNotBlank() &&
-                    viewModel.uiState.value.contrasenaSignup.isNotBlank() &&
-                    viewModel.uiState.value.nombreSignup.isNotBlank()) {
+            hacerSignup = {
+                if (uiState.nombreSignup.isNotBlank() &&
+                    uiState.correoSignup.isNotBlank() &&
+                    uiState.contrasenaSignup.isNotBlank()
+                ) {
                     viewModel.handleEvent(
                         LoginSignupContract.LoginSignupEvent.SignUp(
                             nombre = uiState.nombreSignup,
@@ -153,172 +171,181 @@ fun LoginSignupPantalla(
                             tipoUsuario = uiState.tipoUsuario
                         )
                     )
-                } else {
-                    showSnackbar(Constantes.RELLENA_TODOS_LOS_CAMPOS)
+                } else showSnackbar(Constantes.RELLENA_TODOS_LOS_CAMPOS)
+            }
+        )
+
+        Spacer(Modifier.height(40.dp))
+    }
+}
+
+//
+// TARJETA COMPLETA LOGIN
+//
+@Composable
+fun LoginCard(
+    uiState: LoginSignupContract.LoginSignupState,
+    colorPrimario: Color,
+    colorSecundario: Color,
+    keyboardController: SoftwareKeyboardController?,
+    actualizarCorreo: (String) -> Unit,
+    actualizarContrasena: (String) -> Unit,
+    hacerLogin: () -> Unit
+) {
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(6.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Text(
+                text = Constantes.INICIAR_SESION,
+                style = MaterialTheme.typography.titleMedium,
+                color = colorPrimario
+            )
+
+            OutlinedTextField(
+                value = uiState.correoLogin,
+                onValueChange = actualizarCorreo,
+                label = { Text(Constantes.CORREO_ELECTRONICO, color = colorSecundario) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = uiState.contrasenaLogin,
+                onValueChange = actualizarContrasena,
+                label = { Text(Constantes.CONTRASENA, color = colorSecundario) },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                onClick = {
+                    keyboardController?.hide()
+                    hacerLogin()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = buttonColors(
+                    containerColor = colorPrimario,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(Constantes.INICIAR_SESION)
+            }
+        }
+    }
+}
+
+//
+// TARJETA COMPLETA REGISTRO
+//
+@Composable
+fun SignUpCard(
+    uiState: LoginSignupContract.LoginSignupState,
+    colorPrimario: Color,
+    colorSecundario: Color,
+    keyboardController: SoftwareKeyboardController?,
+    actualizarNombre: (String) -> Unit,
+    actualizarCorreo: (String) -> Unit,
+    actualizarContrasena: (String) -> Unit,
+    actualizarTipoUsuario: (TipoUsuario) -> Unit,
+    hacerSignup: () -> Unit
+) {
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(6.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Text(
+                text = Constantes.REGISTRARSE,
+                style = MaterialTheme.typography.titleMedium,
+                color = colorPrimario
+            )
+
+            OutlinedTextField(
+                value = uiState.nombreSignup,
+                onValueChange = actualizarNombre,
+                label = { Text(Constantes.NOMBRE, color = colorSecundario) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = uiState.correoSignup,
+                onValueChange = actualizarCorreo,
+                label = { Text(Constantes.CORREO_ELECTRONICO, color = colorSecundario) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = uiState.contrasenaSignup,
+                onValueChange = actualizarContrasena,
+                label = { Text(Constantes.CONTRASENA, color = colorSecundario) },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Text(
+                text = "Tipo de usuario",
+                style = MaterialTheme.typography.bodyLarge,
+                color = colorSecundario
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = uiState.tipoUsuario == TipoUsuario.CLIENTE,
+                        onClick = { actualizarTipoUsuario(TipoUsuario.CLIENTE) },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = colorSecundario
+                        )
+                    )
+                    Text(Constantes.CLIENTE)
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = uiState.tipoUsuario == TipoUsuario.REPARTIDOR,
+                        onClick = { actualizarTipoUsuario(TipoUsuario.REPARTIDOR) },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = colorSecundario
+                        )
+                    )
+                    Text(Constantes.REPARTIDOR)
                 }
             }
-        )
-    }
-}
 
-@Composable
-fun LogInBundle(
-    colorPrimario: Color,
-    colorSecundario: Color,
-    uiState: LoginSignupContract.LoginSignupState,
-    actualizarCorreoLogIn: (String) -> Unit = {},
-    actualizarContrasenaLogIn: (String) -> Unit = {},
-    hacerLogIn: () -> Unit = {},
-    keyboardController: SoftwareKeyboardController?,
-) {
-    Column(
-    ) {
-        Text(
-            text = Constantes.INICIAR_SESION,
-            color = colorPrimario
-        )
-        OutlinedTextField(
-            value = uiState.correoLogin,
-            onValueChange = {
-                actualizarCorreoLogIn(it)
-            },
-            label = {
-                Text(
-                    color = colorSecundario,
-                    text = Constantes.CORREO_ELECTRONICO
+            Button(
+                onClick = {
+                    keyboardController?.hide()
+                    hacerSignup()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = buttonColors(
+                    containerColor = colorPrimario,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
-            },
-            modifier = Modifier
-                .fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
-        )
-        OutlinedTextField(
-            value = uiState.contrasenaLogin,
-            onValueChange = {
-                actualizarContrasenaLogIn(it)
-            },
-            label = {
-                Text(
-                    color = colorSecundario,
-                    text = Constantes.CONTRASENA
-                )
-            },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        )
-        Button(
-            onClick = {
-                keyboardController?.hide()
-                hacerLogIn()
-            },
-            colors = ButtonDefaults.buttonColors(colorPrimario)
-        ) {
-            Text(text = Constantes.INICIAR_SESION)
-        }
-    }
-}
-
-@Composable
-fun SignUpBundle(
-    colorPrimario: Color,
-    colorSecundario: Color,
-    uiState: LoginSignupContract.LoginSignupState,
-    keyboardController: SoftwareKeyboardController?,
-    actualizarNombreSignUp: (String) -> Unit = {},
-    actualizarCorreoSignUp: (String) -> Unit = {},
-    actualizarContrasenaSignUp: (String) -> Unit = {},
-    actualizarTipoUsuario: (TipoUsuario) -> Unit = {},
-    hacerSignUp: () -> Unit = {},
-) {
-    Column(
-    ) {
-        Text(
-            text = Constantes.REGISTRARSE,
-            color = colorPrimario
-        )
-        OutlinedTextField(
-            value = uiState.nombreSignup,
-            onValueChange = {
-                actualizarNombreSignUp(it)
-            },
-            label = {
-                Text(
-                    text = Constantes.NOMBRE,
-                    color = colorSecundario
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
-        OutlinedTextField(
-            value = uiState.correoSignup,
-            onValueChange = {
-                actualizarCorreoSignUp(it)
-            },
-            label = {
-                Text(
-                    text = Constantes.CORREO_ELECTRONICO,
-                    color = colorSecundario
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
-        )
-        OutlinedTextField(
-            value = uiState.contrasenaSignup,
-            onValueChange = {
-                actualizarContrasenaSignUp(it)
-            },
-            label = {
-                Text(
-                    text = Constantes.CONTRASENA,
-                    color = colorSecundario
-                )
-            },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        )
-        Column {
-            Row {
-                RadioButton(
-                    selected = uiState.tipoUsuario == TipoUsuario.CLIENTE,
-                    onClick = {
-                        actualizarTipoUsuario(TipoUsuario.CLIENTE)
-                    }
-                )
-                Text(text = Constantes.CLIENTE)
+            ) {
+                Text(Constantes.REGISTRARSE)
             }
-            Row {
-                RadioButton(
-                    selected = uiState.tipoUsuario == TipoUsuario.REPARTIDOR,
-                    onClick = {
-                        actualizarTipoUsuario(TipoUsuario.REPARTIDOR)
-                    }
-                )
-                Text(text = Constantes.REPARTIDOR)
-            }
-        }
-        Button(
-            onClick = {
-                keyboardController?.hide()
-                hacerSignUp()
-            },
-            colors = ButtonDefaults.buttonColors(colorPrimario)
-        ) {
-            Text(text = Constantes.REGISTRARSE)
         }
     }
 }

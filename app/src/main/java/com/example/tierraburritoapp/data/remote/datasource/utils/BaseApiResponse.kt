@@ -52,4 +52,5 @@ abstract class BaseApiResponse {
         NetworkResult.Error(message = errorMessage, code = code)
 
 
+
 }

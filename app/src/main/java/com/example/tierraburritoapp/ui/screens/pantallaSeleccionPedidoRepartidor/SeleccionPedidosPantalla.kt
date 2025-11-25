@@ -4,18 +4,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,8 +35,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -78,6 +84,7 @@ fun SeleccionPedidosPantalla(
         }
     }
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -88,6 +95,39 @@ fun SeleccionPedidosPantalla(
             CircularProgressIndicator(
                 modifier = Modifier.testTag(Constantes.LOADING_INDICATOR)
             )
+        } else if (uiState.pedidos.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Icon(
+                    painter = painterResource(R.drawable.baseline_playlist_remove_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 1f),
+                    modifier = Modifier
+                        .size(250.dp)
+                        .padding(bottom = 24.dp)
+                )
+
+                Text(
+                    text = Constantes.NO_HAY_PEDIDOS_PARA_REPARTIR,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(20.dp)
+                )
+
+                Text(
+                    text = Constantes.TODOS_LOS_PEDIDOS_HAN_SIDO_REPARTIDOS,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -134,16 +174,27 @@ fun PedidoCard(
 
     Card(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        shape = MaterialTheme.shapes.large
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
             PedidoView(
                 pedido = pedido,
                 colorPrimario = MaterialTheme.colorScheme.primary,
-                colorSecundario = MaterialTheme.colorScheme.secondary,
+                colorSecundario = MaterialTheme.colorScheme.secondary
             )
+
             Mapa(
                 latRestaurante = 40.434192,
                 lngRestaurante = -3.606442,
@@ -151,16 +202,32 @@ fun PedidoCard(
                 lngDestino = lngDestino,
                 ruta = ruta
             )
+
             if (pedido.estado != EstadoPedido.ACEPTADO) {
                 Button(
                     onClick = {
-                        viewModel.handleEvent(SeleccionPedidosContract.SeleccionPedidosEvent.AceptarPedido(pedido.id, variablesViewModel.correoUsuario))
-                        viewModel.handleEvent(SeleccionPedidosContract.SeleccionPedidosEvent.LoadPedidos)
-                              },
-                ) { Text(Constantes.ACEPTAR) }
+                        viewModel.handleEvent(
+                            SeleccionPedidosContract.SeleccionPedidosEvent.AceptarPedido(
+                                pedido.id,
+                                variablesViewModel.correoUsuario
+                            )
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ),                ) {
+                    Text(
+                        text = Constantes.ACEPTAR,
+                        color = Color.White,
+                    )
+                }
             }
         }
     }
+
 }
 
 @Composable
@@ -171,38 +238,52 @@ fun PedidoView(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background),
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        LazyRow {
+
+        Text(
+            text = "Platos",
+            style = MaterialTheme.typography.titleMedium,
+            color = colorPrimario
+        )
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
             items(pedido.platos) { plato ->
                 Plato(
                     plato = plato,
-                    colorPrimario = MaterialTheme.colorScheme.primary,
-                    colorSecundario = MaterialTheme.colorScheme.secondary,
-                    titulo = MaterialTheme.typography.titleLarge,
-                    apartado = MaterialTheme.typography.titleMedium,
+                    colorPrimario = colorPrimario,
+                    colorSecundario = colorSecundario,
+                    titulo = MaterialTheme.typography.titleMedium,
+                    apartado = MaterialTheme.typography.bodyMedium,
                     contenido = MaterialTheme.typography.bodySmall
                 )
             }
         }
+
         Column(
             modifier = Modifier
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = Constantes.TOTAL_ + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
-                color = colorPrimario
+                text = "Total: ${pedido.precio}${Constantes.SIMBOLO_EURO}",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
             )
+
             Text(
                 text = pedido.direccion,
                 style = MaterialTheme.typography.titleLarge,
-                color = colorSecundario
+                color = MaterialTheme.colorScheme.secondary,
             )
         }
     }
 }
+
 
 @Composable
 fun Plato(
@@ -213,25 +294,55 @@ fun Plato(
     apartado: TextStyle,
     contenido: TextStyle,
 ) {
-    Box(
+    Card(
         modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.background),
+            .width(180.dp),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
-        Column {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             Text(
                 text = plato.nombre,
                 style = titulo,
                 color = colorPrimario
             )
-            Column(
-                modifier = Modifier.height((plato.ingredientes.size * 20).dp)
-            ) {
-                LazyColumn {
-                    items(plato.ingredientes) {
+
+            Row {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Text(
+                        text = Constantes.INGREDIENTES,
+                        style = apartado,
+                        color = colorSecundario
+                    )
+                    plato.ingredientes.forEach {
                         Text(
-                            text = it.nombre.replace("_", " "),
+                            text = "• ${it.nombre.replace("_", " ")}",
+                            style = contenido,
+                            color = colorSecundario
+                        )
+                    }
+                }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Text(
+                        text = Constantes.EXTRAS,
+                        style = apartado,
+                        color = colorSecundario
+                    )
+                    plato.extras.forEach {
+                        Text(
+                            text = "• ${it.nombre.replace("_", " ")}",
                             style = contenido,
                             color = colorSecundario
                         )
@@ -310,7 +421,14 @@ fun Mapa(
                     }
                     ruta?.let {
                         val coordenadasRuta: MutableList<LatLng> = mutableListOf()
-                        it.forEach { latlng -> coordenadasRuta.add(LatLng(latlng[1], latlng[0])) }
+                        it.forEach { latlng ->
+                            coordenadasRuta.add(
+                                LatLng(
+                                    latlng[1],
+                                    latlng[0]
+                                )
+                            )
+                        }
                         Polyline(
                             points = coordenadasRuta
                         )

@@ -1,21 +1,27 @@
 package com.example.tierraburritoapp.ui.screens.pantallaPedidoAceptadoRepartidor
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,8 +33,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -48,6 +57,12 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 
+
+
+
+
+// VERSION  HECHA POR MI
+
 @Composable
 fun PedidoAceptadoRepartidorPantalla(
     viewModel: PedidoAceptadoRepartidorViewModel = hiltViewModel(),
@@ -57,9 +72,7 @@ fun PedidoAceptadoRepartidorPantalla(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val pedido = uiState.pedido
 
-    //No se puede cambiar al init del viewmodel porque necesito el correo del usuario, que esta en otro viewmodel (variablesViewModel)
     LaunchedEffect(Unit) {
         launch {
             viewModel.handleEvent(
@@ -82,95 +95,156 @@ fun PedidoAceptadoRepartidorPantalla(
         }
     }
 
-    LaunchedEffect(pedido) {
-        viewModel.handleEvent(PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CargarRuta(
-            latOrigen = variablesViewModel.latRestaurante,
-            lngOrigen = variablesViewModel.lngRestaurante
-        ))
+    LaunchedEffect(uiState.pedido) {
+        if (uiState.pedido != null) {
+            viewModel.handleEvent(
+                PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CargarRuta(
+                    latOrigen = variablesViewModel.latRestaurante,
+                    lngOrigen = variablesViewModel.lngRestaurante
+                )
+            )
+        }
     }
 
-    pedido?.let {
+    uiState.pedido?.let {
+        // Contenedor scrollable para toda la pantalla
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState()) // Hacemos la columna desplazable
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight(0.55f)
-                    .background(color = Color.Green),
+            // Contenedor del pedido
+            PedidoView(
+                pedido = uiState.pedido!!,
+                colorPrimario = MaterialTheme.colorScheme.primary,
+                colorSecundario = MaterialTheme.colorScheme.secondary
+            )
+
+            // Mapa
+            Mapa(
+                latRestaurante = variablesViewModel.latRestaurante,
+                lngRestaurante = variablesViewModel.lngRestaurante,
+                latDestino = uiState.latDestino,
+                lngDestino = uiState.lngDestino,
+                ruta = uiState.ruta
+            )
+
+            Spacer(modifier = Modifier.height(16.dp)) // Espacio entre el mapa y los botones
+
+            // Botones debajo del mapa
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (pedido != null) {
-                    PedidoView(
-                        pedido = pedido,
-                        colorPrimario = MaterialTheme.colorScheme.primary,
-                        colorSecundario = MaterialTheme.colorScheme.secondary,
-                    )
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color.Red)
-            ) {
-                Mapa(
-                    latRestaurante = variablesViewModel.latRestaurante,
-                    lngRestaurante = variablesViewModel.lngRestaurante,
-                    latDestino = uiState.latDestino,
-                    lngDestino = uiState.lngDestino,
-                    ruta = uiState.ruta
-                )
-                FloatingActionButton(
+                // Botón para cancelar pedido
+                Button(
                     modifier = Modifier
-                        .height(30.dp)
-                        .width(100.dp)
-                        .align(alignment = Alignment.BottomStart)
-                        .padding(5.dp),
+                        .weight(1f)
+                        .wrapContentSize(),
                     onClick = {
                         viewModel.handleEvent(
-                            PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.CancelarPedido(
+                            PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.NoRepartirEstePedido(
                                 it.id, variablesViewModel.correoUsuario
                             )
                         )
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    ),
+                    shape = MaterialTheme.shapes.medium, // Bordes redondeados
+              //      elevation = ButtonDefaults.elevation(8.dp), // Elevación para efecto de sombra
                 ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_cancel_24), // Añadir un ícono de cancelación
+                        contentDescription = "No repartir este pedido",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onError
+                    )
+                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                     Text(
-                        text = "Cancelar pedido",
-                        color = Color.Red,
+                        text = "No repartir este pedido",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center, // Asegura que el texto se centre
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
-                FloatingActionButton(
+
+                // Botón para marcar como entregado
+                Button(
                     modifier = Modifier
-                        .height(30.dp)
-                        .width(100.dp)
-                        .align(alignment = Alignment.BottomEnd)
-                        .padding(5.dp),
+                        .weight(1f)
+                        .wrapContentSize(),
                     onClick = {
                         viewModel.handleEvent(
                             PedidoAceptadoRepartidorContract.PedidoAceptadoRepartidorEvent.EntregarPedido(
                                 it.id, variablesViewModel.correoUsuario
                             )
                         )
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ),
+                    shape = MaterialTheme.shapes.medium, // Bordes redondeados
+                 //   elevation = ButtonDefaults.elevation(8.dp), // Elevación para efecto de sombra
                 ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_check_circle_24), // Icono de éxito
+                        contentDescription = "Pedido entregado",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSecondary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
                     Text(
                         text = "Pedido entregado",
-                        color = Color.Yellow,
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center, // Asegura que el texto se centre
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
+
             }
         }
     } ?: Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .verticalScroll(rememberScrollState()), // Hacemos la columna desplazable
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Acepta un pedido")
+        // Mostrar cuando no hay pedidos
+        Icon(
+            painter = painterResource(R.drawable.baseline_no_food_24),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 1f),
+            modifier = Modifier
+                .size(250.dp)
+                .padding(bottom = 24.dp)
+        )
+
+        Text(
+            text = Constantes.NO_HAY_PEDIDOS_ACEPTADOS,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 30.sp,
+            modifier = Modifier.padding(20.dp)
+        )
+
+        Text(
+            text = Constantes.ACEPTA_UN_PEDIDO,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            fontSize = 20.sp,
+            modifier = Modifier.padding(20.dp)
+        )
     }
 }
-
 
 @Composable
 fun Mapa(
@@ -187,6 +261,7 @@ fun Mapa(
     var cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(coordenadasRestaurante, 17f)
     }
+
     if (latDestino != null && lngDestino != null) {
         val coordenadasDestino = LatLng(latDestino, lngDestino)
         destinoMarkerState = MarkerState(position = coordenadasDestino)
@@ -199,8 +274,11 @@ fun Mapa(
             )
         }
     }
+
     GoogleMap(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp), // Definimos una altura fija para el mapa
         cameraPositionState = cameraPositionState,
         onMapLoaded = { mapLoaded = true }
     ) {
@@ -228,72 +306,7 @@ fun Mapa(
     }
 }
 
-//todo Este metodo podria mejorarse aunque funciona bien
-private fun calcularZoom(
-    latInicial: Double,
-    lngInicial: Double,
-    latFinal: Double,
-    lngFinal: Double
-): Float {
-    var lat = (latInicial - latFinal) //la latitud son 180 y la longitud 360
-    var lng = lngInicial - lngFinal
-    var comparar: Double
-    if (lat < 0) {
-        lat = lat - 2 * lat
-    }
-    if (lng < 0) {
-        lng = lat - 2 * lat
-    }
-    if (lat > lng) {
-        comparar = lat
-    } else {
-        comparar = lng
-    }
 
-    var zoom: Float = 0f
-    if (comparar < 0.00015) {
-        zoom = 20f
-    } else if (comparar < 0.000450) {
-        zoom = 19f
-    } else if (comparar < 0.000900) {
-        zoom = 18f
-    } else if (comparar < 0.001600) {
-        zoom = 17f
-    } else if (comparar < 0.003200) {
-        zoom = 16f
-    } else if (comparar < 0.006400) {
-        zoom = 15f
-    } else if (comparar < 0.012800) {
-        zoom = 14f
-    } else if (comparar < 0.025000) {
-        zoom = 13f
-    } else if (comparar < 0.050000) {
-        zoom = 12f
-    } else if (comparar < 0.1) {
-        zoom = 11f
-    } else if (comparar < 0.2) {
-        zoom = 10f
-    } else if (comparar < 0.4) {
-        zoom = 9f
-    } else if (comparar < 0.8) {
-        zoom = 8f
-    } else if (comparar < 1.6) {
-        zoom = 7f
-    } else if (comparar < 3.2) {
-        zoom = 6f
-    } else if (comparar < 6.4) {
-        zoom = 5f
-    } else if (comparar < 12.8) {
-        zoom = 4f
-    } else if (comparar < 25.6) {
-        zoom = 3f
-    } else if (comparar < 50) {
-        zoom = 2f
-    } else if (comparar < 100) {
-        zoom = 1f
-    }
-    return zoom
-}
 
 
 @Composable
@@ -326,7 +339,8 @@ fun PedidoView(
         ) {
             Text(
                 text = Constantes.TOTAL_ + pedido.precio.toString() + Constantes.SIMBOLO_EURO,
-                color = colorPrimario
+                color = colorPrimario,
+                textAlign = TextAlign.Center
             )
             Text(
                 text = pedido.direccion,
@@ -403,3 +417,70 @@ fun PlatoPedidoCard(
     }
 }
 
+
+//todo Este metodo podria mejorarse aunque funciona bien
+private fun calcularZoom(
+    latInicial: Double,
+    lngInicial: Double,
+    latFinal: Double,
+    lngFinal: Double
+): Float {
+    var lat = (latInicial - latFinal) //la latitud son 180 y la longitud 360
+    var lng = lngInicial - lngFinal
+    var comparar: Double
+    if (lat < 0) {
+        lat = lat - 2 * lat
+    }
+    if (lng < 0) {
+        lng = lat - 2 * lat
+    }
+    if (lat > lng) {
+        comparar = lat
+    } else {
+        comparar = lng
+    }
+
+    var zoom: Float = 0f
+    if (comparar < 0.00015) {
+        zoom = 20f
+    } else if (comparar < 0.000450) {
+        zoom = 19f
+    } else if (comparar < 0.000900) {
+        zoom = 18f
+    } else if (comparar < 0.001600) {
+        zoom = 17f
+    } else if (comparar < 0.003200) {
+        zoom = 16f
+    } else if (comparar < 0.006400) {
+        zoom = 15f
+    } else if (comparar < 0.012800) {
+        zoom = 14f
+    } else if (comparar < 0.025000) {
+        zoom = 13f
+    } else if (comparar < 0.050000) {
+        zoom = 12f
+    } else if (comparar < 0.1) {
+        zoom = 11f
+    } else if (comparar < 0.2) {
+        zoom = 10f
+    } else if (comparar < 0.4) {
+        zoom = 9f
+    } else if (comparar < 0.8) {
+        zoom = 8f
+    } else if (comparar < 1.6) {
+        zoom = 7f
+    } else if (comparar < 3.2) {
+        zoom = 6f
+    } else if (comparar < 6.4) {
+        zoom = 5f
+    } else if (comparar < 12.8) {
+        zoom = 4f
+    } else if (comparar < 25.6) {
+        zoom = 3f
+    } else if (comparar < 50) {
+        zoom = 2f
+    } else if (comparar < 100) {
+        zoom = 1f
+    }
+    return zoom
+}

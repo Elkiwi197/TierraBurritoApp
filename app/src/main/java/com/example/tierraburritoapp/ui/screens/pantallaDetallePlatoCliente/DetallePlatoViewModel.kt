@@ -29,27 +29,24 @@ class DetallePlatoViewModel @Inject constructor(
     fun handleEvent(event: DetallePlatoContract.DetallePlatoEvent) {
         when (event) {
             is DetallePlatoContract.DetallePlatoEvent.LoadPlato -> getPlatoById(event.id)
-            is DetallePlatoContract.DetallePlatoEvent.LoadIngredientes -> getIngredientes(event.plato)
-            is DetallePlatoContract.DetallePlatoEvent.LoadExtras -> getExtrasPlato(event.plato)
+         //   is DetallePlatoContract.DetallePlatoEvent.LoadIngredientes -> getIngredientes(event.plato)
+         //   is DetallePlatoContract.DetallePlatoEvent.LoadExtras -> getExtrasPlato(event.plato)
             is DetallePlatoContract.DetallePlatoEvent.UiEventDone -> clearUiEvents()
-            is DetallePlatoContract.DetallePlatoEvent.AnadirIngrediente -> anadirIngrediente(event.ingrediente)
-            is DetallePlatoContract.DetallePlatoEvent.EliminarIngrediente -> eliminarIngrediente(
-                event.ingrediente
-            )
+
         }
     }
 
-    private fun eliminarIngrediente(ingrediente: Producto) {
-        val plato = _uiState.value.platoModelo
-        plato.ingredientes.remove(ingrediente)
-        _uiState.value = _uiState.value.copy(platoModelo = plato)
-    }
-
-    private fun anadirIngrediente(ingrediente: Producto) {
-        val plato = _uiState.value.platoModelo
-        plato.ingredientes.add(ingrediente)
-        _uiState.value = _uiState.value.copy(platoModelo = plato)
-    }
+//    private fun eliminarIngrediente(ingrediente: Producto) {
+//        val plato = _uiState.value.platoModelo
+//        plato?.ingredientes?.remove(ingrediente)
+//        _uiState.value = _uiState.value.copy(platoModelo = plato)
+//    }
+//
+//    private fun anadirIngrediente(ingrediente: Producto) {
+//        val plato = _uiState.value.platoModelo
+//        plato?.ingredientes?.add(ingrediente)
+//        _uiState.value = _uiState.value.copy(platoModelo = plato)
+//    }
 
     private fun getPlatoById(id: Int) {
         viewModelScope.launch {
@@ -60,7 +57,6 @@ class DetallePlatoViewModel @Inject constructor(
                         _uiState.value.copy(
                             isLoading = false,
                             platoModelo = it,
-                            platoPedir = it
                         )
                     }!!
 
@@ -83,67 +79,67 @@ class DetallePlatoViewModel @Inject constructor(
         }
     }
 
-    private fun getIngredientes(plato: Plato) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            when (val result = getIngredientesByPlatoUseCase(plato)) {
-                is NetworkResult.Success -> {
-                    _uiState.value =
-                        _uiState.value.copy(
-                            isLoading = false,
-                            ingredientes = (result.data ?: mutableListOf()) as MutableList<Producto>
-                        )
-                }
-
-                is NetworkResult.Error -> {
-                    if (result.code == 401) {
-                        _uiState.value =
-                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
-                                UiEvent.Navigate(mensaje = it)
-                            })
-                    } else {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            uiEvent = UiEvent.ShowSnackbar(
-                                result.message ?: Constantes.ERROR_DESCONOCIDO
-                            )
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getExtrasPlato(plato: Plato) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            when (val result = getExtrasByPlatoUseCase(plato)) {
-                is NetworkResult.Success -> {
-                    _uiState.value =
-                        _uiState.value.copy(
-                            isLoading = false,
-                            extras = (result.data ?: mutableListOf()) as MutableList<Producto>
-                        )
-                }
-
-                is NetworkResult.Error -> {
-                    if (result.code == 401) {
-                        _uiState.value =
-                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
-                                UiEvent.Navigate(mensaje = it)
-                            })
-                    } else {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            uiEvent = UiEvent.ShowSnackbar(
-                                result.message ?: Constantes.ERROR_DESCONOCIDO
-                            )
-                        )
-                    }
-                }
-            }
-        }
-    }
+//    private fun getIngredientes(plato: Plato) {
+//        viewModelScope.launch {
+//            _uiState.value = _uiState.value.copy(isLoading = true)
+//            when (val result = getIngredientesByPlatoUseCase(plato)) {
+//                is NetworkResult.Success -> {
+//                    _uiState.value =
+//                        _uiState.value.copy(
+//                            isLoading = false,
+//                            ingredientes = (result.data ?: mutableListOf()) as MutableList<Producto>
+//                        )
+//                }
+//
+//                is NetworkResult.Error -> {
+//                    if (result.code == 401) {
+//                        _uiState.value =
+//                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
+//                                UiEvent.Navigate(mensaje = it)
+//                            })
+//                    } else {
+//                        _uiState.value = _uiState.value.copy(
+//                            isLoading = false,
+//                            uiEvent = UiEvent.ShowSnackbar(
+//                                result.message ?: Constantes.ERROR_DESCONOCIDO
+//                            )
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun getExtrasPlato(plato: Plato) {
+//        viewModelScope.launch {
+//            _uiState.value = _uiState.value.copy(isLoading = true)
+//            when (val result = getExtrasByPlatoUseCase(plato)) {
+//                is NetworkResult.Success -> {
+//                    _uiState.value =
+//                        _uiState.value.copy(
+//                            isLoading = false,
+//                            extras = (result.data ?: mutableListOf()) as MutableList<Producto>
+//                        )
+//                }
+//
+//                is NetworkResult.Error -> {
+//                    if (result.code == 401) {
+//                        _uiState.value =
+//                            _uiState.value.copy(isLoading = false, uiEvent = result.message?.let {
+//                                UiEvent.Navigate(mensaje = it)
+//                            })
+//                    } else {
+//                        _uiState.value = _uiState.value.copy(
+//                            isLoading = false,
+//                            uiEvent = UiEvent.ShowSnackbar(
+//                                result.message ?: Constantes.ERROR_DESCONOCIDO
+//                            )
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
     private fun clearUiEvents() {
         _uiState.value = _uiState.value.copy(uiEvent = null)
     }

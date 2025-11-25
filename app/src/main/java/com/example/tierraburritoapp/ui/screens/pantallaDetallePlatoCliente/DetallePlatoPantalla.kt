@@ -2,15 +2,15 @@ package com.example.tierraburritoapp.ui.screens.pantallaDetallePlatoCliente
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,10 +33,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.tierraburritoapp.common.Constantes
+import com.example.tierraburritoapp.domain.model.Plato
 import com.example.tierraburritoapp.domain.model.Producto
 import com.example.tierraburritoapp.ui.common.UiEvent
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
-import kotlinx.coroutines.launch
+import okhttp3.internal.immutableListOf
 
 @Composable
 fun DetallePlatoPantalla(
@@ -47,21 +49,29 @@ fun DetallePlatoPantalla(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val platoModelo = uiState.platoModelo
-    val platoPedirState = remember { mutableStateOf(uiState.platoPedir.copy()) }
-    val platoPedir = platoPedirState.value
 
+    val platoPedir = remember {
+        mutableStateOf(Plato(0, "", immutableListOf(), immutableListOf(), 0.0, ""))
+    }
+
+
+    // -----------------------------
+    // LOADERS
+    // -----------------------------
     LaunchedEffect(platoId) {
         viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadPlato(platoId))
     }
-    LaunchedEffect(uiState.platoModelo) {
-        launch { viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadIngredientes(plato = platoModelo)) }
-        launch { viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadExtras(plato = platoModelo)) }
+    LaunchedEffect(uiState.platoModelo?.id) {
+        uiState.platoModelo?.let {
+            platoPedir.value = platoPedir.value.copy(
+                id = it.id,
+                nombre = it.nombre,
+                ingredientes = it.ingredientes,
+                precio = it.precio,
+                rutaFoto = it.rutaFoto
+            )
+        }
     }
-    LaunchedEffect(uiState.ingredientes) {
-        platoPedirState.value = platoModelo.copy(ingredientes = uiState.ingredientes)
-    }
-
 
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
@@ -76,172 +86,281 @@ fun DetallePlatoPantalla(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+// -----------------------------
+// UI
+// -----------------------------
+    uiState.platoModelo?.let {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Box(modifier = Modifier.fillMaxWidth()) {
 
-        AsyncImage(
-            model = platoPedir.rutaFoto,
-            contentDescription = Constantes.FOTO_PLATO,
-            modifier = Modifier
-                .height(200.dp)
-                .width(200.dp)
-        )
-        Text(
-            text = platoPedir.nombre,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            uiState.ingredientes.forEach { ingrediente ->
-                val estaIncluido = platoPedir.ingredientes.contains(ingrediente)
-                IngredienteCard(
-                    ingrediente = ingrediente,
-                    estaIncluido = estaIncluido,
-                    colorAnadir = MaterialTheme.colorScheme.secondary,
-                    colorEliminar = MaterialTheme.colorScheme.tertiary,
-                    onToggle = {
-                        val nuevaLista = platoPedir.ingredientes.toMutableList().apply {
-                            if (estaIncluido) remove(ingrediente) else add(ingrediente)
+                    // Imagen principal
+                    AsyncImage(
+                        model = it.rutaFoto,
+                        contentDescription = Constantes.FOTO_PLATO,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(16f / 9f),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    )
+
+                    // 🔥 Degradado overlay corregido
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color.Black.copy(alpha = 0.35f)
+                                    )
+                                )
+                            )
+                    )
+                }
+            }
+
+
+            // CONTENT SHEET
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 25.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                shape = MaterialTheme.shapes.large,
+                elevation = CardDefaults.cardElevation(8.dp)
+            ) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+
+                    Text(
+                        text = it.nombre,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Text(
+                        text = "${it.precio}€",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    )
+
+                    // -----------------------------
+                    // INGREDIENTES
+                    // -----------------------------
+                    Text(
+                        text = "Ingredientes",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .padding(vertical = 8.dp)
+                    ) {
+                        it.ingredientes.forEach { ingrediente ->
+                            IngredienteChip(
+                                ingrediente = ingrediente,
+                                estaIncluido = platoPedir.value.ingredientes.contains(ingrediente),
+                                colorAnadir = MaterialTheme.colorScheme.secondary,
+                                colorEliminar = MaterialTheme.colorScheme.tertiary,
+                                onToggle = {
+                                    val nuevosIngredientes =
+                                        platoPedir.value.ingredientes.toMutableList().apply {
+                                            if (contains(ingrediente)) {
+                                                remove(ingrediente)
+                                            } else {
+                                                add(ingrediente)
+                                            }
+                                        }
+                                    platoPedir.value = platoPedir.value.copy(
+                                        ingredientes = nuevosIngredientes
+                                    )
+                                }
+                            )
                         }
-                        platoPedirState.value = platoPedir.copy(ingredientes = nuevaLista)
                     }
-                )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            uiState.extras.forEach { extra ->
-                val estaIncluido = platoPedir.extras.contains(extra)
-                ExtraCard(
-                    extra = extra,
-                    estaIncluido = estaIncluido,
-                    colorAnadir = MaterialTheme.colorScheme.secondary,
-                    colorEliminar = MaterialTheme.colorScheme.tertiary,
-                    onToggle = {
-                        val nuevaLista = platoPedir.extras.toMutableList().apply {
-                            if (estaIncluido) {
-                                remove(extra)
-                                platoPedir.precio -= extra.precio
-                            } else {
-                                add(extra)
-                                platoPedir.precio += extra.precio
-                            }
+
+                    // -----------------------------
+                    // EXTRAS
+                    // -----------------------------
+                    Text(
+                        text = "Extras",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .padding(vertical = 8.dp)
+                    ) {
+                        it.extras.forEach { extra ->
+                            ExtraChip(
+                                extra = extra,
+                                estaIncluido = platoPedir.value.extras.contains(extra),
+                                colorAnadir = MaterialTheme.colorScheme.secondary,
+                                colorEliminar = MaterialTheme.colorScheme.tertiary,
+                                onToggle = {
+                                    val nuevosExtras =
+                                        platoPedir.value.extras.toMutableList().apply {
+                                            if (contains(extra)) {
+                                                remove(extra)
+                                                platoPedir.value.precio -= extra.precio
+                                            } else {
+                                                add(extra)
+                                                platoPedir.value.precio += extra.precio
+                                            }
+                                        }
+                                    platoPedir.value = platoPedir.value.copy(
+                                        extras = nuevosExtras
+                                    )
+                                }
+                            )
                         }
-                        platoPedirState.value = platoPedir.copy(extras = nuevaLista)
-                    },
-                )
+                    }
+
+                    // BUTTON - Add to order
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        onClick = {
+                            variablesViewModel.anadirPlatoAlPedido(platoPedir.value)
+                            showSnackbar(Constantes.PLATO_ANADIDO_A_PEDIDO)
+                        }
+                    ) {
+                        Text(
+                            Constantes.ANADIR_PLATO_A_PEDIDO,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
             }
-        }
-        Text(
-            text = platoPedir.precio.toString() + Constantes.SIMBOLO_EURO,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Button(
-            modifier = Modifier
-                .wrapContentSize(),
-            onClick = {
-                variablesViewModel.anadirPlatoAlPedido(platoPedir)
-                showSnackbar(Constantes.PLATO_ANADIDO_A_PEDIDO)
-            }
-        ) {
-            Text(Constantes.ANADIR_PLATO_A_PEDIDO)
         }
     }
 }
 
+
 @Composable
-fun IngredienteCard(
+fun IngredienteChip(
     ingrediente: Producto,
     estaIncluido: Boolean,
     colorAnadir: Color,
     colorEliminar: Color,
-    onToggle: () -> Unit,
+    onToggle: () -> Unit
 ) {
     Card(
         modifier = Modifier
-            .width(200.dp)
-            .padding(8.dp)
-            .background(color = MaterialTheme.colorScheme.background),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .padding(end = 12.dp)
+            .width(160.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = if (estaIncluido) colorEliminar.copy(alpha = 0.2f)
+            else colorAnadir.copy(alpha = 0.15f)
+        ),
+        elevation = CardDefaults.cardElevation(2.dp),
+        onClick = onToggle
     ) {
-
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.CenterHorizontally)
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             AsyncImage(
                 model = ingrediente.rutaFoto,
-                contentDescription = Constantes.FOTO_INGREDIENTE,
+                contentDescription = null,
                 modifier = Modifier
-                    .height(100.dp)
-                    .width(100.dp)
+                    .height(80.dp)
+                    .width(80.dp)
             )
-            Text(text = ingrediente.nombre.replace("_", " "))
-            Button(
-                onClick = onToggle,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (estaIncluido) colorEliminar else colorAnadir
-                )
-            ) {
-                Text(text = if (estaIncluido) Constantes.ELIMINAR else Constantes.ANADIR)
-            }
+
+            Text(
+                ingrediente.nombre.replace("_", " "),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+
+            Text(
+                if (estaIncluido) "Eliminar" else "Añadir",
+                color = if (estaIncluido) colorEliminar else colorAnadir
+            )
         }
     }
 }
 
-
 @Composable
-fun ExtraCard(
+fun ExtraChip(
     extra: Producto,
     estaIncluido: Boolean,
     colorAnadir: Color,
     colorEliminar: Color,
-    onToggle: () -> Unit,
+    onToggle: () -> Unit
 ) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
-            .fillMaxHeight()
-            .background(color = MaterialTheme.colorScheme.background),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .padding(end = 12.dp)
+            .width(160.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = if (estaIncluido) colorEliminar.copy(alpha = 0.2f)
+            else colorAnadir.copy(alpha = 0.15f)
+        ),
+        elevation = CardDefaults.cardElevation(2.dp),
+        onClick = onToggle
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.CenterHorizontally)
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             AsyncImage(
                 model = extra.rutaFoto,
-                contentDescription = Constantes.FOTO_INGREDIENTE,
+                contentDescription = null,
                 modifier = Modifier
-                    .height(100.dp)
-                    .width(100.dp)
+                    .height(80.dp)
+                    .width(80.dp)
             )
-            Text(text = extra.nombre.replace("_", " "))
-            Text(text = extra.precio.toString() + Constantes.SIMBOLO_EURO)
-            Button(
-                onClick = onToggle,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (estaIncluido) colorEliminar else colorAnadir
-                )            ) {
-                Text(text = if (estaIncluido) Constantes.ELIMINAR else Constantes.ANADIR)
-            }
+
+            Text(
+                extra.nombre.replace("_", " "),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+
+            Text(
+                "${extra.precio}€",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                if (estaIncluido) "Eliminar" else "Añadir",
+                color = if (estaIncluido) colorEliminar else colorAnadir,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
     }
 }

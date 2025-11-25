@@ -40,5 +40,9 @@ class PedidosRepository @Inject constructor(
         return pedidosDataSource.entregarPedido(idPedido, correoRepartidor)
     }
 
+    suspend fun noRepartirEstePedido(idPedido: Int):  NetworkResult<String> {
+        return pedidosDataSource.noRepartirEstePedido(idPedido)
+    }
+
 
 }

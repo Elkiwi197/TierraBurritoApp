@@ -17,15 +17,15 @@ data class Feature(
     val type: String,
     val properties: Properties,
 
-    @SerialName("geometry")
-    val geometryOpenRoutesService: GeometryOpenRoutesService
+    val geometry: GeometryOpenRoutesService
 )
 
 @Serializable
 data class GeometryOpenRoutesService(
     val coordinates: List<List<Double>>,
-    val type: String
+    val type: String,
 )
+
 
 @Serializable
 data class Properties(
@@ -81,3 +81,4 @@ data class Engine(
     @SerialName("build_date")
     val buildDate: String
 )
+

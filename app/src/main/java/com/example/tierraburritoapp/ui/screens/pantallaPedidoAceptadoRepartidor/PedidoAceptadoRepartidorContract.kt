@@ -14,7 +14,7 @@ interface PedidoAceptadoRepartidorContract {
             val latOrigen: Double,
             val lngOrigen: Double
         ) : PedidoAceptadoRepartidorEvent()
-        data class CancelarPedido(
+        data class NoRepartirEstePedido(
             val idPedido: Int,
             val correo: String
         ) : PedidoAceptadoRepartidorEvent()

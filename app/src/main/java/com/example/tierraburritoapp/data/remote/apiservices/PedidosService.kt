@@ -45,4 +45,9 @@ interface PedidosService {
         @Query("correoRepartidor") correoRepartidor: String
     ): Response<ResponseBody>
 
+    @POST("/pedidos/noRepartirEstePedido")
+    suspend fun noRepartirEstePedido(
+        @Query("idPedido") idPedido: Int,
+    ): Response<ResponseBody>
+
 }

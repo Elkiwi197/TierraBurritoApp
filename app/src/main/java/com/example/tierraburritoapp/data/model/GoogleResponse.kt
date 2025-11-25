@@ -23,7 +23,7 @@ data class Viewport(
 )
 
 @Serializable
-data class Geometry(
+data class GoogleGeometry(
     val location: Location,
     val location_type: String,
     val viewport: Viewport
@@ -33,7 +33,7 @@ data class Geometry(
 data class Result(
     val address_components: List<AddressComponent>,
     val formatted_address: String,
-    val geometry: Geometry,
+    val geometry: GoogleGeometry,
     val place_id: String,
     val plus_code: PlusCode,
     val types: List<String>
@@ -46,7 +46,7 @@ data class PlusCode(
 )
 
 @Serializable
-data class LocationResponse(
+data class GoogleResponse(
     val results: List<Result>,
     val status: String
 )

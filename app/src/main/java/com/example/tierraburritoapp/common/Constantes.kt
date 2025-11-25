@@ -2,6 +2,18 @@ package com.example.tierraburritoapp.common
 
 object Constantes {
 
+    const val COORDENADAS_RESTAURANTE = "-3.606442,40.434192"
+    const val AQUI_APARECERAN_TUS_PEDIDOS_HECHOS = "Aquí aparecerán los pedidos que hagas"
+    const val NO_HAY_PEDIDOS = "No has hecho ningún pedido"
+    const val ANADE_PLATOS_PARA_VER = "Añade platos para verlo"
+    const val NO_HAY_PEDIDO = "No has empezado ningún pedido"
+    const val INTENTA_DE_NUEVO_MAS_TARDE = "Inténtalo de nuevo más tarde"
+    const val NO_SE_PUDO_ACCEDER_A_PLATOS = "No se ha podido acceder a los platos"
+    const val AQUI_APARECERAN_TUS_PEDIDOS_REPARTIDOS = "Aquí aparecerán tus pedidos cuando empieces a repartir"
+    const val NO_HAY_PEDIDOS_REPARTIDOS = "No has repartido ningún pedido"
+    const val ACEPTA_UN_PEDIDO = "Acepta un pedido para repartirlo"
+    const val TODOS_LOS_PEDIDOS_HAN_SIDO_REPARTIDOS = "Todos los pedidos ya han sido repartidos"
+    const val NO_HAY_PEDIDOS_PARA_REPARTIR = "No hay pedidos para repartir"
     const val NO_HAY_MENSAJE = "Llamada sin mensaje"
     const val RELLENA_TODOS_LOS_CAMPOS = "Rellena todos los campos"
     const val CONTRASENA_INCORRECTA = "Contraseña incorrecta"
