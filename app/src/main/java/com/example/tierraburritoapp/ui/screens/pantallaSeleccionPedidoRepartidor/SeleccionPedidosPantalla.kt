@@ -1,6 +1,5 @@
 package com.example.tierraburritoapp.ui.screens.pantallaSeleccionPedidoRepartidor
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -60,7 +60,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun SeleccionPedidosPantalla(
-    navController: NavController,
     viewModel: SeleccionPedidosViewModel = hiltViewModel(),
     variablesViewModel: VariablesViewModel,
     showSnackbar: (String) -> Unit,
@@ -137,8 +136,6 @@ fun SeleccionPedidosPantalla(
                     PedidoCard(
                         pedido = pedido,
                         viewModel = viewModel,
-                        colorPrimario = MaterialTheme.colorScheme.primary,
-                        colorSecundario = MaterialTheme.colorScheme.secondary,
                         variablesViewModel = variablesViewModel
                     )
                 }
@@ -152,8 +149,6 @@ fun PedidoCard(
     pedido: Pedido,
     viewModel: SeleccionPedidosViewModel,
     variablesViewModel: VariablesViewModel,
-    colorPrimario: Color,
-    colorSecundario: Color,
 ) {
     var ruta by remember { mutableStateOf<List<List<Double>>?>(null) }
     var latDestino by remember { mutableStateOf<Double?>(null) }
@@ -203,31 +198,29 @@ fun PedidoCard(
                 ruta = ruta
             )
 
-            if (pedido.estado != EstadoPedido.ACEPTADO) {
-                Button(
-                    onClick = {
-                        viewModel.handleEvent(
-                            SeleccionPedidosContract.SeleccionPedidosEvent.AceptarPedido(
-                                pedido.id,
-                                variablesViewModel.correoUsuario
-                            )
+            Button(
+                onClick = {
+                    viewModel.handleEvent(
+                        SeleccionPedidosContract.SeleccionPedidosEvent.RepartirPedido(
+                            pedido.id,
+                            variablesViewModel.correoUsuario
                         )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    ),                ) {
-                    Text(
-                        text = Constantes.ACEPTAR,
-                        color = Color.White,
                     )
-                }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                ),
+            ) {
+                Text(
+                    text = Constantes.ACEPTAR,
+                    color = Color.White,
+                )
             }
         }
     }
-
 }
 
 @Composable
@@ -295,8 +288,7 @@ fun Plato(
     contenido: TextStyle,
 ) {
     Card(
-        modifier = Modifier
-            .width(180.dp),
+        modifier = Modifier.wrapContentSize(),
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
@@ -312,25 +304,27 @@ fun Plato(
                 style = titulo,
                 color = colorPrimario
             )
-
-            Row {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                    modifier = Modifier.padding(8.dp)
-                ) {
+        }
+        Row {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text(
+                    text = Constantes.INGREDIENTES,
+                    style = apartado,
+                    color = colorSecundario
+                )
+                plato.ingredientes.forEach {
                     Text(
-                        text = Constantes.INGREDIENTES,
-                        style = apartado,
+                        text = "• ${it.nombre.replace("_", " ")}",
+                        style = contenido,
                         color = colorSecundario
                     )
-                    plato.ingredientes.forEach {
-                        Text(
-                            text = "• ${it.nombre.replace("_", " ")}",
-                            style = contenido,
-                            color = colorSecundario
-                        )
-                    }
                 }
+            }
+
+            if (plato.extras.isNotEmpty()) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                     modifier = Modifier.padding(8.dp)
@@ -353,7 +347,6 @@ fun Plato(
     }
 }
 
-
 @Composable
 fun Mapa(
     latRestaurante: Double,
@@ -362,7 +355,6 @@ fun Mapa(
     lngDestino: Double?,
     ruta: List<List<Double>>?
 ) {
-    val context = LocalContext.current
     var mapLoaded by remember { mutableStateOf(false) }
     val coordenadasRestaurante = LatLng(latRestaurante, lngRestaurante)
     val restauranteMarkerState = MarkerState(position = coordenadasRestaurante)
@@ -439,7 +431,6 @@ fun Mapa(
     }
 }
 
-//todo Este metodo podria mejorarse aunque funciona bien
 private fun calcularZoom(
     latInicial: Double,
     lngInicial: Double,

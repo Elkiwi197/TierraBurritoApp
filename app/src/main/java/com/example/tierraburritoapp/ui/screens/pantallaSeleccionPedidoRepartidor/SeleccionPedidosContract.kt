@@ -8,7 +8,7 @@ interface SeleccionPedidosContract {
     sealed class SeleccionPedidosEvent {
         data object LoadPedidos : SeleccionPedidosEvent()
         data object UiEventDone : SeleccionPedidosEvent()
-        data class AceptarPedido(
+        data class RepartirPedido(
             val idPedido: Int,
             val correo: String
         ) : SeleccionPedidosEvent()

@@ -135,7 +135,6 @@ fun Navigation() {
 
             composable<SeleccionPedidos> {
                 SeleccionPedidosPantalla(
-                    navController = navController,
                     onNavigateToLoginSignup = {
                         navController.navigate(Login)
                     },

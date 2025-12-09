@@ -10,8 +10,9 @@ import kotlin.Int
 data class Plato (
     val id: Int,
     val nombre: String,
-    var ingredientes: List<Producto>,
-    var extras: List<Producto>,
+    var ingredientes: List<Ingrediente>,
+    var extras: List<Ingrediente>,
     var precio: Double,
     val rutaFoto: String
 ) : Parcelable
+

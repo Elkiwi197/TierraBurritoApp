@@ -13,7 +13,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.tierraburritoapp.R
 import com.example.tierraburritoapp.common.Constantes
-import com.example.tierraburritoapp.ui.navigation.ListaPlatos
 import com.example.tierraburritoapp.ui.navigation.PedidoAceptado
 import com.example.tierraburritoapp.ui.navigation.PedidosRepartidos
 import com.example.tierraburritoapp.ui.navigation.SeleccionPedidos

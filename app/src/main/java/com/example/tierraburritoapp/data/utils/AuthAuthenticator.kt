@@ -74,27 +74,3 @@ class AuthAuthenticator @Inject constructor(
     }
 }
 
-
-/*
-    private fun getNewToken(refreshToken: String): Response<TokenResponse> {
-        return try {
-            val response = runBlocking {
-                authApiService.get().refreshToken("Bearer $refreshToken")
-            }
-
-            val body = response.body()
-            if (response.isSuccessful && body != null && body.contentLength() > 0) {
-                val token = Gson().fromJson(body.string(), TokenResponse::class.java)
-                Response.success(token)
-            } else {
-                Response.error(
-                    response.code(),
-                    response.errorBody() ?: ResponseBody.create(null, "Error desconocido")
-                )
-            }
-        } catch (e: Exception) {
-            Response.error(500, ResponseBody.create(null, e.message ?: "Error desconocido"))
-        }
-    }
-}
-*/

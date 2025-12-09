@@ -7,9 +7,8 @@ import com.example.tierraburritoapp.common.Constantes
 import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetCoordenadasUseCase
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetRutaUseCase
-import com.example.tierraburritoapp.domain.usecases.pedidos.CancelarPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.EntregarPedidoUseCase
-import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidoAceptadoUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidoEnRepartoByRepartidorUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.NoRepartirEstePedidoUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PedidoAceptadoRepartidorViewModel @Inject
 constructor(
-    private val getPedidoAceptadoUseCase: GetPedidoAceptadoUseCase,
+    private val getPedidoEnRepartoByRepartidorUseCase: GetPedidoEnRepartoByRepartidorUseCase,
     private val getCoordenadasUseCase: GetCoordenadasUseCase,
     private val getRutaUseCase: GetRutaUseCase,
     private val noRepartirEstePedidoUseCase: NoRepartirEstePedidoUseCase,
@@ -125,7 +124,7 @@ constructor(
     private fun cargarPedido(correoRepartidor: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            when (val result = getPedidoAceptadoUseCase(correoRepartidor)) {
+            when (val result = getPedidoEnRepartoByRepartidorUseCase(correoRepartidor)) {
                 is NetworkResult.Success -> _uiState.value =
                     result.data?.let {
                         _uiState.value.copy(

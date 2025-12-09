@@ -1,7 +1,6 @@
 package com.example.tierraburritoapp.ui.screens.pantallaLoginSignup
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,9 +39,6 @@ import com.example.tierraburritoapp.data.model.TipoUsuario
 import com.example.tierraburritoapp.ui.common.UiEvent
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
 
-//-------------------------------------
-// PANTALLA COMPLETA
-//-------------------------------------
 
 @Composable
 fun LoginSignupPantalla(
@@ -56,7 +52,6 @@ fun LoginSignupPantalla(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Eventos
     LaunchedEffect(uiState.uiEvent) {
         uiState.uiEvent?.let {
             when (it) {
@@ -68,15 +63,13 @@ fun LoginSignupPantalla(
                         TipoUsuario.REPARTIDOR -> onNavigateToSeleccionPedidos()
                     }
                 }
+
                 is UiEvent.ShowSnackbar -> showSnackbar(it.message)
             }
             viewModel.handleEvent(LoginSignupContract.LoginSignupEvent.UiEventDone)
         }
     }
 
-    //-------------------------------------
-    // DISEÑO VISUAL COMPLETO
-    //-------------------------------------
 
     Column(
         modifier = Modifier
@@ -87,9 +80,8 @@ fun LoginSignupPantalla(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.height(20.dp))
 
-        // TITULO PRINCIPAL
         Text(
             text = "Bienvenido a Tierra Burrito",
             style = MaterialTheme.typography.headlineSmall,
@@ -98,9 +90,6 @@ fun LoginSignupPantalla(
 
         Spacer(Modifier.height(20.dp))
 
-        //-------------------------------------
-        // LOGIN
-        //-------------------------------------
         LoginCard(
             uiState,
             colorPrimario = MaterialTheme.colorScheme.primary,
@@ -128,11 +117,8 @@ fun LoginSignupPantalla(
             }
         )
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(20.dp))
 
-        //-------------------------------------
-        // SIGNUP
-        //-------------------------------------
         SignUpCard(
             uiState,
             colorPrimario = MaterialTheme.colorScheme.primary,
@@ -175,13 +161,10 @@ fun LoginSignupPantalla(
             }
         )
 
-        Spacer(Modifier.height(40.dp))
+
     }
 }
 
-//
-// TARJETA COMPLETA LOGIN
-//
 @Composable
 fun LoginCard(
     uiState: LoginSignupContract.LoginSignupState,
@@ -201,8 +184,7 @@ fun LoginCard(
     ) {
 
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(10.dp),
         ) {
 
             Text(
@@ -245,9 +227,6 @@ fun LoginCard(
     }
 }
 
-//
-// TARJETA COMPLETA REGISTRO
-//
 @Composable
 fun SignUpCard(
     uiState: LoginSignupContract.LoginSignupState,
@@ -269,8 +248,7 @@ fun SignUpCard(
     ) {
 
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(10.dp),
         ) {
 
             Text(
@@ -309,7 +287,7 @@ fun SignUpCard(
                 color = colorSecundario
             )
 
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column() {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(
                         selected = uiState.tipoUsuario == TipoUsuario.CLIENTE,

@@ -21,8 +21,8 @@ interface PedidosService {
     @GET("/pedidos/enPreparacion")
     suspend fun getPedidosEnPreparacion(): Response<List<Pedido>>
 
-    @POST("/pedidos/aceptarPedido")
-    suspend fun aceptarPedido(
+    @POST("/pedidos/repartirPedido")
+    suspend fun repartirPedido(
         @Query("idPedido") idPedido: Int,
         @Query("correoRepartidor") correoRepartidor: String
     ): Response<ResponseBody>
@@ -33,8 +33,8 @@ interface PedidosService {
         @Query("correoRepartidor") correoRepartidor: String
     ): Response<ResponseBody>
 
-    @GET("/pedidos/aceptado/{correoRepartidor}")
-    suspend fun getPedidoAceptado(@Path("correoRepartidor") correoRepartidor: String): Response<Pedido>
+    @GET("/pedidos/enReparto/{correoRepartidor}")
+    suspend fun getPedidoEnRepartoByRepartidor(@Path("correoRepartidor") correoRepartidor: String): Response<Pedido>
 
     @GET("/pedidos/repartidos/{correoRepartidor}")
     suspend fun getPedidosRepartidos(@Path("correoRepartidor") correoRepartidor: String): Response<List<Pedido>>

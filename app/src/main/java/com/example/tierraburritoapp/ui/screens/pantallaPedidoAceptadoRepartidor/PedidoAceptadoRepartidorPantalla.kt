@@ -59,10 +59,6 @@ import kotlinx.coroutines.launch
 
 
 
-
-
-// VERSION  HECHA POR MI
-
 @Composable
 fun PedidoAceptadoRepartidorPantalla(
     viewModel: PedidoAceptadoRepartidorViewModel = hiltViewModel(),
@@ -107,22 +103,19 @@ fun PedidoAceptadoRepartidorPantalla(
     }
 
     uiState.pedido?.let {
-        // Contenedor scrollable para toda la pantalla
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()) // Hacemos la columna desplazable
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Contenedor del pedido
             PedidoView(
                 pedido = uiState.pedido!!,
                 colorPrimario = MaterialTheme.colorScheme.primary,
                 colorSecundario = MaterialTheme.colorScheme.secondary
             )
 
-            // Mapa
             Mapa(
                 latRestaurante = variablesViewModel.latRestaurante,
                 lngRestaurante = variablesViewModel.lngRestaurante,
@@ -131,15 +124,13 @@ fun PedidoAceptadoRepartidorPantalla(
                 ruta = uiState.ruta
             )
 
-            Spacer(modifier = Modifier.height(16.dp)) // Espacio entre el mapa y los botones
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Botones debajo del mapa
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Botón para cancelar pedido
                 Button(
                     modifier = Modifier
                         .weight(1f)
@@ -155,26 +146,24 @@ fun PedidoAceptadoRepartidorPantalla(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError
                     ),
-                    shape = MaterialTheme.shapes.medium, // Bordes redondeados
-              //      elevation = ButtonDefaults.elevation(8.dp), // Elevación para efecto de sombra
+                    shape = MaterialTheme.shapes.medium,
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.baseline_cancel_24), // Añadir un ícono de cancelación
+                        painter = painterResource(R.drawable.baseline_cancel_24),
                         contentDescription = "No repartir este pedido",
                         modifier = Modifier.size(20.dp),
                         tint = MaterialTheme.colorScheme.onError
                     )
-                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "No repartir este pedido",
                         color = Color.White,
                         style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center, // Asegura que el texto se centre
+                        textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
 
-                // Botón para marcar como entregado
                 Button(
                     modifier = Modifier
                         .weight(1f)
@@ -190,21 +179,20 @@ fun PedidoAceptadoRepartidorPantalla(
                         containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
-                    shape = MaterialTheme.shapes.medium, // Bordes redondeados
-                 //   elevation = ButtonDefaults.elevation(8.dp), // Elevación para efecto de sombra
+                    shape = MaterialTheme.shapes.medium,
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.baseline_check_circle_24), // Icono de éxito
+                        painter = painterResource(R.drawable.baseline_check_circle_24),
                         contentDescription = "Pedido entregado",
                         modifier = Modifier.size(20.dp),
                         tint = MaterialTheme.colorScheme.onSecondary
                     )
-                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Pedido entregado",
                         color = Color.White,
                         style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center, // Asegura que el texto se centre
+                        textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -214,11 +202,10 @@ fun PedidoAceptadoRepartidorPantalla(
     } ?: Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()), // Hacemos la columna desplazable
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Mostrar cuando no hay pedidos
         Icon(
             painter = painterResource(R.drawable.baseline_no_food_24),
             contentDescription = null,
@@ -278,7 +265,7 @@ fun Mapa(
     GoogleMap(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp), // Definimos una altura fija para el mapa
+            .height(300.dp),
         cameraPositionState = cameraPositionState,
         onMapLoaded = { mapLoaded = true }
     ) {
@@ -418,7 +405,6 @@ fun PlatoPedidoCard(
 }
 
 
-//todo Este metodo podria mejorarse aunque funciona bien
 private fun calcularZoom(
     latInicial: Double,
     lngInicial: Double,

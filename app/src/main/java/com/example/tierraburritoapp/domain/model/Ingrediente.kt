@@ -1,8 +1,14 @@
 package com.example.tierraburritoapp.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
-enum class Ingrediente {
-    STEAK, CARNITAS, CARNE_BBQ, POLLO, ARROZ_BLANCO, ARROZ_INTEGRAL, FRIJOLES, VERDURAS,
-    PICO_DE_GALLO, SALSA_DE_QUESO, SALSA_CHIPOTLE, CREMA_AGRIA, SALSA_666, SALSA_MEDIA,
-    SALSA_VERDE, MAIZ, JALAPENOS, QUESO_RALLADO, GUACAMOLE, LECHUGA
-}
+@Serializable
+@Parcelize
+data class Ingrediente(
+    val id: Int,
+    val nombre: String,
+    val precio: Double,
+    val rutaFoto: String
+): Parcelable

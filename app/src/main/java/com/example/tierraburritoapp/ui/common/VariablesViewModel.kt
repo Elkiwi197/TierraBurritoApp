@@ -7,6 +7,8 @@ import com.example.tierraburritoapp.domain.model.EstadoPedido
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.domain.model.Plato
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -22,7 +24,6 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
         Pedido(
             id = 0,
             platos = mutableListOf(),
-            otros = mutableListOf(),
             direccion = "",
             estado = EstadoPedido.CLIENTE_ELIGIENDO,
             precio = 0.0,
@@ -47,34 +48,32 @@ class VariablesViewModel @Inject constructor() : ViewModel() {
     fun anadirPlatoAlPedido(plato: Plato) {
         val platosAnadir = pedido.platos.toMutableList().apply { add(plato) }
         pedido = pedido.copy(platos = platosAnadir)
-        pedido.precio = 0.0
+        var precioTotal = BigDecimal(0.0)
         platosAnadir.forEach { p ->
-            pedido.precio += p.precio
+            precioTotal += BigDecimal(p.precio)
         }
+        pedido.precio = precioTotal.toDouble()
     }
 
     fun eliminarPlatoDelPedido(plato: Plato) {
         val platosAnadir = pedido.platos.toMutableList().apply { remove(plato) }
         pedido = pedido.copy(platos = platosAnadir)
         pedido.precio = 0.0
+        var precioTotal = BigDecimal(0.0)
         platosAnadir.forEach { p ->
-            pedido.precio += p.precio
+            val nuevoPrecio = BigDecimal(pedido.precio) + BigDecimal(p.precio)
+            precioTotal += nuevoPrecio.setScale(2, RoundingMode.HALF_UP)
         }
-    }
-
-    fun cambiarEstadoPedido(estado: EstadoPedido) {
-        pedido = pedido.copy(estado = estado)
+        pedido.precio = precioTotal.toDouble()
     }
 
     fun resetearPedido() {
         pedido = pedido.copy(
             id = 0,
             platos = mutableListOf(),
-            otros = mutableListOf(),
             direccion = "",
             estado = EstadoPedido.CLIENTE_ELIGIENDO,
             precio = 0.0,
-            correoCliente = "",
             correoRepartidor = "",
             horaLlegada = null
         )

@@ -8,7 +8,7 @@ import com.example.tierraburritoapp.data.remote.NetworkResult
 import com.example.tierraburritoapp.domain.model.Pedido
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetCoordenadasUseCase
 import com.example.tierraburritoapp.domain.usecases.coordenadas.GetRutaUseCase
-import com.example.tierraburritoapp.domain.usecases.pedidos.AceptarPedidoUseCase
+import com.example.tierraburritoapp.domain.usecases.pedidos.RepartirPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.CancelarPedidoUseCase
 import com.example.tierraburritoapp.domain.usecases.pedidos.GetPedidosEnPreparacionUseCase
 import com.example.tierraburritoapp.ui.common.UiEvent
@@ -23,7 +23,7 @@ class SeleccionPedidosViewModel @Inject constructor(
     private val getPedidosEnPreparacionUseCase: GetPedidosEnPreparacionUseCase,
     private val getCoordenadasUseCase: GetCoordenadasUseCase,
     private val getRutaUseCase: GetRutaUseCase,
-    private val aceptarPedidoUseCase: AceptarPedidoUseCase,
+    private val repartirPedidoUseCase: RepartirPedidoUseCase,
     private val cancelarPedidoUseCase: CancelarPedidoUseCase
 ) : ViewModel() {
 
@@ -39,7 +39,7 @@ class SeleccionPedidosViewModel @Inject constructor(
                 event.onResult
             )
 
-            is SeleccionPedidosContract.SeleccionPedidosEvent.AceptarPedido -> aceptarPedido(
+            is SeleccionPedidosContract.SeleccionPedidosEvent.RepartirPedido -> repartirPedido(
                 event.idPedido,
                 event.correo
             )
@@ -81,10 +81,10 @@ class SeleccionPedidosViewModel @Inject constructor(
         }
     }
 
-    private fun aceptarPedido(idPedido: Int, correo: String) {
+    private fun repartirPedido(idPedido: Int, correo: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
-            when (val result = aceptarPedidoUseCase(idPedido, correo)) {
+            when (val result = repartirPedidoUseCase(idPedido, correo)) {
                 is NetworkResult.Success -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,

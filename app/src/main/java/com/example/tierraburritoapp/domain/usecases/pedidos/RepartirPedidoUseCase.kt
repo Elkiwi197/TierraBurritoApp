@@ -5,10 +5,10 @@ import com.example.tierraburritoapp.data.remote.repositories.PedidosRepository
 import javax.inject.Inject
 
 
-class AceptarPedidoUseCase @Inject constructor(
+class RepartirPedidoUseCase @Inject constructor(
     private val pedidosRepository: PedidosRepository
 ) {
     suspend operator fun invoke(idPedido: Int, correoRepartidor: String): NetworkResult<String> {
-        return pedidosRepository.aceptarPedido(idPedido, correoRepartidor)
+        return pedidosRepository.repartirPedido(idPedido, correoRepartidor)
     }
 }

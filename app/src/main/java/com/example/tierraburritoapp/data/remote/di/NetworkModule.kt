@@ -90,7 +90,6 @@ object NetworkModule {
                 level = HttpLoggingInterceptor.Level.BODY
             })
             .build()
-        //todo mandar el access token todo el rato, y poner e refresh token cuando de un 401 (unauthorized)
     }
 
     @Provides

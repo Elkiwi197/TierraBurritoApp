@@ -125,7 +125,6 @@ fun PedidoActualPantalla(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            // Contenido scrollable
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -168,7 +167,10 @@ fun PedidoActualPantalla(
 
                 pedido.horaLlegada?.let {
                     Text(
-                        text = "${Constantes.HORA_ESTIMADA_LLEGADA_} ${pedido.horaLlegada!!.hour}:${pedido.horaLlegada!!.minute}",
+                        text = "${Constantes.HORA_ESTIMADA_LLEGADA_} ${pedido.horaLlegada!!.hour}:" +
+                                if (pedido.horaLlegada!!.minute % 10 == 0) "${pedido.horaLlegada!!.minute}"
+                                else if (pedido.horaLlegada!!.minute < 10) "0${pedido.horaLlegada!!.minute}"
+                                else "${pedido.horaLlegada!!.minute}",
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -214,7 +216,7 @@ fun PedidoActualPantalla(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp)) // padding bottom para que no choque con bottom bar
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
         if (showDialog) {
@@ -260,7 +262,6 @@ fun PlatoPedidoCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // Imagen con bordes redondeados
             AsyncImage(
                 model = plato.rutaFoto,
                 contentDescription = Constantes.FOTO_PLATO,
@@ -272,7 +273,6 @@ fun PlatoPedidoCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Nombre del plato destacado
             Text(
                 text = plato.nombre,
                 style = MaterialTheme.typography.titleLarge,
@@ -281,7 +281,6 @@ fun PlatoPedidoCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Ingredientes y extras en columnas separadas con fondo sutil
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -330,7 +329,6 @@ fun PlatoPedidoCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Precio y botón eliminar en fila estilizada
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

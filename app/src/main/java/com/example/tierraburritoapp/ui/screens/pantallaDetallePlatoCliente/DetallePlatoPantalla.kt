@@ -24,7 +24,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,11 +32,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.tierraburritoapp.common.Constantes
+import com.example.tierraburritoapp.domain.model.Ingrediente
 import com.example.tierraburritoapp.domain.model.Plato
-import com.example.tierraburritoapp.domain.model.Producto
 import com.example.tierraburritoapp.ui.common.UiEvent
 import com.example.tierraburritoapp.ui.common.VariablesViewModel
 import okhttp3.internal.immutableListOf
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Composable
 fun DetallePlatoPantalla(
@@ -54,10 +55,6 @@ fun DetallePlatoPantalla(
         mutableStateOf(Plato(0, "", immutableListOf(), immutableListOf(), 0.0, ""))
     }
 
-
-    // -----------------------------
-    // LOADERS
-    // -----------------------------
     LaunchedEffect(platoId) {
         viewModel.handleEvent(DetallePlatoContract.DetallePlatoEvent.LoadPlato(platoId))
     }
@@ -86,9 +83,6 @@ fun DetallePlatoPantalla(
         }
     }
 
-// -----------------------------
-// UI
-// -----------------------------
     uiState.platoModelo?.let {
         Column(
             modifier = Modifier
@@ -99,7 +93,7 @@ fun DetallePlatoPantalla(
             Card(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 10.dp)
-                    .fillMaxWidth(),
+                    .width(300.dp),
                 shape = MaterialTheme.shapes.large,
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
@@ -114,25 +108,10 @@ fun DetallePlatoPantalla(
                             .aspectRatio(16f / 9f),
                         contentScale = androidx.compose.ui.layout.ContentScale.Crop
                     )
-
-                    // 🔥 Degradado overlay corregido
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .background(
-                                brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                                    colors = listOf(
-                                        Color.Transparent,
-                                        Color.Black.copy(alpha = 0.35f)
-                                    )
-                                )
-                            )
-                    )
                 }
             }
 
 
-            // CONTENT SHEET
             Card(
                 modifier = Modifier
                     .fillMaxSize()
@@ -164,9 +143,6 @@ fun DetallePlatoPantalla(
                         modifier = Modifier.padding(vertical = 6.dp)
                     )
 
-                    // -----------------------------
-                    // INGREDIENTES
-                    // -----------------------------
                     Text(
                         text = "Ingredientes",
                         style = MaterialTheme.typography.titleMedium,
@@ -202,9 +178,6 @@ fun DetallePlatoPantalla(
                         }
                     }
 
-                    // -----------------------------
-                    // EXTRAS
-                    // -----------------------------
                     Text(
                         text = "Extras",
                         style = MaterialTheme.typography.titleMedium,
@@ -227,11 +200,12 @@ fun DetallePlatoPantalla(
                                         platoPedir.value.extras.toMutableList().apply {
                                             if (contains(extra)) {
                                                 remove(extra)
-                                                platoPedir.value.precio -= extra.precio
+                                                val nuevoPrecio = BigDecimal(platoPedir.value.precio) - BigDecimal(extra.precio)
+                                                platoPedir.value.precio = nuevoPrecio.setScale(2, RoundingMode.HALF_UP).toDouble()
                                             } else {
                                                 add(extra)
-                                                platoPedir.value.precio += extra.precio
-                                            }
+                                                val nuevoPrecio = BigDecimal(platoPedir.value.precio) + BigDecimal(extra.precio)
+                                                platoPedir.value.precio = nuevoPrecio.setScale(2, RoundingMode.HALF_UP).toDouble()                                            }
                                         }
                                     platoPedir.value = platoPedir.value.copy(
                                         extras = nuevosExtras
@@ -241,7 +215,13 @@ fun DetallePlatoPantalla(
                         }
                     }
 
-                    // BUTTON - Add to order
+                    Text(
+                        text = "Total: ${platoPedir.value.precio}€",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    )
+
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -266,7 +246,7 @@ fun DetallePlatoPantalla(
 
 @Composable
 fun IngredienteChip(
-    ingrediente: Producto,
+    ingrediente: Ingrediente,
     estaIncluido: Boolean,
     colorAnadir: Color,
     colorEliminar: Color,
@@ -313,7 +293,7 @@ fun IngredienteChip(
 
 @Composable
 fun ExtraChip(
-    extra: Producto,
+    extra: Ingrediente,
     estaIncluido: Boolean,
     colorAnadir: Color,
     colorEliminar: Color,

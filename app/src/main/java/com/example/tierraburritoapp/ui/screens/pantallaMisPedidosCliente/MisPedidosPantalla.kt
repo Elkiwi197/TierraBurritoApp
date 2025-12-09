@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -63,7 +64,7 @@ fun MisPedidosPantalla(
         }
     }
 
-    if (uiState.pedidos.isEmpty()){
+    if (uiState.pedidos.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -81,7 +82,7 @@ fun MisPedidosPantalla(
             )
 
             Text(
-                text = Constantes.NO_HAY_PEDIDOS,
+                text = Constantes.NO_HAS_HECHO_PEDIDOS,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 30.sp,
@@ -97,32 +98,36 @@ fun MisPedidosPantalla(
             )
         }
     } else {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
-    ) {
-        if (uiState.isLoading) {
-            androidx.compose.material3.CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(uiState.pedidos) { pedido ->
-                    PedidoCard(
-                        viewModel = viewModel,
-                        variablesViewModel = variablesViewModel,
-                        pedido = pedido
-                    )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
+        ) {
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .padding(16.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(uiState.pedidos) { pedido ->
+                        PedidoCard(
+                            viewModel = viewModel,
+                            variablesViewModel = variablesViewModel,
+                            pedido = pedido
+                        )
+                    }
                 }
             }
         }
     }
-}}
+}
 
 @Composable
 fun PedidoCard(
@@ -158,13 +163,15 @@ fun PedidoCard(
                         EstadoPedido.EN_REPARTO -> MaterialTheme.colorScheme.secondary
                         EstadoPedido.EN_PREPARACION -> MaterialTheme.colorScheme.tertiary
                         EstadoPedido.CLIENTE_ELIGIENDO -> MaterialTheme.colorScheme.primary
-                        EstadoPedido.ACEPTADO -> MaterialTheme.colorScheme.primary
+                        EstadoPedido.ENTREGADO -> MaterialTheme.colorScheme.primary
                         else -> MaterialTheme.colorScheme.onSurfaceVariant
                     },
-                    modifier = Modifier.background(
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                        shape = MaterialTheme.shapes.small
-                    ).padding(horizontal = 8.dp, vertical = 4.dp)
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
 
@@ -176,7 +183,6 @@ fun PedidoCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // Repartidor si existe
             pedido.correoRepartidor?.let {
                 Text(
                     text = "Repartidor: $it",
@@ -184,10 +190,12 @@ fun PedidoCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            Spacer(
+                modifier = Modifier.height(
+                    12.dp
+                )
+            )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // PLATOS
             pedido.platos.forEach { plato ->
                 Card(
                     modifier = Modifier
@@ -224,7 +232,6 @@ fun PedidoCard(
                             )
                         }
 
-                        // Precio plato
                         Text(
                             text = "Precio: ${plato.precio}€",
                             style = MaterialTheme.typography.bodyMedium,
@@ -236,31 +243,30 @@ fun PedidoCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // TOTAL Y HORA ESTIMADA
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "Total: ${pedido.precio}€",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    text = "Hora de llegada: ${pedido.horaLlegada?.hour}:${pedido.horaLlegada?.minute}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                pedido.horaLlegada?.let {
+                    Text(
+                        text = "${Constantes.HORA_ESTIMADA_LLEGADA_} ${pedido.horaLlegada!!.hour}:" +
+                                if (pedido.horaLlegada!!.minute != 0) "${pedido.horaLlegada!!.minute}" else "00",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // BOTÓN CANCELAR
             if (pedido.estado in listOf(
                     EstadoPedido.CLIENTE_ELIGIENDO,
                     EstadoPedido.EN_PREPARACION,
                     EstadoPedido.EN_REPARTO,
-                    EstadoPedido.ACEPTADO
                 )
             ) {
                 Button(

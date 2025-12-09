@@ -20,12 +20,12 @@ class PedidosRepository @Inject constructor(
         return pedidosDataSource.getPedidosEnPreparacion()
     }
 
-    suspend fun aceptarPedido(idPedido: Int, correoRepartidor: String): NetworkResult<String> {
-        return pedidosDataSource.aceptarPedido(idPedido, correoRepartidor)
+    suspend fun repartirPedido(idPedido: Int, correoRepartidor: String): NetworkResult<String> {
+        return pedidosDataSource.repartirPedido(idPedido, correoRepartidor)
     }
 
-    suspend fun getPedidoAceptado(correoRepartidor: String): NetworkResult<Pedido> {
-        return pedidosDataSource.getPedidoAceptado(correoRepartidor)
+    suspend fun getPedidoEnRepartoByRepartidor(correoRepartidor: String): NetworkResult<Pedido> {
+        return pedidosDataSource.getPedidoEnRepartoByRepartidor(correoRepartidor)
     }
 
     suspend fun cancelarPedido(idPedido: Int, correoRepartidor: String): NetworkResult<String> {
